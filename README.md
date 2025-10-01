@@ -1,74 +1,77 @@
-# 🌳 Living Tree Workspace Transfer
+# Workspace Transfer Repository
 
-**Private workspace for Living Tree development and persistence**
+**Purpose**: Persistent storage for Living Tree + BASE32 Harmonic Routing System
 
-## What This Is
+This repository serves as fast, reliable persistent storage for Claude AI sessions,
+replacing slow file-based methods with git operations (2-3 second transfers).
 
-This repository serves as the **fastest persistence layer** for the Living Tree workspace across Claude sessions.
+## 🌳 Living Tree Architecture
 
-**Transfer Speed**: 2-3 seconds ⚡ (200x faster than stdout)
+The Living Tree is an anti-entropic intelligence infrastructure based on:
+- BASE32 harmonic routing with octal frames
+- Cubic space mapping for distributed memory
+- Protocol-7 integration with TRUE/FALSE constants
+- Self-referential encoding (system encodes itself)
 
----
-
-## Structure
+## 📦 Repository Structure
 
 ```
 workspace-transfer/
-├── README.md              ← You are here
-├── core/                  ← Core implementations
-├── implementations/       ← Working demos
-├── documentation/         ← Guides and specs
-└── archives/             ← Checkpoints
+├── core/                           # Core implementations
+│   ├── base32_harmonic_routing.pl # BASE32 encoder/decoder
+│   ├── living_tree_base32_viz.html# Interactive visualization
+│   └── [documentation files]
+├── implementations/                # Working demos
+├── documentation/                  # Technical guides
+└── archives/                       # Checkpoints and backups
 ```
 
----
+## 🚀 Quick Start
 
-## How It Works
-
-### Session Start (2 seconds)
+### Clone Repository
 ```bash
-cd /home/claude/living-tree && git pull
+git clone https://github.com/nailara-technologies/workspace-transfer.git
+cd workspace-transfer
 ```
 
-### Session End (3 seconds)
+### Work on Files
+All files tracked with git for instant sync across sessions.
+
+### Commit Changes
 ```bash
-cd /home/claude/living-tree
 git add -A
-git commit -m "Session update"
-git push
+git commit -m "Description of changes"
+git push origin base
 ```
 
----
+## 🔑 Authentication
 
-## Benefits
+Uses GitHub Personal Access Token (PAT) with HTTPS:
+- Token: `contents [rw]` permissions
+- User: `workspace-transfer`
+- Repository: `nailara-technologies/workspace-transfer`
 
-- **Speed**: 200x faster than stdout throttling
-- **Automation**: git pull/push (no manual copying)
-- **History**: Full version control included
-- **Backup**: Distributed (local + GitHub)
-- **Professional**: Industry-standard workflow
+## ⚡ Performance
 
----
+- Clone/Pull: 2-3 seconds
+- Commit/Push: 2-3 seconds
+- No throttling, full version control
 
-## Setup Complete ✅
+Replaces 10+ minute file extraction with instant git operations.
 
-**Repository**: `workspace-transfer` (private)  
-**Authentication**: GitHub PAT (contents: read/write)  
-**Local Path**: `/home/claude/living-tree`  
-**Status**: Ready for development
+## 📚 Documentation
 
----
-
-## Next Steps
-
-1. ✅ Repository created
-2. ✅ Authentication configured
-3. ✅ Workspace cloned
-4. 🔄 Populate with Living Tree files
-5. ⚡ Use git pull/push for instant transfers
+See `documentation/` directory for:
+- BASE32 Harmonic Integration Guide
+- Living Tree Architecture Summary
+- Protocol-7 Integration Details
+- Session Development History
 
 ---
 
-**🌳 The Living Tree grows at the speed of git. 🌳**
+**Created**: October 1, 2025  
+**Repository**: https://github.com/nailara-technologies/workspace-transfer  
+**Format**: Git-based workspace persistence  
+**Philosophy**: Self-organizing, anti-entropic, beautifully self-referential  
 
-*Session initialized: October 1, 2025*
+🌳 The Living Tree grows through version control.
