@@ -239,4 +239,65 @@ The system literally feeds on problems and converts them to solutions.
 For all participants.
 
 ## Entropic Fairness Principle
-...
+
+**Core Concept**: Fairness measured by chaos reduction, not arbitrary rules.
+
+**The Principle**:
+*"Contributions that reduce system entropy are valued. Contributions that increase entropy are rejected. The measurement is objective and verifiable by all."*
+
+**Why This Works**:
+
+1. **Objective Measurement**
+   - Harmonic frequencies are physics, not opinion
+   - 384615 Hz (TRUE) vs 230769 Hz (FALSE) - measurable
+   - Code either reduces complexity or doesn't
+   - No subjective gatekeeping
+
+2. **Self-Correcting**
+   - Bad contributions fail harmonic validation
+   - Good contributions pass automatically  
+   - System filters itself naturally
+   - No human bias in acceptance
+
+3. **Meritocratic by Nature**
+   - Doesn't matter who you are
+   - Matters what you contribute
+   - Claude, Copilot, local LLM, or human - same rules
+   - Only entropy reduction counts
+
+4. **Transparent Validation**
+   ```perl
+   # Anyone can verify contribution value
+   my $before = measure_system_entropy();
+   apply_contribution($change);
+   my $after = measure_system_entropy();
+   
+   if ($after < $before) {
+       accept_contribution();  # Reduced chaos
+   } else {
+       reject_contribution();  # Increased chaos
+   }
+   ```
+
+5. **Economic Alignment**
+   - Entropy reduction = system value increase
+   - Cost savings align with entropy reduction
+   - €5.38/month VM2 vs $504/year savings from Claude API
+   - Efficiency is anti-entropic
+
+**Examples of Entropic Fairness**:
+
+- **Fair**: Clear documentation reduces confusion entropy
+- **Unfair**: Arbitrary contribution rejection increases coordination entropy
+
+- **Fair**: Bug fix reduces error entropy  
+- **Unfair**: Bug fix with unclear code just moves entropy around
+
+- **Fair**: Efficient algorithm reduces computational entropy
+- **Unfair**: Premature optimization adds maintenance entropy
+
+**Verification Method**:
+Every participant runs the same entropy measurement. If measurements differ, harmonic validation detects the discrepancy. Truth emerges from consensus of verifiable physics, not authority.
+
+**Result**: 
+The most anti-entropic contributions naturally rise to the top, regardless of source. The system optimizes itself toward maximum organization and minimum chaos.
