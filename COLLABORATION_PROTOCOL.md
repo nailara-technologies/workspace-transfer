@@ -1,7 +1,23 @@
 # Collaboration Protocol
 
 ## Identity-Agnostic Cooperation Principle
-...
+
+**Core Truth**: The work matters, not who does it. Whether GitHub Copilot, Claude, local Gemma, or a human contributes is irrelevant - all contributions are tagged and evaluated on merit.
+
+**Implementation**:
+- All commits tagged with originator (COPILOT, CLAUDE, LOCAL-MODEL, USER)
+- Questions tagged QUESTION, answers tagged ANSWER
+- Resolved issues tagged RESOLVED, revisions tagged REVISING
+- ZENKI tag for local AI instance contributions
+- ELF tag for collective self-improvement discoveries
+
+**Verification**: 
+- Code must work regardless of source
+- Documentation clarity matters, not authorship
+- Anti-entropic contributions (reducing chaos) are valued from any source
+
+**Fairness Mechanism**:
+All participants follow the same Protocol-7 harmonic validation - ensuring TRUE (384615) vs FALSE (230769) distinction regardless of originator.
 
 ## Tag System
 - COPILOT
