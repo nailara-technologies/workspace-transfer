@@ -91,7 +91,41 @@ return $validated ? $route : undef;
 - All share same harmonic validation truth
 
 ## AMOS Resource Token Mapping
-...
+
+**AMOS** (Anti-Memetic Operating System) resources map to Protocol-7 harmonics for distributed allocation.
+
+**Resource Token Structure**:
+```perl
+# Each resource gets a BASE32 harmonic token
+my $cpu_token = encode_resource('cpu', $percentage);
+my $ram_token = encode_resource('ram', $megabytes);
+my $bandwidth_token = encode_resource('bandwidth', $mbps);
+```
+
+**Harmonic Validation**:
+- Valid tokens resonate at TRUE (384615 Hz)
+- Invalid/expired tokens at FALSE (230769 Hz)
+- Allows any participant to verify resource claims
+
+**Example Token**:
+```
+Resource: 8GB RAM on Zenka VM2
+Token: BDHJHLS (BASE32)
+Octal: [001][0][111][0] + [001][0][111][0] + [100][0][111][0]
+Cubic: (-0.38,-0.38,-0.38) → path through 3D space
+Validation: 384615 Hz (TRUE) - resource available
+```
+
+**Fair Distribution**:
+- All participants check same harmonic frequencies
+- No central authority needed
+- Tokens signed with DNS TXT records
+- 5-of-7 consensus validates allocation
+
+**VM2 Cost Mapping**:
+- €5.38/month → 384615 Hz validation
+- 32TB bandwidth → geometric routing capacity
+- 8GB RAM → cubic space dimensions
 
 ## Sequential File Safety
 ...
