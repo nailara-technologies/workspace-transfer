@@ -236,7 +236,136 @@ die "Increased chaos!" if $reduction < 0;
 The system literally feeds on problems and converts them to solutions.
 
 ## Getting Started Guides
-For all participants.
+
+### For Claude (or any API-based AI)
+
+```bash
+# 1. Clone repository
+git clone https://github.com/nailara-technologies/workspace-transfer.git
+cd workspace-transfer
+
+# 2. Validate system
+perl bootstrap.pl
+
+# 3. Make contributions
+# ... edit files ...
+
+# 4. Commit with tag
+git commit -am "[CLAUDE] Your contribution description"
+git push origin base
+```
+
+**Key Points**:
+- Always tag commits with [CLAUDE]
+- Validate harmonics before pushing
+- Sequential commits to avoid conflicts
+
+### For GitHub Copilot
+
+```bash
+# 1. Work in local editor (VS Code, etc.)
+# 2. Copilot suggests code inline
+# 3. Developer reviews and commits
+
+git commit -am "[COPILOT] Suggestion: description"
+git push origin base
+```
+
+**Key Points**:
+- Human validates Copilot suggestions
+- Tag shows AI involvement
+- Same harmonic validation applies
+
+### For Local LLM (Zenki/Gemma)
+
+```bash
+# 1. On VM2 or local machine
+cd /opt/workspace-transfer
+git pull origin base
+
+# 2. Zenki processes request
+perl zenki_processor.pl
+
+# 3. Validate and commit
+perl -I. -e 'use base32_harmonic_routing; validate_harmonics();'
+git commit -am "[ZENKI] Enhancement description"
+git push origin base
+```
+
+**Key Points**:
+- Runs on dedicated hardware
+- Email-triggered processing
+- Offline-capable operation
+
+### For Human Contributors
+
+```bash
+# 1. Clone and explore
+git clone https://github.com/nailara-technologies/workspace-transfer.git
+cd workspace-transfer
+cat INSTANT_BOOT.md
+
+# 2. Test existing features
+perl core/base32_harmonic_routing.pl
+open core/living_tree_base32_viz.html
+
+# 3. Make improvements
+# ... edit files ...
+
+# 4. Commit clearly
+git commit -am "[USER] Description of changes"
+git push origin base
+```
+
+**Key Points**:
+- Read INSTANT_BOOT.md first
+- Test before committing
+- Clear commit messages
+
+### For Network Elves (Distributed Validators)
+
+```bash
+# 1. Monitor repository
+git fetch origin base
+git log --since="1 hour ago"
+
+# 2. Validate commits
+for commit in $(git log --since="1 hour ago" --format="%H"); do
+    git checkout $commit
+    perl bootstrap.pl || echo "Validation failed: $commit"
+done
+
+# 3. Tag issues
+git tag -a QUESTION-<hash> -m "Need clarification"
+git push origin --tags
+```
+
+**Key Points**:
+- Continuous validation
+- No write access needed for validation
+- Tag-based communication
+
+### For Protocol-7 Nodes
+
+```bash
+# 1. DNS discovery
+dig TXT _protocol7._tcp.nailara.net
+
+# 2. Connect to available nodes
+perl core/protocol7_network.pl --discover
+
+# 3. Sync and validate
+git fetch origin base
+perl core/validate_all.pl
+
+# 4. Contribute if needed
+# ... only if validation detects issues ...
+```
+
+**Key Points**:
+- DNS-based discovery
+- Passive monitoring by default
+- Active contribution when needed
 
 ## Entropic Fairness Principle
 
