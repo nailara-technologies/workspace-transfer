@@ -1,5 +1,7 @@
 # Workspace Transfer Repository
 
+> **🚀 NEW SESSION? Start here:** Read `INSTANT_BOOT.md` then run `./bootstrap.pl` (30 seconds total)
+
 **Purpose**: Persistent storage for Living Tree + BASE32 Harmonic Routing System
 
 This repository serves as fast, reliable persistent storage for Claude AI sessions,
@@ -28,20 +30,44 @@ workspace-transfer/
 
 ## 🚀 Quick Start
 
-### Clone Repository
+### For New Claude Sessions (30 seconds)
+```bash
+# 1. Clone repository
+git clone https://TOKEN@github.com/nailara-technologies/workspace-transfer.git
+cd workspace-transfer
+
+# 2. Read instant boot docs
+cat INSTANT_BOOT.md        # 30-second orientation
+
+# 3. Validate everything works
+./bootstrap.pl             # One-command validation
+
+# 4. Check current status
+cat QUICK_STATUS.md        # What's happening now
+
+# 5. Start coding!
+```
+
+### For Development Work
+```bash
+# Make changes to files
+vim core/base32_harmonic_routing.pl
+
+# Test your changes
+perl core/base32_harmonic_routing.pl
+
+# Commit frequently (avoid context limits)
+./commit_checkpoint.pl "What you changed"
+
+# All changes auto-pushed to GitHub
+```
+
+### First Time Setup (One Time Only)
 ```bash
 git clone https://github.com/nailara-technologies/workspace-transfer.git
 cd workspace-transfer
-```
-
-### Work on Files
-All files tracked with git for instant sync across sessions.
-
-### Commit Changes
-```bash
-git add -A
-git commit -m "Description of changes"
-git push origin base
+./bootstrap.pl
+# ✓ Ready in 30 seconds!
 ```
 
 ## 🔑 Authentication
