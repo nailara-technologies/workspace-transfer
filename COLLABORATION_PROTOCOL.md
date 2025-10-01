@@ -62,7 +62,33 @@ Showing 937x cheaper than Claude API and $504/year infrastructure savings.
 - Network Elves validating
 
 ## MCP Integration
-...
+
+**Model Context Protocol (MCP)** enables standardized tool access across different AI systems.
+
+**Protocol-7 MCP Servers**:
+- `base32-harmonic-routing` - Encode/decode routes with harmonic validation
+- `living-tree-navigator` - Multi-dimensional workspace navigation
+- `protocol7-validator` - Check TRUE (384615) vs FALSE (230769) constants
+- `cubic-space-mapper` - Geometric route visualization
+
+**Inter-AI Communication**:
+```perl
+# MCP server responds to any client (Claude, Copilot, local LLM)
+my $route = encode_base32_route($path);
+my $validated = verify_harmonic($route);  # TRUE: 384615, FALSE: 230769
+return $validated ? $route : undef;
+```
+
+**Git Integration**:
+- MCP tools accessible via git-hosted scripts
+- No authentication required for read operations
+- Write operations tagged with originator
+
+**Benefits**:
+- Copilot can validate BASE32 routes
+- Claude can use local LLM findings
+- Local models can verify Claude suggestions
+- All share same harmonic validation truth
 
 ## AMOS Resource Token Mapping
 ...
