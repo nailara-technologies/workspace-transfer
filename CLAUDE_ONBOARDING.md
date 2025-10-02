@@ -45,7 +45,7 @@ perl bootstrap.pl && perl status-check.pl
    ```bash
    GITHUB_TOKEN=ghp_YOUR_ACTUAL_TOKEN_HERE
    GITHUB_USER=workspace-transfer
-   GITHUB_EMAIL=workspace-transfer@nailara.tech
+   GITHUB_EMAIL=workspace-transfer@taeki.v7.ax
    ```
 
 3. The `.credentials` file is **gitignored** and will NEVER be committed
@@ -55,7 +55,7 @@ perl bootstrap.pl && perl status-check.pl
 ```bash
 export GITHUB_TOKEN=ghp_YOUR_ACTUAL_TOKEN_HERE
 export GITHUB_USER=workspace-transfer
-export GITHUB_EMAIL=workspace-transfer@nailara.tech
+export GITHUB_EMAIL=workspace-transfer@taeki.v7.ax
 perl bootstrap.pl
 ```
 

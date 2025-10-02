@@ -12,7 +12,7 @@
 ```bash
 cd /home/claude
 git config --global user.name "workspace-transfer"
-git config --global user.email "workspace-transfer@nailara.tech"
+git config --global user.email "workspace-transfer@taeki.v7.ax"
 git clone https://YOUR_TOKEN_HERE@github.com/nailara-technologies/workspace-transfer.git living-tree
 cd living-tree
 ```

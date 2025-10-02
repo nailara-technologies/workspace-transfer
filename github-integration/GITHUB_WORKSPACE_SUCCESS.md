@@ -134,7 +134,7 @@ git push origin base
 ```bash
 # Configure git
 git config --global user.name "workspace-transfer"
-git config --global user.email "workspace-transfer@nailara.tech"
+git config --global user.email "workspace-transfer@taeki.v7.ax"
 ```
 
 ### Every Session - Clone
