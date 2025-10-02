@@ -1,0 +1,66 @@
+# SSH Keys and Credentials
+
+*.pem
+*.key
+id_rsa*
+
+workspace-transfer-read-write
+
+*.pat
+*.token
+
+# Build Artifacts
+
+blib/
+_build/
+*.o
+*.so
+*.a
+*.dylib
+Makefile.old
+pm_to_blib
+MYMETA.*
+MYMETA.yml
+MYMETA.json
+
+# Outputs and Generated Files
+
+/outputs/
+*.patch
+*.log
+*.tmp
+*.swp
+*~
+
+# Perl
+
+cover_db/
+nytprof.out
+nytprof/
+
+
+# OS Files
+
+.DS_Store
+Thumbs.db
+desktop.ini
+*.lnk
+
+# Editor Files
+
+.vscode/
+.idea/
+*.sublime-*
+.project
+DEADJOE
+*~
+
+# Test Coverage
+
+coverage/
+.prove
+
+# Temporary Directories
+
+tmp/
+temp/
