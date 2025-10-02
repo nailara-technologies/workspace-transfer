@@ -8,6 +8,9 @@
 .github-token
 credentials.conf
 
+# Session markers (local only)
+.initialized
+
 # Build artifacts
 *.o
 *.so
