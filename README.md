@@ -177,7 +177,9 @@ Git's atomic operations prevent corruption:
 
 ## License
 
-[Choose: MIT / Apache 2.0 / Custom]
+Public Domain - see [LICENSE](LICENSE) file
+
+All workspace-transfer work is released to public knowledge.
 
 ---
 
