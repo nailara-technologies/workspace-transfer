@@ -1,143 +1,101 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
+# Enhanced bootstrap.pl - Auto-configures workspace in < 5 seconds
+# Run this FIRST in every new session
+
+use v5.24;
 use strict;
 use warnings;
-use v5.30;
-use File::Spec;
 
-## LIVING TREE BOOTSTRAP VALIDATOR
-## One-command workspace validation and status check
-
-say "=" x 70;
-say "🌳 Living Tree Bootstrap Validator";
-say "=" x 70;
+say "🚀 WORKSPACE BOOTSTRAP - Starting...";
 say "";
 
-my $all_pass = 1;
-my @warnings;
-my @errors;
+# Helper: Load credentials from file or environment
+sub load_credentials {
+    my %creds;
+    
+    # Try .credentials file first
+    if (-f '.credentials') {
+        open my $fh, '<', '.credentials' or die "Cannot read .credentials: $!";
+        while (<$fh>) {
+            next if /^\s*#/ || /^\s*$/;
+            if (/^(\w+)=(.+)$/) {
+                $creds{$1} = $2;
+            }
+        }
+        close $fh;
+    }
+    
+    # Environment variables override file
+    $creds{GITHUB_TOKEN} = $ENV{GITHUB_TOKEN} if $ENV{GITHUB_TOKEN};
+    $creds{GITHUB_USER} = $ENV{GITHUB_USER} || 'workspace-transfer';
+    $creds{GITHUB_EMAIL} = $ENV{GITHUB_EMAIL} || 'workspace-transfer@nailara.tech';
+    
+    return %creds;
+}
 
-## Check: Git repository
-say "📁 Checking git repository...";
-if (-d '.git') {
-    my $branch = `git branch --show-current 2>/dev/null`;
-    chomp $branch;
-    if ($branch) {
-        say "   ✓ Git repository: branch '$branch'";
+# 1. Create working directories
+say "📁 Creating work directories...";
+system('mkdir -p /home/claude/work') == 0 or warn "mkdir failed: $?";
+
+# 2. Check if we're already in the repo
+my $in_repo = -d '.git' && -f 'CLAUDE_ONBOARDING.md';
+
+unless ($in_repo) {
+    # We're not in the repo yet, need to clone
+    if (-d '/home/claude/workspace-transfer') {
+        say "✅ Repository exists at /home/claude/workspace-transfer";
+        chdir '/home/claude/workspace-transfer' or die "Cannot cd: $!";
     } else {
-        push @warnings, "Git branch detection failed";
-        say "   ⚠ Git branch detection failed";
+        say "📦 Cloning workspace-transfer repository...";
+        say "⚠️  NOTE: Token should be provided via .credentials file or GITHUB_TOKEN env var";
+        say "    See .credentials.template for format";
+        
+        # This will fail gracefully if no token is available
+        # User can manually clone or provide token
+        die "❌ Cannot clone: Not in repository and no existing clone found.\n" .
+            "   Please provide token in .credentials file or GITHUB_TOKEN environment variable.\n";
+    }
+}
+
+# 3. Load credentials for git operations
+my %creds = load_credentials();
+
+# 4. Configure git identity (prevents commit failures)
+say "🔧 Configuring git identity...";
+system(qq{git config user.name "$creds{GITHUB_USER}"});
+system(qq{git config user.email "$creds{GITHUB_EMAIL}"});
+
+# 5. Verify and fix remote URL (prevents push failures)
+if ($creds{GITHUB_TOKEN}) {
+    my $remote = `git remote get-url origin 2>/dev/null`;
+    chomp $remote;
+    
+    my $expected_token = substr($creds{GITHUB_TOKEN}, 0, 10);
+    
+    if ($remote && $remote !~ /\Q$expected_token\E/) {
+        say "🔧 Fixing remote URL for authenticated push...";
+        my $new_url = "https://$creds{GITHUB_USER}:$creds{GITHUB_TOKEN}\@github.com/nailara-technologies/workspace-transfer.git";
+        system(qq{git remote set-url origin "$new_url"});
+        say "✅ Remote URL updated with credentials";
+    } else {
+        say "✅ Remote URL already configured correctly";
     }
 } else {
-    push @errors, "Not a git repository";
-    say "   ✗ Not a git repository!";
-    $all_pass = 0;
+    say "⚠️  No GitHub token found - push operations may fail";
+    say "    Create .credentials file (see .credentials.template)";
 }
 
-## Check: Core files exist
-say "\n📦 Checking core files...";
-my @required_files = (
-    'core/base32_harmonic_routing.pl',
-    'core/living_tree_base32_viz.html',
-    'core/BASE32_HARMONIC_INTEGRATION_GUIDE.md',
-    'core/LIVING_TREE_SUMMARY.md',
-    'core/PROTOCOL7_HARMONIC_LIVING_TREE.md',
-);
+# 6. Quick verification
+my $branch = `git branch --show-current 2>/dev/null`;
+chomp $branch;
 
-my $files_ok = 1;
-for my $file (@required_files) {
-    if (-f $file) {
-        my $size = -s $file;
-        say "   ✓ $file ($size bytes)";
-    } else {
-        push @errors, "Missing file: $file";
-        say "   ✗ Missing: $file";
-        $files_ok = 0;
-        $all_pass = 0;
-    }
-}
-
-## Check: Perl syntax
-say "\n🔍 Checking Perl syntax...";
-my @perl_files = glob('core/*.pl implementations/*.pl *.pl');
-my $syntax_ok = 1;
-for my $pl (@perl_files) {
-    next if $pl =~ /bootstrap\.pl$/; # Don't check ourselves while running
-    my $result = `perl -c $pl 2>&1`;
-    if ($result =~ /syntax OK/) {
-        say "   ✓ $pl";
-    } else {
-        push @errors, "Syntax error in $pl";
-        say "   ✗ $pl: $result";
-        $syntax_ok = 0;
-        $all_pass = 0;
-    }
-}
-
-## Test: Run BASE32 implementation
-say "\n🧪 Testing BASE32 implementation...";
-my $test_output = `perl core/base32_harmonic_routing.pl 2>&1`;
-if ($? == 0 && $test_output =~ /Octal Frame Tests|Demo Output/) {
-    say "   ✓ BASE32 implementation runs successfully";
-} else {
-    push @warnings, "BASE32 test produced unexpected output";
-    say "   ⚠ BASE32 test output unusual (check manually)";
-}
-
-## Check: Dependencies
-say "\n📚 Checking system dependencies...";
-my @deps = (
-    ['perl', 'perl --version'],
-    ['git', 'git --version'],
-    ['base32', 'base32 --version'],
-);
-
-for my $dep (@deps) {
-    my ($name, $cmd) = @$dep;
-    my $check = `which $name 2>/dev/null`;
-    if ($check) {
-        chomp $check;
-        say "   ✓ $name: $check";
-    } else {
-        push @warnings, "Optional dependency missing: $name";
-        say "   ⚠ $name not found (may be needed for some operations)";
-    }
-}
-
-## Summary
-say "\n" . "=" x 70;
-say "📊 VALIDATION SUMMARY";
-say "=" x 70;
-
-if ($all_pass && @warnings == 0) {
-    say "\n✅ ALL CHECKS PASSED - System fully operational!";
-    say "\n🚀 Ready to:";
-    say "   • Run: perl core/base32_harmonic_routing.pl";
-    say "   • View: core/living_tree_base32_viz.html";
-    say "   • Code: Start developing new features";
-    say "   • Commit: ./commit_checkpoint.pl 'your changes'";
-} elsif ($all_pass && @warnings > 0) {
-    say "\n⚠️  PASSED WITH WARNINGS";
-    say "\nWarnings:";
-    say "   • $_" for @warnings;
-    say "\nSystem is functional but check warnings above.";
-} else {
-    say "\n❌ VALIDATION FAILED";
-    if (@errors) {
-        say "\nErrors:";
-        say "   • $_" for @errors;
-    }
-    if (@warnings) {
-        say "\nWarnings:";
-        say "   • $_" for @warnings;
-    }
-    say "\nFix errors above before proceeding.";
-}
-
-say "\n📖 Documentation:";
-say "   • Quick start: INSTANT_BOOT.md";
-say "   • Current status: QUICK_STATUS.md";
-say "   • Work plan: WORK_PLAN.md";
-
-say "\n" . "=" x 70;
-
-exit($all_pass ? 0 : 1);
+say "";
+say "=" x 60;
+say "✅ BOOTSTRAP COMPLETE";
+say "=" x 60;
+say "📍 Branch: $branch";
+say "📂 Location: " . `pwd`;
+say "🔑 Git: $creds{GITHUB_USER} <$creds{GITHUB_EMAIL}>";
+say "";
+say "⏭️  NEXT STEP: perl status-check.pl";
+say "=" x 60;
