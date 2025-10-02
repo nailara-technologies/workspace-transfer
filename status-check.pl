@@ -92,7 +92,7 @@ my $git_user = `git config user.name`;
 my $git_email = `git config user.email`;
 chomp($git_user, $git_email);
 
-if ($git_user eq 'workspace-transfer' && $git_email eq 'workspace-transfer@nailara.tech') {
+if ($git_user eq 'workspace-transfer' && $git_email eq 'workspace-transfer@taeki.v7.ax') {
     say "   ✅ CONFIGURED: $git_user <$git_email>";
 } else {
     say "   ⚠️  MISCONFIGURED: $git_user <$git_email>";

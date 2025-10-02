@@ -28,7 +28,7 @@ sub load_credentials {
     # Environment variables override file
     $creds{GITHUB_TOKEN} = $ENV{GITHUB_TOKEN} if $ENV{GITHUB_TOKEN};
     $creds{GITHUB_USER} = $ENV{GITHUB_USER} || 'workspace-transfer';
-    $creds{GITHUB_EMAIL} = $ENV{GITHUB_EMAIL} || 'workspace-transfer@nailara.tech';
+    $creds{GITHUB_EMAIL} = $ENV{GITHUB_EMAIL} || 'workspace-transfer@taeki.v7.ax';
     
     return %creds;
 }
