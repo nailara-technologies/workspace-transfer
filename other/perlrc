@@ -1,0 +1,5 @@
+# Persistent CPAN modules
+export PERL5LIB="/mnt/user-data/perl5/lib/perl5:$PERL5LIB"
+export PERL_LOCAL_LIB_ROOT="/mnt/user-data/perl5"
+export PERL_MB_OPT="--install_base /mnt/user-data/perl5"
+export PERL_MM_OPT="INSTALL_BASE=/mnt/user-data/perl5"
