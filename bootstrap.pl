@@ -89,6 +89,13 @@ if ($creds{GITHUB_TOKEN}) {
 my $branch = `git branch --show-current 2>/dev/null`;
 chomp $branch;
 
+# 7. Create initialization marker
+open my $marker, '>', '.initialized' or warn "Cannot create marker: $!";
+print $marker "Initialized: " . scalar(localtime) . "\n";
+print $marker "Branch: $branch\n";
+print $marker "Email: $creds{GITHUB_EMAIL}\n";
+close $marker;
+
 say "";
 say "=" x 60;
 say "✅ BOOTSTRAP COMPLETE";
@@ -96,6 +103,7 @@ say "=" x 60;
 say "📍 Branch: $branch";
 say "📂 Location: " . `pwd`;
 say "🔑 Git: $creds{GITHUB_USER} <$creds{GITHUB_EMAIL}>";
+say "🎫 Initialization marker created";
 say "";
 say "⏭️  NEXT STEP: perl status-check.pl";
 say "=" x 60;
