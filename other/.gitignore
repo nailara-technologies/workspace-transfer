@@ -1,0 +1,29 @@
+# Existing content
+*~
+DEADJOE
+.DS_Store
+
+# SSH keys and credentials
+*.key
+*.pem
+id_rsa*
+id_ed25519*
+*.pass
+credentials.*
+
+# Local overrides
+local-config.*
+*.local
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# Large binaries
+*.iso
+*.img
+*.qcow2
+
+# Recovered content (commit selectively)
+recovered/by-date/
