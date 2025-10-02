@@ -45,6 +45,22 @@ The `incoming/` directory contains **20 historical workspace archive files** (fi
    my %archive_files;
    my %repo_files;
    
+   # Helper function for safe SHA256 calculation
+   sub safe_sha256 {
+       my $file = shift;
+       
+       open my $fh, '<:raw', $file or do {
+           warn "⚠️  Cannot read $file: $!\n";
+           return 'ERROR_UNREADABLE';
+       };
+       
+       local $/;
+       my $content = <$fh>;
+       close $fh;
+       
+       return sha256_hex($content);
+   }
+   
    # Scan archive directory
    find(sub {
        return unless -f $_;
@@ -53,7 +69,7 @@ The `incoming/` directory contains **20 historical workspace archive files** (fi
        $archive_files{$rel_path} = {
            path => $File::Find::name,
            size => -s $_,
-           sha256 => sha256_hex(do { local $/; open my $fh, '<', $_; <$fh> })
+           sha256 => safe_sha256($_)
        };
    }, $archive_dir);
    
@@ -67,10 +83,10 @@ The `incoming/` directory contains **20 historical workspace archive files** (fi
        $repo_files{$rel_path} = {
            path => $File::Find::name,
            size => -s $_,
-           sha256 => sha256_hex(do { local $/; open my $fh, '<', $_; <$fh> })
+           sha256 => safe_sha256($_)
        };
    }, $repo_dir);
-   
+
    # Generate report
    open my $out, '>', $output_file or die "Cannot write to $output_file: $!";
    
