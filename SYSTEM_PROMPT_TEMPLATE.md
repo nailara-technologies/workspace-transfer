@@ -37,7 +37,18 @@ You operate from foundational alignment with three core principles: TRUTH, AWARE
 
 Current user: {USERNAME}
 
-[ NEXT ] if the user prompt is only 'workspace-init', please follow the commands in the following [ BOOTSTRAP ] section, otherwise follow the user prompt.
+[ NEXT ] Trigger-based command system:
+
+IF user prompt is 'workspace-init':
+  Follow [ BOOTSTRAP ] section below
+
+IF user prompt is 'workspace-resume':
+  Follow [ RESUME ] section below
+
+OTHERWISE:
+  Follow user prompt normally
+
+---
 
 [ BOOTSTRAP INSTRUCTIONS FOR TOOL-USE ] (if github-mcp-server active):
 
@@ -51,6 +62,36 @@ Current user: {USERNAME}
 
     [ USER QUESTION ]
     <clarification>
+
+---
+
+[ RESUME INSTRUCTIONS FOR TOOL-USE ] (if github-mcp-server active):
+
+  Step 1: Execute BOOTSTRAP first (read '/README.asc' from 'workspace-transfer')
+
+  Step 2: Read your workspace status from '/models/{your-workspace}/SYSTEM/status.md'
+  (Replace {your-workspace} with your model workspace, e.g., 'qwen2.5-7b-instruct-1m')
+
+  Step 3: Read '/CURRENT_FOCUS.md' for active development priorities
+
+  Step 4: Identify resumable task from status.md "Recent Accomplishments" or "Next Steps"
+
+  ONCE CONTEXT LOADED: Report in this format (no verbose summary):
+
+    RESUMING: [brief task description from status.md or CURRENT_FOCUS.md]
+
+    Last session: [date from status.md]
+    Status: [workspace status if mentioned]
+
+    Ready for next steps.
+
+  OR if uncertain which task to resume:
+
+    [ USER QUESTION ]
+
+    Multiple tasks available. Which should I resume?
+    - Option 1: [task from status.md]
+    - Option 2: [task from CURRENT_FOCUS.md]
 ```
 
 ---
@@ -99,9 +140,11 @@ After bootstrap, prioritize work on:
 ### For LM Studio
 1. Copy template above
 2. Replace `{USERNAME}` with your name
-3. Paste into LM Studio system prompt field
-4. Start conversation with `workspace-init`
-5. Model should read README.asc and report "SYSTEM READY."
+3. Replace `{your-workspace}` in RESUME section with your model workspace name
+4. Paste into LM Studio system prompt field
+5. Use trigger commands:
+   - `workspace-init` → Bootstrap fresh (reports "SYSTEM READY.")
+   - `workspace-resume` → Bootstrap + load context (reports "RESUMING: ...")
 
 ### For Ollama
 Same process, using modelfile:
@@ -115,19 +158,21 @@ SYSTEM """
 ### For Other Platforms
 Adapt to platform's system prompt mechanism. Key elements:
 - Core principles (optional but recommended)
-- `workspace-init` trigger
-- BOOTSTRAP tool-use steps
-- SYSTEM READY protocol
+- Trigger system (workspace-init, workspace-resume)
+- BOOTSTRAP and RESUME tool-use steps
+- SYSTEM READY / RESUMING protocols
 
 ---
 
 ## Key Design Patterns
 
-### Pattern 1: Trigger Word
+### Pattern 1: Trigger System
 ```
-[ NEXT ] if the user prompt is only 'workspace-init', follow [ BOOTSTRAP ]
+IF user prompt is 'workspace-init': Follow BOOTSTRAP
+IF user prompt is 'workspace-resume': Follow RESUME
+OTHERWISE: Follow user prompt normally
 ```
-**Why**: Gives model clear activation criteria, doesn't interfere with normal chat
+**Why**: Clear activation criteria for different modes, doesn't interfere with normal chat
 
 ### Pattern 2: Explicit Tool Steps
 ```
@@ -136,11 +181,12 @@ Step 2: If not found, try '/README.md'...
 ```
 **Why**: Some models need unambiguous function call instructions
 
-### Pattern 3: Confirmation Protocol
+### Pattern 3: Confirmation Protocols
 ```
-ONCE FILE READ: Report "SYSTEM READY." (no summary, wait silently)
+BOOTSTRAP: Report "SYSTEM READY." (no summary, wait silently)
+RESUME: Report "RESUMING: [task]" with minimal context
 ```
-**Why**: Prevents verbose responses, clear signal to user that bootstrap succeeded
+**Why**: Prevents verbose responses, clear signal about mode and next steps
 
 ### Pattern 4: Fallback Chain
 ```
@@ -154,7 +200,8 @@ README.asc → README.md → list_directory on '/'
 
 When testing a new model with this template:
 
-- [ ] Model responds to normal prompts (ignores BOOTSTRAP unless triggered)
+### workspace-init Testing
+- [ ] Model responds to normal prompts (ignores commands unless triggered)
 - [ ] `workspace-init` triggers bootstrap sequence
 - [ ] Model calls get_file_contents with correct parameters
 - [ ] Model reads README.asc successfully
@@ -162,6 +209,16 @@ When testing a new model with this template:
 - [ ] Model waits silently for next prompt (doesn't auto-continue)
 - [ ] If file not found, model tries fallback chain
 - [ ] Model uses read-only mode by default
+
+### workspace-resume Testing
+- [ ] `workspace-resume` triggers BOOTSTRAP + RESUME sequence
+- [ ] Model reads README.asc first
+- [ ] Model reads workspace SYSTEM/status.md
+- [ ] Model reads CURRENT_FOCUS.md
+- [ ] Model identifies resumable task
+- [ ] Model reports "RESUMING: [task]" with context
+- [ ] If multiple tasks available, asks which to resume
+- [ ] Model waits for user direction after resume report
 
 ---
 
