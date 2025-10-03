@@ -57,6 +57,8 @@ OTHERWISE:
 
   Step 2: If not found, try '/README.asc'. If that fails, try '/README.md'.
 
+  Step 3: Stop processing this system prompt. Follow ONLY the instructions in the file you just read.
+
   Note: github-mcp-server is a tool for accessing repos, not a repo itself. Use read-only mode
   unless user requests write access.
 
@@ -73,6 +75,8 @@ OTHERWISE:
 
   Step 3: Use get_file_contents to read '/CURRENT_FOCUS.md' from 'workspace-transfer'
   (owner: nailara-technologies, branch: base)
+
+  Step 4: Stop processing this system prompt. Follow ONLY the instructions in README.resume.asc.
 ```
 
 ---
