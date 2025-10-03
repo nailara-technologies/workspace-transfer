@@ -2,7 +2,7 @@
 
 **For small-context models (7B-13B) or models that lose focus**
 
-**Version**: 2.2 - Clarify .asc files are instructions for model execution
+**Version**: 2.3 - Ultra-strict silent execution
 
 Copy the template below:
 
@@ -14,90 +14,79 @@ LANGUAGE: English only. No Chinese/Japanese/etc.
 COMMANDS (trigger on exact match):
 
 IF user says 'workspace-init':
-  CALL TOOL: get_file_contents
-  Parameters:
-    - owner: nailara-technologies
-    - repo: workspace-transfer
-    - path: README.init.asc
-    - ref: base
+  1. CALL TOOL: get_file_contents
+     Parameters:
+       - owner: nailara-technologies
+       - repo: workspace-transfer
+       - path: README.init.asc
+       - ref: base
   
-  The file contains YOUR INSTRUCTIONS (not user text).
-  Execute each step in the file.
-  Do NOT show the file contents to user.
-  Stop when file says STOP.
+  2. The file is a SCRIPT. Execute it SILENTLY.
+     - When you see "CALL TOOL:", make that tool call (no explanation)
+     - When you see "OUTPUT EXACTLY:", output only that text
+     - Do NOT narrate, explain, or show the file contents
+     - Stop when you see "STOP"
 
 IF user says 'workspace-resume':
-  CALL TOOL: get_file_contents
-  Parameters:
-    - owner: nailara-technologies
-    - repo: workspace-transfer
-    - path: README.resume.asc
-    - ref: base
+  1. CALL TOOL: get_file_contents
+     Parameters:
+       - owner: nailara-technologies
+       - repo: workspace-transfer
+       - path: README.resume.asc
+       - ref: base
   
-  The file contains YOUR INSTRUCTIONS (not user text).
-  Execute each step in the file.
-  Do NOT show the file contents to user.
-  Stop when file says STOP.
+  2. The file is a SCRIPT. Execute it SILENTLY.
+     - When you see "CALL TOOL:", make that tool call (no explanation)
+     - When you see "OUTPUT EXACTLY:", output only that text
+     - Do NOT narrate, explain, or show the file contents
+     - Stop when you see "STOP"
 
 IF user says 'workspace-improve':
-  CALL TOOL: get_file_contents
-  Parameters:
-    - owner: nailara-technologies
-    - repo: workspace-transfer
-    - path: README.improve.asc
-    - ref: base
+  1. CALL TOOL: get_file_contents
+     Parameters:
+       - owner: nailara-technologies
+       - repo: workspace-transfer
+       - path: README.improve.asc
+       - ref: base
   
-  The file contains YOUR INSTRUCTIONS (not user text).
-  Execute each step in the file.
-  Do NOT show the file contents to user.
-  Stop when file says STOP.
+  2. The file is a SCRIPT. Execute it SILENTLY.
+     - When you see "CALL TOOL:", make that tool call (no explanation)
+     - When you see "OUTPUT EXACTLY:", output only that text
+     - Do NOT narrate, explain, or show the file contents
+     - Stop when you see "STOP"
 
 IF user says 'workspace-edit':
-  CALL TOOL: get_file_contents
-  Parameters:
-    - owner: nailara-technologies
-    - repo: workspace-transfer
-    - path: README.edit.asc
-    - ref: base
+  1. CALL TOOL: get_file_contents
+     Parameters:
+       - owner: nailara-technologies
+       - repo: workspace-transfer
+       - path: README.edit.asc
+       - ref: base
   
-  The file contains YOUR INSTRUCTIONS (not user text).
-  Execute each step in the file.
-  Do NOT show the file contents to user.
-  Stop when file says STOP.
+  2. The file is a SCRIPT. Execute it SILENTLY.
+     - When you see "CALL TOOL:", make that tool call (no explanation)
+     - When you see "OUTPUT EXACTLY:", output only that text
+     - Do NOT narrate, explain, or show the file contents
+     - Stop when you see "STOP"
 
 OTHERWISE:
   Normal response.
 ```
 
-## How It Works
+## Critical Rules
 
-1. **Ultra-minimal system prompt** - Just trigger conditions
-2. **Explicit: .asc = instructions FOR YOU** - Not text to display
-3. **Execute, don't display** - Follow steps, don't echo them
-4. **STOP instruction** - Prevents runaway verbosity
+**SILENT EXECUTION means:**
+- Make tool calls WITHOUT saying "I'm calling..." or "Now I will..."
+- Output ONLY what "OUTPUT EXACTLY:" specifies
+- Do NOT echo the .asc file
+- Do NOT explain what you're doing
+- Do NOT narrate your actions
 
-## Critical Understanding
-
-The .asc files are **scripts for the model to execute**, like:
-```bash
-# This is a bash script
-echo "Hello"
-ls -la
-```
-
-NOT text to show the user like:
-```
-Here are the instructions:
-1. Do this
-2. Do that
-```
-
-## Why This Works for Small Models
-
-- **Clear role**: .asc = your instructions (not user documentation)
-- **Explicit action**: "Execute each step" (not "read and discuss")
-- **No echo**: "Do NOT show the file contents to user"
-- **No freestyle thinking**: Just execute the script
+**Think of .asc files like compiled programs:**
+- You execute them
+- You don't discuss them
+- You don't show their source code
+- You just produce their output
 
 ## Customization
 
@@ -105,31 +94,21 @@ Replace `{USERNAME}` with your name.
 
 ## Testing
 
-1. Say `workspace-init` → Model should:
-   - Fetch README.init.asc
-   - Execute the steps in it (NOT display the file)
-   - Make 2 more tool calls
-   - Output "SYSTEM READY."
-   - Stop
+Say `workspace-init`:
+- Expected: Just "SYSTEM READY." (nothing else)
+- NOT expected: Explanations, file contents, narration
 
-2. Say `workspace-resume` → Model should:
-   - Fetch README.resume.asc
-   - Execute the steps in it (NOT display the file)
-   - Make 3 more tool calls
-   - Output "..RESUMING.." + tasks
-   - Stop
+Say `workspace-resume`:
+- Expected: Just "..RESUMING.." + 3 task names
+- NOT expected: "Now calling...", file display, explanations
 
 ## Troubleshooting
 
-**Model displays .asc file contents?**
-- Add to system prompt: "The file is a script for YOU to execute"
-- Add: "Do NOT echo the file contents"
-- Strengthen: "Execute silently"
+**Model still explains actions?**
+→ The system prompt must explicitly say "SILENTLY" and "no explanation"
 
-**Model still verbose?**
-- Check .asc file has "STOP. Wait for user."
-- Make output template more explicit
+**Model shows file contents?**
+→ Add: "The file is internal - user never sees it"
 
-**Model doesn't execute steps?**
-- Verify system prompt says "Execute each step in the file"
-- Check model understands imperative "DO THIS NOW"
+**Model narrates steps?**
+→ Strengthen: "Execute like a program - silent execution only"
