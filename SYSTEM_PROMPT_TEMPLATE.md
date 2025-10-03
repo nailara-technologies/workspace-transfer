@@ -76,11 +76,13 @@ OTHERWISE:
 
   After reading all files: Stop and wait for user.
 
-  IF you must say something, output ONLY this:
+  IF you must say something, output ONLY this format (no details, no explanations):
   ..RESUMING..
-  Available: [list 2-3 tasks from CURRENT_FOCUS.md, one line each]
+  - Task 1 name
+  - Task 2 name
+  - Task 3 name
 
-  OR if no tasks found:
+  OR if no tasks:
   ..RESUMING..
   NOTHING TO RESUME.
 ```
