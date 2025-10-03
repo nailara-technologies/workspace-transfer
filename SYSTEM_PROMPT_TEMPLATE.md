@@ -76,11 +76,17 @@ OTHERWISE:
 
   After reading all files: Stop and wait for user.
 
-  IF you must say something, output ONLY this format (no details, no explanations):
+  IF you must say something, output ONLY this format:
   ..RESUMING..
-  - Task 1 name
-  - Task 2 name
-  - Task 3 name
+  - [exact task name from CURRENT_FOCUS.md]
+  - [exact task name from CURRENT_FOCUS.md]
+  - [exact task name from CURRENT_FOCUS.md]
+
+  Example:
+  ..RESUMING..
+  - Filesystem Integration
+  - Network Distribution Protocol
+  - Learning System Implementation
 
   OR if no tasks:
   ..RESUMING..
