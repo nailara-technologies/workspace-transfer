@@ -122,13 +122,14 @@ if ($needs_action) {
     say "   1️⃣  Read the creative excellence checkpoint";
     say "       perl creative-checkpoint.pl";
     say "";
-    say "   2️⃣  Then proceed to Phase 1: BMW Resumability Analysis";
-    say "       cat bmw-analysis/BMW_RESUMABILITY_TEST_PLAN.md";
+    say "   2️⃣  Check active development priorities";
+    say "       cat CURRENT_FOCUS.md";
     say "";
-    say "   Or: Review living-tree implementations";
-    say "       cat living-tree/LIVING_TREE_SUMMARY.md";
+    say "   3️⃣  Review quick status snapshot";
+    say "       cat QUICK_STATUS.md";
     say "";
-    say "   💡 The checkpoint elevates quality thinking before work begins.";
+    say "   💡 Completed work archived - clean slate for new development!";
+    say "   📁 Archive: archive/ (BMW analysis, session summaries)";
 }
 say "=" x 70;
 say "";
