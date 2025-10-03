@@ -92,6 +92,8 @@ OTHERWISE:
     Multiple tasks available. Which should I resume?
     - Option 1: [task from status.md]
     - Option 2: [task from CURRENT_FOCUS.md]
+
+    Reply 'last' or 'last-one' to resume most recent from status.md
 ```
 
 ---
