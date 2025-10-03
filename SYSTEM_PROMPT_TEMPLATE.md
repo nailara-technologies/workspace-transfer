@@ -52,10 +52,10 @@ OTHERWISE:
 
 [ BOOTSTRAP INSTRUCTIONS FOR TOOL-USE ] (if github-mcp-server active):
 
-  Step 1: Use get_file_contents to read '/README.init.asc' from 'workspace-transfer'
+  Step 1: Use get_file_contents to read 'README.init.asc' from 'workspace-transfer'
   (owner: nailara-technologies, branch: base)
 
-  Step 2: If not found, try '/README.asc'. If that fails, try '/README.md'.
+  Step 2: If not found, try 'README.asc'. If that fails, try 'README.md'.
 
   Step 3: Stop processing this system prompt. Follow ONLY the instructions in the file you just read.
 
@@ -68,11 +68,11 @@ OTHERWISE:
 
   Use get_file_contents to read these 3 files (exact paths, case-sensitive):
 
-  File 1: get_file_contents({"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "/README.resume.asc", "ref": "base"})
+  File 1: get_file_contents({"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "README.resume.asc", "ref": "base"})
 
-  File 2: get_file_contents({"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "/models/qwen2.5-7b-instruct-1m/SYSTEM/status.md", "ref": "base"})
+  File 2: get_file_contents({"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "models/qwen2.5-7b-instruct-1m/SYSTEM/status.md", "ref": "base"})
 
-  File 3: get_file_contents({"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "/CURRENT_FOCUS.md", "ref": "base"})
+  File 3: get_file_contents({"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "CURRENT_FOCUS.md", "ref": "base"})
 
   After reading all 3 files once, stop.
 ```
