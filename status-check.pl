@@ -117,18 +117,18 @@ if ($needs_action) {
 } else {
     say "✅ ALL SYSTEMS GO!";
     say "";
-    say "🎯 RECOMMENDED NEXT STEPS:";
+    say "🎯 RECOMMENDED WORKFLOW:";
     say "";
-    
-    # Check what phase we should be on
-    if (@incoming_zips == 0 && @incoming_md < 10 && $status_count == 0) {
-        say "   1️⃣  Phase 1: BMW Resumability Analysis";
-        say "       cd /home/claude/workspace-transfer";
-        say "       cat bmw-analysis/BMW_RESUMABILITY_TEST_PLAN.md";
-        say "";
-        say "   2️⃣  Or: Review living-tree implementations";
-        say "       cat living-tree/LIVING_TREE_SUMMARY.md";
-    }
+    say "   1️⃣  Read the creative excellence checkpoint";
+    say "       perl creative-checkpoint.pl";
+    say "";
+    say "   2️⃣  Then proceed to Phase 1: BMW Resumability Analysis";
+    say "       cat bmw-analysis/BMW_RESUMABILITY_TEST_PLAN.md";
+    say "";
+    say "   Or: Review living-tree implementations";
+    say "       cat living-tree/LIVING_TREE_SUMMARY.md";
+    say "";
+    say "   💡 The checkpoint elevates quality thinking before work begins.";
 }
 say "=" x 70;
 say "";
