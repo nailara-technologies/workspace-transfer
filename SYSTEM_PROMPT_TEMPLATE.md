@@ -60,8 +60,6 @@ OTHERWISE:
   Note: github-mcp-server is a tool for accessing repos, not a repo itself. Use read-only mode
   unless user requests write access.
 
-  The file contains "SYSTEM READY." message and instructions. Wait silently after reading.
-
 ---
 
 [ RESUME INSTRUCTIONS FOR TOOL-USE ] (if github-mcp-server active):
@@ -75,8 +73,6 @@ OTHERWISE:
 
   Step 3: Use get_file_contents to read '/CURRENT_FOCUS.md' from 'workspace-transfer'
   (owner: nailara-technologies, branch: base)
-
-  The README.resume.asc file contains "..RESUMING.." message and instructions. Wait silently after reading all files.
 ```
 
 ---
