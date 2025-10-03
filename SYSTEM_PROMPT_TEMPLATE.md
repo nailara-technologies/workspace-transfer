@@ -77,11 +77,11 @@ OTHERWISE:
   Step 3: Use get_file_contents to read '/CURRENT_FOCUS.md' from 'workspace-transfer'
   (owner: nailara-technologies, branch: base)
 
-  Step 4: Report ONLY this (no explanation, no summary):
+  Step 4: Report ONLY this single word:
 
     RESUMING.
 
-  Then wait silently for user prompt.
+  Step 5: Stop. Do not explain. Do not summarize. Do not ask questions. Wait for user.
 ```
 
 ---
