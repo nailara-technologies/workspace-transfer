@@ -241,7 +241,104 @@ If "no" or "unsure" to any → **Ask human before committing**
 
 ---
 
+## Maintaining Security Infrastructure
+
+### .gitignore Maintenance
+**Location**: `/.gitignore`
+
+**When to update:**
+- Discovered new credential file patterns
+- Found new temporary/build artifact patterns
+- Encountered new sensitive file types
+
+**Current patterns protected:**
+```
+.credentials           # Local credentials file
+.github-token         # Legacy token file
+credentials.conf      # Config with credentials
+.initialized          # Local session marker
+/work/                # External repos and builds
+*.tmp                 # Temporary files
+```
+
+**How to update:**
+1. Read current `.gitignore`
+2. Add new pattern with descriptive comment
+3. Test: `git check-ignore <filename>` to verify
+4. Commit with message: "Update .gitignore: Add pattern for <reason>"
+
+### Pre-commit Hook Maintenance
+**Location**: `/security/hooks/pre-commit-secret-scanner.pl`
+
+**Hook Status**:
+- Script exists but NOT currently installed in `.git/hooks/`
+- Install with: `perl security/hooks/install-pre-commit-hook.pl`
+
+**Current patterns detected (lines 17-28):**
+```perl
+'GitHub Classic Token'         => qr/\bghp_[a-zA-Z0-9]{36}\b/
+'GitHub Fine-grained Token'    => qr/\bgithub_pat_[a-zA-Z0-9_]{82}\b/
+'GitHub OAuth Token'           => qr/\bgho_[a-zA-Z0-9]{36}\b/
+'GitHub App Token'             => qr/\b(ghu|ghs)_[a-zA-Z0-9]{36}\b/
+'Generic API Key'              => various patterns
+'AWS Access Key'               => qr/\bAKIA[0-9A-Z]{16}\b/
+'Private SSH Key Header'       => SSH key detection
+'Password in URL'              => credentials in URLs
+'Slack Token'                  => xox[baprs] patterns
+'Generic Secret'               => password/secret assignments
+```
+
+**When to update:**
+- New credential format discovered (e.g., new cloud provider)
+- False positive patterns need refinement
+- New secret types need detection
+
+**How to update:**
+1. Read `/security/hooks/pre-commit-secret-scanner.pl`
+2. Add new pattern to `%patterns` hash (lines 17-28)
+3. Format: `'Description' => qr/regex_pattern/`
+4. Test with: `perl security/hooks/test-secret-scanner.pl`
+5. Document in SECURITY_SCANNER_GUIDE.md
+6. Commit with message: "Update secret scanner: Add detection for <type>"
+
+**Pattern Examples to Add When Discovered:**
+```perl
+'Anthropic API Key'     => qr/\bsk-ant-[a-zA-Z0-9-_]{95}\b/
+'OpenAI API Key'        => qr/\bsk-[a-zA-Z0-9]{48}\b/
+'Azure Key'             => qr/\b[a-zA-Z0-9/+]{88}==\b/  # if context suggests Azure
+'Google API Key'        => qr/\bAIza[0-9A-Za-z\\-_]{35}\b/
+'JWT Token'             => qr/\beyJ[a-zA-Z0-9_-]+\.eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/
+'Database Connection'   => qr/(?:postgresql|mysql|mongodb):\/\/[^:]+:[^@]+@/
+```
+
+### Security Improvement Protocol
+
+**When you discover a security gap:**
+1. Document the gap in session notes
+2. Update .gitignore OR pre-commit-secret-scanner.pl
+3. Test the change
+4. Commit with clear explanation
+5. Note in SYSTEM/status.md under security improvements
+
+**Example Session Flow:**
+```
+1. Notice: "Found reference to .env.local files"
+2. Check: cat .gitignore | grep env
+3. Update: Add ".env.local" to .gitignore
+4. Verify: git check-ignore .env.local (should match)
+5. Commit: "Update .gitignore: Add .env.local pattern"
+6. Document: Update SYSTEM/status.md security section
+```
+
+---
+
 **Last Updated**: 2025-10-03
 **Status**: Active security guidelines
 **Review**: Every session start
 **Importance**: CRITICAL 🔴
+
+**Security Infrastructure Status**:
+- ✅ .gitignore: Active and protecting credentials
+- ⚠️ Pre-commit hook: Available but not installed (install with `perl security/hooks/install-pre-commit-hook.pl`)
+- ✅ Security documentation: Complete
+- ✅ Maintenance protocol: Defined above
