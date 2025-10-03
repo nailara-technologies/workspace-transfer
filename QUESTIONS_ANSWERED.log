@@ -6,3 +6,7 @@
   Q: Test: Can models use this system to ask for clarification during work?
   A: Yes! Models can log questions using: perl question-answer-system.pl --log "your question" --target user --priority URGENT
 
+[2025-10-03 10:24:01] ANSWERED | any-model | PRIORITY:NORMAL
+  Q: which color is true? [:<
+  A: blue =)
+
