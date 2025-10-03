@@ -1,0 +1,12 @@
+{
+  "model": "qwen2.5-7b-instruct-1m",
+  "description": "Innovative model with 1M tokens from V1.4 of Nomic-Inc", 
+  "framework": "TensorFlow-2.4.x", 
+  "versions": [
+    "1.4-opt-extended"
+  ],
+  "config-url": "https://example.com/config-file",
+  "repository": "https://github.com/Nomic-Inc/qwen-models/",
+  "licenses": [
+    "GPL",
+    "SPDX"
