@@ -79,7 +79,7 @@ OTHERWISE:
 
   Step 4: Report ONLY this:
 
-    ..RESUMING..
+    ..:
 
   Step 5: Stop. Do not explain. Do not summarize. Do not ask questions. Wait for user.
 ```
