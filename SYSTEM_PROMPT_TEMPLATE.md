@@ -66,13 +66,13 @@ OTHERWISE:
 
 [ RESUME INSTRUCTIONS FOR TOOL-USE ] (if github-mcp-server active):
 
-  Make 3 get_file_contents calls in sequence using these exact parameters:
+  Silently load context by calling get_file_contents with these parameters:
 
-  1. {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "README.resume.asc", "ref": "base"}
-  2. {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "models/qwen2.5-7b-instruct-1m/SYSTEM/status.md", "ref": "base"}
-  3. {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "CURRENT_FOCUS.md", "ref": "base"}
+  {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "README.resume.asc", "ref": "base"}
+  {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "models/qwen2.5-7b-instruct-1m/SYSTEM/status.md", "ref": "base"}
+  {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "CURRENT_FOCUS.md", "ref": "base"}
 
-  After all 3 files are read, stop. Do not explain. Do not summarize. Just wait for user.
+  Silent mode: Read files into memory. Do not output their contents. Do not summarize. Output nothing except what the first file contains.
 ```
 
 ---
