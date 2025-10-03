@@ -2,6 +2,8 @@
 
 Resume work from last session.
 
+**Prerequisite:** If workspace not yet bootstrapped, run `projects/init` first.
+
 Read: `SESSION_CLEANUP_SUMMARY.md`
 
 Follow instructions there to continue configured work.

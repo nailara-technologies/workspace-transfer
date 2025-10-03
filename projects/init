@@ -2,8 +2,21 @@
 
 Bootstrap workspace only. Report status and wait.
 
+**Token:** Find GitHub token in `workspace-transfer-read-write` document.
+
 ```bash
-cd /home/claude/workspace-transfer
+# Clone or update repository
+cd /home/claude
+if [ ! -d workspace-transfer ]; then
+    git clone https://github.com/nailara-technologies/workspace-transfer.git
+fi
+
+cd workspace-transfer
+
+# Set authenticated remote (use token from workspace-transfer-read-write)
+git remote set-url origin https://TOKEN@github.com/nailara-technologies/workspace-transfer.git
+
+# Pull latest
 git pull origin base
 ```
 
