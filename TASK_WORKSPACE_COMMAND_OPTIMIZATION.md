@@ -44,23 +44,23 @@ System Prompt (Minimal)
 ## 📋 Implementation Tasks
 
 ### Phase 1: Remote .asc File Architecture
-- [ ] Review current README.init.asc
-- [ ] Review current README.resume.asc
-- [ ] Identify what's working vs what needs debugging
-- [ ] Design minimal system prompt structure
-- [ ] Define .asc file format standards
+- [x] Review current README.init.asc
+- [x] Review current README.resume.asc
+- [x] Identify what's working vs what needs debugging
+- [x] Design minimal system prompt structure
+- [x] Define .asc file format standards (directive-style)
 
 ### Phase 2: Create/Refactor .asc Files
-- [ ] Refactor README.init.asc (if needed)
-- [ ] Refactor README.resume.asc (if needed)
-- [ ] Create README.improve.asc (workspace infrastructure mode)
-- [ ] Create README.edit.asc (documentation edit mode)
-- [ ] Ensure all .asc files are self-contained and executable
+- [x] Refactor README.init.asc (explicit 2-step tool calls)
+- [x] Refactor README.resume.asc (explicit 3-step tool calls)
+- [x] Create README.improve.asc (workspace infrastructure mode)
+- [x] Create README.edit.asc (documentation edit mode)
+- [x] Ensure all .asc files are self-contained and executable
 
 ### Phase 3: Minimal System Prompt
-- [ ] Design new minimal system prompt template
-- [ ] Add github-mcp-server fetch instructions
-- [ ] Add command → .asc file mapping
+- [x] Design new minimal system prompt template (v2.0)
+- [x] Add github-mcp-server fetch instructions
+- [x] Add command → .asc file mapping
 - [ ] Test with qwen2.5-7b-instruct-1m
 - [ ] Document the new pattern
 
@@ -136,10 +136,23 @@ When user invokes a command, fetch the corresponding .asc file and follow its in
 
 ## 🔄 Progress Log
 
-### Session 1 - October 3, 2025
+### Session 1 - October 3, 2025 (Original)
 - Task document created
 - Ready to investigate current state
 - Next: Review existing README.init.asc and README.resume.asc
+
+### Session 2 - October 3, 2025 (Current - Explicit .asc Files)
+- ✅ Reviewed all existing .asc files and identified issues
+- ✅ Problem: .asc files too minimal, no actionable instructions
+- ✅ Problem: Models become verbose when instructions unclear
+- ✅ Problem: Tool calls fail due to lack of explicit format
+- ✅ Created explicit directive-style .asc files:
+  - README.init.asc: 2 tool calls + "SYSTEM READY." output
+  - README.resume.asc: 3 tool calls + task listing output
+  - README.improve.asc: 3 tool calls for infrastructure mode
+  - README.edit.asc: 2 tool calls for edit mode
+- ✅ Updated SYSTEM_PROMPT_MINIMAL.md v2.0 with new pattern
+- 🔄 Next: Test with qwen model, verify tool call success
 
 ---
 

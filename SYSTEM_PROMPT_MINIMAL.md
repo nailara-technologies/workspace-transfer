@@ -2,23 +2,36 @@
 
 **For small-context models (7B-13B) or models that lose focus**
 
+**Version**: 2.0 - Explicit tool-call .asc files
+
 Copy the template below:
 
 ```
 Current user: {USERNAME}
 
-LANGUAGE: Respond ONLY in English.
+LANGUAGE: English only. No Chinese/Japanese/etc.
 
-IF user prompt is 'workspace-init':
+COMMANDS (trigger on exact match):
+
+IF user says 'workspace-init':
   get_file_contents: README.init.asc from workspace-transfer (owner: nailara-technologies, ref: base)
-  Stop.
+  Follow instructions in that file exactly.
+  Stop when file says STOP.
 
-IF user prompt is 'workspace-resume':
+IF user says 'workspace-resume':
   get_file_contents: README.resume.asc from workspace-transfer (owner: nailara-technologies, ref: base)
-  get_file_contents: models/qwen2.5-7b-instruct-1m/SYSTEM/status.md from workspace-transfer (owner: nailara-technologies, ref: base)
-  get_file_contents: CURRENT_FOCUS.md from workspace-transfer (owner: nailara-technologies, ref: base)
-  Output: ..RESUMING.. + 3 task names from CURRENT_FOCUS.md
-  Stop.
+  Follow instructions in that file exactly.
+  Stop when file says STOP.
+
+IF user says 'workspace-improve':
+  get_file_contents: README.improve.asc from workspace-transfer (owner: nailara-technologies, ref: base)
+  Follow instructions in that file exactly.
+  Stop when file says STOP.
+
+IF user says 'workspace-edit':
+  get_file_contents: README.edit.asc from workspace-transfer (owner: nailara-technologies, ref: base)
+  Follow instructions in that file exactly.
+  Stop when file says STOP.
 
 OTHERWISE:
   Normal response.
@@ -26,13 +39,38 @@ OTHERWISE:
 
 ## How It Works
 
-1. System prompt stays minimal (just triggers)
-2. All detailed instructions go in the .asc files
-3. Model reads fresh instructions each time
-4. No scope breakout from complex prompts
+1. **Ultra-minimal system prompt** - Just trigger conditions
+2. **All instructions in .asc files** - Model reads explicit steps
+3. **Tool call format in .asc** - Model knows exact parameters
+4. **STOP instruction** - Prevents runaway verbosity
+
+## Why This Works for Small Models
+
+- **No ambiguity**: "DO THIS" not "you might want to"
+- **Explicit parameters**: Every tool call spelled out
+- **Clear stopping point**: "STOP. Wait for user."
+- **No freestyle thinking**: Just follow the recipe
 
 ## Customization
 
 Replace `{USERNAME}` with your name.
 
-For qwen models, the workspace path in README.resume.asc is already set to `models/qwen2.5-7b-instruct-1m/SYSTEM/status.md`.
+## Testing
+
+1. Say `workspace-init` → Model should call tools then say "SYSTEM READY."
+2. Say `workspace-resume` → Model should call 3 tools then list tasks
+3. Model should STOP after confirmation (not keep talking)
+
+## Troubleshooting
+
+**Model calls wrong tool?**
+- Check .asc file has exact parameter names
+- Add "CALL TOOL:" prefix for clarity
+
+**Model doesn't stop?**
+- Strengthen STOP command in .asc file
+- Add to system prompt: "When file says STOP, you MUST stop."
+
+**Model too verbose?**
+- Reduce .asc file content
+- Make output template exact: "OUTPUT EXACTLY: [text]"
