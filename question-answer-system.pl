@@ -63,7 +63,7 @@ sub log_question {
 # Function: Check for QUESTION files
 sub check_question_files {
     my @question_files = glob("$repo_root/QUESTION*");
-    @question_files = grep { -f $_ && !/\.md$/ } @question_files;
+    @question_files = grep { -f $_ && !/\.(md|log)$/ } @question_files;
     
     return unless @question_files;
     
