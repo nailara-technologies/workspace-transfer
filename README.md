@@ -2,6 +2,8 @@
 
 **Stateless workspace handoff for multi-AI development on Protocol-7**
 
+> 🚦 **New to this workspace?** Start with **[START_HERE.md](START_HERE.md)** for 5-second initialization.
+
 ---
 
 ## Purpose
@@ -52,10 +54,11 @@ git checkout base  # Already default
 ## Quick Start for AI Assistants
 
 ### For Claude AI
-1. Read `CLAUDE_ONBOARDING.md` in this repository
-2. Review priorities in `CURRENT_FOCUS.md`
-3. Generate deliverables in `/mnt/user-data/outputs/`
-4. Update workspace with findings
+1. Read `START_HERE.md` and run initialization scripts
+2. Follow recommendations from `status-check.pl`
+3. Review priorities in `CURRENT_FOCUS.md`
+4. Generate deliverables in `/mnt/user-data/outputs/`
+5. Update workspace with findings
 
 ### For Other AI Systems
 1. Clone this repository (public, no auth required)

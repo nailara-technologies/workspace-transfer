@@ -69,23 +69,25 @@ perl bootstrap.pl
 
 ---
 
-## 📋 Detailed Phase Documentation (Reference)
+## 📋 Workspace Reference
 
-### Phase 0: Extract and Analyze Historical Workspace Archives
+### Directory Structure
+```
+/home/claude/workspace-transfer/    # This repository (managed via Git)
+/home/claude/work/                  # External repos, builds, experiments
+/mnt/user-data/outputs/             # Generated reports and artifacts
+```
 
-**STATUS: ✅ COMPLETED (October 2, 2025)**
+### Key Scripts
+- `bootstrap.pl` - One-time workspace setup
+- `init.pl` - Verify initialization status
+- `status-check.pl` - Show current workspace status and next steps
+- `commit_checkpoint.pl` - Create git checkpoint with timestamp
+- `creative-checkpoint.pl` - Quality elevation prompt
 
-Archives (files 20-39) were extracted and analyzed. Results available in:
-- `other/archive-inventory-report.md` (155 files analyzed, 20 identical to repo)
+### Active Work
+See `CURRENT_FOCUS.md` for current development priorities.
 
-**Note**: No action needed for new sessions - this phase is complete.
-
-**Once Phase 0 is complete, proceed to Phase 1 (BMW Analysis).**
-
----
-
-## Phase 1: BMW Analysis (If Applicable)
-
-Reference the specific BMW work if resuming that project.
+For completed missions and historical work, see `archive/`.
 
 ---
