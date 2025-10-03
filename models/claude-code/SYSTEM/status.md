@@ -14,6 +14,12 @@
 - **Remote**: https://github.com/nailara-technologies/workspace-transfer.git
 - **Visibility**: ALL COMMITS ARE PUBLIC - follow SYSTEM/SECURITY.md guidelines
 
+**Security Infrastructure**:
+- ✅ .gitignore: Protecting .credentials, tokens, /work/, temp files
+- ⚠️ Pre-commit hook: Available but NOT installed (run: `perl security/hooks/install-pre-commit-hook.pl`)
+- ✅ Secret scanner: Detects 10+ credential types (see security/hooks/)
+- 📋 Maintenance: Update .gitignore and scanner when new patterns discovered
+
 ### Repository Health
 - ✅ Onboarding flow optimized and verified
 - ✅ BMW references properly archived
