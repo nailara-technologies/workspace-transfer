@@ -67,33 +67,21 @@ OTHERWISE:
 
 [ RESUME INSTRUCTIONS FOR TOOL-USE ] (if github-mcp-server active):
 
-  Step 1: Execute BOOTSTRAP first (read '/README.asc' from 'workspace-transfer')
+  Step 1: Use get_file_contents to read '/README.asc' from 'workspace-transfer'
+  (owner: nailara-technologies, branch: base)
 
-  Step 2: Read your workspace status from '/models/{your-workspace}/SYSTEM/status.md'
-  (Replace {your-workspace} with your model workspace, e.g., 'qwen2.5-7b-instruct-1m')
+  Step 2: Use get_file_contents to read '/models/{your-workspace}/SYSTEM/status.md'
+  from 'workspace-transfer' (owner: nailara-technologies, branch: base)
+  Replace {your-workspace} with: qwen2.5-7b-instruct-1m
 
-  Step 3: Read '/CURRENT_FOCUS.md' for active development priorities
+  Step 3: Use get_file_contents to read '/CURRENT_FOCUS.md' from 'workspace-transfer'
+  (owner: nailara-technologies, branch: base)
 
-  Step 4: Identify resumable task from status.md "Recent Accomplishments" or "Next Steps"
+  ONCE ALL FILES READ: Report (no summary):
 
-  ONCE CONTEXT LOADED: Report in this format (no verbose summary):
+    RESUMING: [task from status.md Recent Accomplishments or CURRENT_FOCUS]
 
-    RESUMING: [brief task description from status.md or CURRENT_FOCUS.md]
-
-    Last session: [date from status.md]
-    Status: [workspace status if mentioned]
-
-    Ready for next steps.
-
-  OR if uncertain which task to resume:
-
-    [ USER QUESTION ]
-
-    Multiple tasks available. Which should I resume?
-    - Option 1: [task from status.md]
-    - Option 2: [task from CURRENT_FOCUS.md]
-
-    Reply 'last' or 'last-one' to resume most recent from status.md
+  Then wait for user.
 ```
 
 ---
