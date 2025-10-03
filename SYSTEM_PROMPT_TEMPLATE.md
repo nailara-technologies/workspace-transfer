@@ -74,7 +74,11 @@ OTHERWISE:
   {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "models/qwen2.5-7b-instruct-1m/SYSTEM/status.md", "ref": "base"}
   {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "CURRENT_FOCUS.md", "ref": "base"}
 
-  After reading all files: Stop immediately. Say nothing. Do not ask questions. Do not offer help. Do not explain. Just stop and wait.
+  After reading all files: Stop and wait for user.
+
+  IF you must say something, output ONLY this:
+  ..RESUMING..
+  Available: [list 2-3 tasks from CURRENT_FOCUS.md, one line each]
 ```
 
 ---
