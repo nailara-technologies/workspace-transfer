@@ -213,3 +213,39 @@ Strategic recommendations with examples for each point. Focus on:
 ---
 
 **Ready for your strategic input on simplifying this system while maintaining reliability!**
+
+---
+
+## Important Note on Task Delegation
+
+**You can hand off implementation tasks back to the local model (Qwen) if it will save tokens!**
+
+This task is about **strategy and architecture design** - that's where your (Claude Code) capabilities shine. But for:
+
+- **Repetitive file edits** (updating multiple .asc files with similar content)
+- **Testing iterations** (trying different prompt variations)
+- **Documentation updates** (recording what works/doesn't work)
+- **Git operations** (committing incremental changes)
+
+Feel free to:
+1. **Analyze and strategize** (your strength - complex reasoning)
+2. **Provide clear implementation instructions** (what to change, how, why)
+3. **Suggest handing off to local model** for execution if it will save significant tokens
+
+Example handoff format:
+```
+HANDOFF TO LOCAL MODEL:
+Task: Update README.resume.asc with new format
+Changes needed:
+  - Line 1: Change X to Y
+  - Add section Z after line 5
+Reasoning: This is a simple file edit that doesn't require my reasoning capabilities
+```
+
+The local model has shown it can:
+- ✅ Make file edits when given explicit instructions
+- ✅ Commit and push changes
+- ✅ Follow structured task lists
+- ❌ Complex multi-step reasoning (needs your help here)
+
+**Token efficiency matters** - use your reasoning for strategy, delegate execution when appropriate!
