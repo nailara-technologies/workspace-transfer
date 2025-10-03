@@ -9,7 +9,7 @@
 This repository enables seamless collaboration between AI assistants (Claude, GPT-4, Gemini, etc.) working on the Protocol-7 harmonic computing framework. It provides:
 
 - ✅ **Comprehensive onboarding documentation** for new AI sessions
-- ✅ **Mission-specific instructions** (current: BMW Resumability Analysis)
+- ✅ **Mission-specific instructions**
 - ✅ **Clean state snapshots** that can be instantiated anywhere
 - ✅ **Multi-AI coordination** via Git commits and tags
 - ✅ **2-3 second restoration** in any new environment
@@ -19,12 +19,14 @@ This repository enables seamless collaboration between AI assistants (Claude, GP
 ## Key Files
 
 ### 📘 Onboarding & Missions
-- **[CLAUDE_ONBOARDING.md](CLAUDE_ONBOARDING.md)** - Complete BMW resumability analysis guide
+- **[CLAUDE_ONBOARDING.md](CLAUDE_ONBOARDING.md)** - Complete onboarding guide
   - Directory structure and workspace rules
-  - Repository references (workspace-transfer, protocol-7, digest-bmw)
-  - Step-by-step testing workflow with Perl scripts
+  - Repository references and related projects
+  - Step-by-step workflow guidelines
   - Analysis report templates
-  - Implementation guidance for missing features
+  - Implementation guidance
+- **[CURRENT_FOCUS.md](CURRENT_FOCUS.md)** - Active development priorities and new missions
+- **archive/** - Contains archived work and previous analyses
 
 ### 📐 Architecture Documentation
 - **[COMPLETE_ARCHITECTURE.md](COMPLETE_ARCHITECTURE.md)** - Protocol-7 system architecture
@@ -51,7 +53,7 @@ git checkout base  # Already default
 
 ### For Claude AI
 1. Read `CLAUDE_ONBOARDING.md` in this repository
-2. Follow Phase 1-5 instructions for BMW analysis
+2. Review priorities in `CURRENT_FOCUS.md`
 3. Generate deliverables in `/mnt/user-data/outputs/`
 4. Update workspace with findings
 
@@ -73,7 +75,7 @@ git checkout base  # Already default
 ```
 
 **Rules**:
-- ✅ Clone external repos (digest-bmw, protocol-7) into `/home/claude/work/`
+- ✅ Clone external repos related to active missions into `/home/claude/work/`
 - ✅ Place build artifacts in `/home/claude/work/`
 - ✅ Write deliverables to `/mnt/user-data/outputs/`
 - ❌ Do NOT commit binaries or build artifacts to workspace-transfer
@@ -87,26 +89,13 @@ git checkout base  # Already default
 - **Branch**: `base` (default)
 - **Description**: Harmonic computing framework with signature system
 
-### Digest::BMW (External Dependency)
-- **URL**: https://github.com/gray/digest-bmw
-- **Description**: Perl interface to BMW384 hash algorithm
-- **Current Task**: Verify resumability support (clone/getstate/setstate)
-
 ---
 
-## Current Mission: BMW Resumability Analysis
+## Current Focus
 
-**Objective**: Determine if Digest::BMW supports state save/restore for streaming signatures.
+See **[CURRENT_FOCUS.md](CURRENT_FOCUS.md)** for active development priorities and next steps.
 
-**Context**: Protocol-7 uses BMW384 checksums for cryptographic signatures. ELF7 checksums are already resumable, but BMW needs verification.
-
-**Deliverables**:
-1. `bmw-test-results.txt` - Test execution output
-2. `bmw-analysis-report.md` - Findings and recommendations
-3. `bmw-state-serialization.patch` - Implementation (if needed)
-4. `bmw-implementation-notes.md` - Technical details
-
-**See**: [CLAUDE_ONBOARDING.md](CLAUDE_ONBOARDING.md) for complete instructions.
+For previous missions and analysis, see **archive/**.
 
 ---
 
@@ -164,7 +153,7 @@ No complex setup, no dependencies, just Git.
 Workspace-transfer embodies the "Living Tree" philosophy:
 - **Genetic code in Git** - Complete state captured in version control
 - **Anti-entropic** - System becomes more organized through use
-- **Harmonic validation** - ELF7 and BMW checksums ensure integrity
+- **Harmonic validation** - Checksums ensure integrity
 - **Instant propagation** - Clone anywhere, anytime
 
 ### Sequential File Safety
