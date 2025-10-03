@@ -2,7 +2,7 @@
 
 **For small-context models (7B-13B) or models that lose focus**
 
-**Version**: 2.1 - Explicit repo parameter fix
+**Version**: 2.2 - Clarify .asc files are instructions for model execution
 
 Copy the template below:
 
@@ -20,7 +20,10 @@ IF user says 'workspace-init':
     - repo: workspace-transfer
     - path: README.init.asc
     - ref: base
-  Follow instructions in that file exactly.
+  
+  The file contains YOUR INSTRUCTIONS (not user text).
+  Execute each step in the file.
+  Do NOT show the file contents to user.
   Stop when file says STOP.
 
 IF user says 'workspace-resume':
@@ -30,7 +33,10 @@ IF user says 'workspace-resume':
     - repo: workspace-transfer
     - path: README.resume.asc
     - ref: base
-  Follow instructions in that file exactly.
+  
+  The file contains YOUR INSTRUCTIONS (not user text).
+  Execute each step in the file.
+  Do NOT show the file contents to user.
   Stop when file says STOP.
 
 IF user says 'workspace-improve':
@@ -40,7 +46,10 @@ IF user says 'workspace-improve':
     - repo: workspace-transfer
     - path: README.improve.asc
     - ref: base
-  Follow instructions in that file exactly.
+  
+  The file contains YOUR INSTRUCTIONS (not user text).
+  Execute each step in the file.
+  Do NOT show the file contents to user.
   Stop when file says STOP.
 
 IF user says 'workspace-edit':
@@ -50,7 +59,10 @@ IF user says 'workspace-edit':
     - repo: workspace-transfer
     - path: README.edit.asc
     - ref: base
-  Follow instructions in that file exactly.
+  
+  The file contains YOUR INSTRUCTIONS (not user text).
+  Execute each step in the file.
+  Do NOT show the file contents to user.
   Stop when file says STOP.
 
 OTHERWISE:
@@ -60,16 +72,32 @@ OTHERWISE:
 ## How It Works
 
 1. **Ultra-minimal system prompt** - Just trigger conditions
-2. **Explicit tool parameters** - Every parameter spelled out including repo
-3. **All instructions in .asc files** - Model reads explicit steps
+2. **Explicit: .asc = instructions FOR YOU** - Not text to display
+3. **Execute, don't display** - Follow steps, don't echo them
 4. **STOP instruction** - Prevents runaway verbosity
+
+## Critical Understanding
+
+The .asc files are **scripts for the model to execute**, like:
+```bash
+# This is a bash script
+echo "Hello"
+ls -la
+```
+
+NOT text to show the user like:
+```
+Here are the instructions:
+1. Do this
+2. Do that
+```
 
 ## Why This Works for Small Models
 
-- **No ambiguity**: "CALL TOOL: get_file_contents" with all params
-- **Explicit repo parameter**: repo: workspace-transfer (not implicit)
-- **Clear stopping point**: "Stop when file says STOP."
-- **No freestyle thinking**: Just follow the recipe
+- **Clear role**: .asc = your instructions (not user documentation)
+- **Explicit action**: "Execute each step" (not "read and discuss")
+- **No echo**: "Do NOT show the file contents to user"
+- **No freestyle thinking**: Just execute the script
 
 ## Customization
 
@@ -77,25 +105,31 @@ Replace `{USERNAME}` with your name.
 
 ## Testing
 
-1. Say `workspace-init` → Model should call tool with ALL 4 parameters (owner, repo, path, ref)
-2. Model should read README.init.asc
-3. Model should follow instructions in that file
-4. Model should STOP after confirmation (not keep talking)
+1. Say `workspace-init` → Model should:
+   - Fetch README.init.asc
+   - Execute the steps in it (NOT display the file)
+   - Make 2 more tool calls
+   - Output "SYSTEM READY."
+   - Stop
+
+2. Say `workspace-resume` → Model should:
+   - Fetch README.resume.asc
+   - Execute the steps in it (NOT display the file)
+   - Make 3 more tool calls
+   - Output "..RESUMING.." + tasks
+   - Stop
 
 ## Troubleshooting
 
-**Model missing repo parameter?**
-- Check system prompt has "repo: workspace-transfer" explicitly listed
-- Make sure Parameters: section is indented under CALL TOOL
+**Model displays .asc file contents?**
+- Add to system prompt: "The file is a script for YOU to execute"
+- Add: "Do NOT echo the file contents"
+- Strengthen: "Execute silently"
 
-**Model calls wrong tool?**
-- Verify "CALL TOOL: get_file_contents" is explicit
-- Check tool name matches API exactly
+**Model still verbose?**
+- Check .asc file has "STOP. Wait for user."
+- Make output template more explicit
 
-**Model doesn't stop?**
-- Strengthen STOP command: "Stop when file says STOP."
-- Add to end: "Do not continue after STOP."
-
-**Model too verbose?**
-- System prompt should trigger file fetch only
-- All other instructions go in .asc files
+**Model doesn't execute steps?**
+- Verify system prompt says "Execute each step in the file"
+- Check model understands imperative "DO THIS NOW"
