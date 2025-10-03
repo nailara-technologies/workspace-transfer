@@ -56,22 +56,28 @@ Implemented optimizations and their impact
 
 ### Session Start Protocol
 1. **READ `SYSTEM/SECURITY.md` FIRST** - verify repository context and safety
-2. Check `SYSTEM/status.md` for current state
-3. Review recent `sessions/` entries for context
-4. Run status-check.pl if in workspace-transfer root
-5. Identify current focus from CURRENT_FOCUS.md
+2. **READ `SYSTEM/workflow-reminders.md`** - review automation reminders
+3. Check `SYSTEM/status.md` for current state
+4. Review recent `sessions/` entries for context
+5. Run status-check.pl if in workspace-transfer root
+6. Identify current focus from CURRENT_FOCUS.md
 
 ### During Work
-- Use TodoWrite for multi-step tasks
+- Use TodoWrite for multi-step tasks (mark in_progress → completed)
+- Commit after each substantial task
 - Batch parallel tool calls aggressively
 - Document significant decisions in sessions/
+- **Update status.md after each phase** (not each task)
 - Create checkpoints for major changes
 
 ### Session End Protocol
-1. Create session summary in `sessions/YYYY-MM-DD-brief-description.md`
-2. Update `SYSTEM/status.md` with current state
-3. Commit session artifacts with descriptive messages
-4. Note any patterns worth reusing in `optimizations/`
+1. **Update `SYSTEM/status.md`** with all session work
+2. Commit status update
+3. **Create session summary** in `sessions/YYYY-MM-DD-brief-description.md`
+4. Commit session artifacts with descriptive messages
+5. Note any patterns worth reusing in `optimizations/`
+6. Final push to remote
+7. Clear TodoWrite completed items
 
 ---
 
