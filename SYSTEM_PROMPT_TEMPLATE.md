@@ -66,13 +66,15 @@ OTHERWISE:
 
 [ RESUME INSTRUCTIONS FOR TOOL-USE ] (if github-mcp-server active):
 
-  Use get_file_contents to read these 3 files (exact paths, case-sensitive):
+  Use get_file_contents with these EXACT parameters (no leading slash in path):
 
-  File 1: get_file_contents({"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "README.resume.asc", "ref": "base"})
+  {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "README.resume.asc", "ref": "base"}
 
-  File 2: get_file_contents({"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "models/qwen2.5-7b-instruct-1m/SYSTEM/status.md", "ref": "base"})
+  {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "models/qwen2.5-7b-instruct-1m/SYSTEM/status.md", "ref": "base"}
 
-  File 3: get_file_contents({"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "CURRENT_FOCUS.md", "ref": "base"})
+  {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "CURRENT_FOCUS.md", "ref": "base"}
+
+  IMPORTANT: Do NOT add / at start of path. Copy parameters exactly as shown above.
 
   After reading all 3 files once, stop.
 ```
