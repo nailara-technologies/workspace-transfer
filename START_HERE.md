@@ -39,19 +39,23 @@ Don't read the assembly manual while the car is being assembled by the factory. 
 
 ## ✅ After Initialization
 
-Once you see the ✅ message from `init.pl`, you may proceed to:
+Once you see the ✅ message from `init.pl`, proceed through the quality gates:
 
 ```bash
-# Check workspace status (tells you what to do next)
+# Step 1: Check workspace status
 perl status-check.pl
+
+# Step 2: Creative excellence checkpoint (IMPORTANT)
+perl creative-checkpoint.pl
 ```
 
-Status check will show:
-- Phase completion status
-- Git status
-- Recommended next actions
+**The creative checkpoint** elevates your thinking before work begins:
+- ✨ Raises quality from "nice to have" to "standard"
+- 🌀 Encourages Protocol-7 integration awareness
+- 🚀 Highlights compound efficiency principles
+- 💎 Sets expectation for excellence
 
-Then follow the recommendations!
+**After the checkpoint**, follow the recommendations from status-check.pl!
 
 ---
 

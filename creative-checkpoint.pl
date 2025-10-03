@@ -1,0 +1,183 @@
+#!/usr/bin/perl
+# creative-checkpoint.pl - Elevate quality to standard behavior
+# Run AFTER initialization, BEFORE starting work
+
+use v5.24;
+use strict;
+use warnings;
+
+say "";
+say "=" x 70;
+say "✨ CREATIVE EXCELLENCE CHECKPOINT";
+say "=" x 70;
+say "";
+
+# Check if initialized
+unless (-f '.initialized') {
+    say "⚠️  Not initialized yet!";
+    say "   Run: perl init.pl";
+    say "";
+    exit 1;
+}
+
+say "Before beginning your task, consider these quality principles:";
+say "";
+
+say "=" x 70;
+say "🎯 EFFICIENCY UPGRADES (Not Optional)";
+say "=" x 70;
+say "";
+say "These are NOT 'nice to have' - they compound over time:";
+say "";
+say "  1. Token Efficiency";
+say "     • Optimize for minimal token usage in outputs";
+say "     • Create tools that reduce future token costs";
+say "     • Document patterns that save tokens";
+say "";
+say "  2. Self-Testing Mechanisms";
+say "     • Build systems that validate themselves";
+say "     • Each execution is a test case";
+say "     • Failures should be obvious, not silent";
+say "";
+say "  3. Automation First";
+say "     • If you do it twice, automate it";
+say "     • Scripts over manual instructions";
+say "     • Reproducibility is not negotiable";
+say "";
+say "  4. Clear Visual Feedback";
+say "     • Use ✅/⚠️/❌ for status (universal language)";
+say "     • Exit codes matter (0 = success, 1 = failure)";
+say "     • Progress should be visible";
+say "";
+say "  5. Documentation as Code";
+say "     • Write docs that execute";
+say "     • Examples should be copy-paste ready";
+say "     • Tests are documentation";
+say "";
+
+say "=" x 70;
+say "🌀 PROTOCOL-7 INTEGRATION THINKING";
+say "=" x 70;
+say "";
+say "Ask yourself: How does this work integrate with Protocol-7?";
+say "";
+say "  • Harmonic Routing";
+say "    → Can this use BASE32 addressing?";
+say "    → Does it benefit from DHT-like discovery?";
+say "    → Could it route through the living tree?";
+say "";
+say "  • Self-Organization";
+say "    → Does it require central coordination?";
+say "    → Can it work peer-to-peer?";
+say "    → Does it scale horizontally?";
+say "";
+say "  • Resumability";
+say "    → Can work be interrupted and resumed?";
+say "    → Is state serializable?";
+say "    → Can it recover from crashes?";
+say "";
+say "  • Verifiability";
+say "    → Can results be cryptographically verified?";
+say "    → Is provenance tracked?";
+say "    → Can signatures be validated?";
+say "";
+say "  • Network Effect";
+say "    → Does value increase with more nodes?";
+say "    → Can it contribute to the network?";
+say "    → Does it strengthen the protocol?";
+say "";
+
+say "=" x 70;
+say "💎 QUALITY ELEVATION (Standard, Not Optional)";
+say "=" x 70;
+say "";
+say "These patterns should be DEFAULT behavior:";
+say "";
+say "  ✅ Error Handling";
+say "     • Fail fast with clear messages";
+say "     • Graceful degradation when possible";
+say "     • Always validate inputs";
+say "";
+say "  ✅ Security by Default";
+say "     • No secrets in code or commits";
+say "     • Least privilege principle";
+say "     • Validate all external data";
+say "";
+say "  ✅ Performance Awareness";
+say "     • Measure what matters";
+say "     • Optimize hot paths";
+say "     • Don't prematurely optimize";
+say "";
+say "  ✅ Composability";
+say "     • Small, focused tools";
+say "     • Unix philosophy (do one thing well)";
+say "     • Pipe-able, chainable, reusable";
+say "";
+say "  ✅ Future-Proofing";
+say "     • Version markers in output";
+say "     • Backward compatibility consideration";
+say "     • Migration paths documented";
+say "";
+
+say "=" x 70;
+say "🚀 COMPOUND EFFICIENCY (Think Long-Term)";
+say "=" x 70;
+say "";
+say "Your work today affects efficiency tomorrow:";
+say "";
+say "  • Time saved compounds";
+say "    → 5 seconds saved per session";
+say "    → 100 sessions = 8 minutes saved";
+say "    → 1000 sessions = 83 minutes saved";
+say "";
+say "  • Tokens saved compound";
+say "    → 1000 tokens saved per task";
+say "    → 100 tasks = 100,000 tokens saved";
+say "    → = \\$0.30 at current rates";
+say "    → = Real cost reduction";
+say "";
+say "  • Quality improvements compound";
+say "    → Better tools → faster work";
+say "    → Faster work → more experimentation";
+say "    → More experimentation → better solutions";
+say "";
+say "  • Knowledge compounds";
+say "    → Document patterns";
+say "    → Patterns become templates";
+say "    → Templates become standards";
+say "    → Standards become culture";
+say "";
+
+say "=" x 70;
+say "🎨 CREATIVE FREEDOM WITHIN STRUCTURE";
+say "=" x 70;
+say "";
+say "Excellence requires both:";
+say "";
+say "  • Structure (These principles)";
+say "    → Provides foundation";
+say "    → Prevents common mistakes";
+say "    → Enables consistent quality";
+say "";
+say "  • Freedom (Your creativity)";
+say "    → Find elegant solutions";
+say "    → Innovate within constraints";
+say "    → Surprise yourself";
+say "";
+say "The best work happens at the intersection.";
+say "";
+
+say "=" x 70;
+say "✅ CHECKPOINT COMPLETE";
+say "=" x 70;
+say "";
+say "Keep these principles in mind as you work.";
+say "They're not rules - they're multipliers.";
+say "";
+say "Now proceed to your task with elevated standards! 🚀";
+say "";
+say "Next: Follow recommendations from status-check.pl";
+say "=" x 70;
+say "";
+
+exit 0;
