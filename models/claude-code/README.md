@@ -55,10 +55,11 @@ Implemented optimizations and their impact
 ## Operational Patterns
 
 ### Session Start Protocol
-1. Check `SYSTEM/status.md` for current state
-2. Review recent `sessions/` entries for context
-3. Run status-check.pl if in workspace-transfer root
-4. Identify current focus from CURRENT_FOCUS.md
+1. **READ `SYSTEM/SECURITY.md` FIRST** - verify repository context and safety
+2. Check `SYSTEM/status.md` for current state
+3. Review recent `sessions/` entries for context
+4. Run status-check.pl if in workspace-transfer root
+5. Identify current focus from CURRENT_FOCUS.md
 
 ### During Work
 - Use TodoWrite for multi-step tasks
