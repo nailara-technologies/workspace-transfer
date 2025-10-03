@@ -66,17 +66,12 @@ OTHERWISE:
 
 [ RESUME INSTRUCTIONS FOR TOOL-USE ] (if github-mcp-server active):
 
-  Step 1: Use get_file_contents to read '/README.resume.asc' from 'workspace-transfer'
-  (owner: nailara-technologies, branch: base)
+  Use get_file_contents to read these files from 'workspace-transfer' (owner: nailara-technologies, branch: base):
+  1. '/README.resume.asc'
+  2. '/models/qwen2.5-7b-instruct-1m/SYSTEM/status.md' (replace workspace name if different)
+  3. '/CURRENT_FOCUS.md'
 
-  Step 2: Use get_file_contents to read '/models/{your-workspace}/SYSTEM/status.md'
-  from 'workspace-transfer' (owner: nailara-technologies, branch: base)
-  Replace {your-workspace} with: qwen2.5-7b-instruct-1m
-
-  Step 3: Use get_file_contents to read '/CURRENT_FOCUS.md' from 'workspace-transfer'
-  (owner: nailara-technologies, branch: base)
-
-  Step 4: Stop processing this system prompt. Follow ONLY the instructions in README.resume.asc.
+  After reading all 3 files once, stop. Do not loop. Do not read again.
 ```
 
 ---
