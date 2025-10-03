@@ -21,5 +21,6 @@
     "macOS",
     "Windows"
   ],
-  "notes": "See README.md and index.asc for full workflow."
+  "notes": "See README.md and index.asc for full workflow.",
+  "tested": ["Linux (Ubuntu 22.04)", "macOS Ventura"]
 }
