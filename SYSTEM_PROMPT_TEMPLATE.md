@@ -52,7 +52,7 @@ Current user: {USERNAME}
     [ USER QUESTION ]
     <clarification>
 
-  Optional: Call get_system_info() first to identify your model name for workspace selection.
+Note: Model identification must be done manually (get_system_info provides only OS/Python info, not model name).
 ```
 
 ---
@@ -79,11 +79,13 @@ Extend the BOOTSTRAP section with model-specific instructions:
 ```
 [ BOOTSTRAP INSTRUCTIONS FOR TOOL-USE ]
 
-  Step 1: Call get_system_info() to identify your model name
-  Step 2: Use get_file_contents to read '/README.asc' from 'workspace-transfer'...
-  Step 3: Check if models/{your-model-name}/ exists using list_directory
+  Step 1: Use get_file_contents to read '/README.asc' from 'workspace-transfer'...
+  Step 2: Check if models/qwen2.5-7b-instruct-1m/ exists using list_directory
+  Step 3: If your workspace exists, read models/{your-workspace}/README.md
   ...
 ```
+
+Note: Model name must be hardcoded in system prompt (no API provides model identity).
 
 ### 4. Workspace-Specific Focus
 Add focus areas after BOOTSTRAP:
@@ -171,9 +173,9 @@ When testing a new model with this template:
 
 ### Working Behaviors (Positive)
 - Model correctly identifies github-mcp-server as tool, not repo
-- get_system_info() can be used to identify model name for workspace selection
 - "SYSTEM READY." response without summary works well
 - Models wait silently after confirmation
+- workspace-init trigger activates bootstrap without interfering with normal prompts
 
 ### Issues Encountered (and Fixes)
 - **Issue**: Model called get_system_info() instead of get_file_contents
@@ -182,6 +184,8 @@ When testing a new model with this template:
   - **Fix**: Added "(no summary, wait silently)" to ONCE FILE READ
 - **Issue**: Model treated github-mcp-server as repository
   - **Fix**: Added "Plugin is tool, not repo" note
+- **Issue**: get_system_info() doesn't provide model name (only OS/Python info)
+  - **Fix**: Model name must be hardcoded in system prompt if needed for workspace selection
 
 ---
 
