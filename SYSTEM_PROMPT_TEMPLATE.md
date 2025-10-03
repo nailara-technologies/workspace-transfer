@@ -67,7 +67,7 @@ OTHERWISE:
 
 [ RESUME INSTRUCTIONS FOR TOOL-USE ] (if github-mcp-server active):
 
-  Step 1: Use get_file_contents to read '/README.asc' from 'workspace-transfer'
+  Step 1: Use get_file_contents to read '/README.resume.asc' from 'workspace-transfer'
   (owner: nailara-technologies, branch: base)
 
   Step 2: Use get_file_contents to read '/models/{your-workspace}/SYSTEM/status.md'
@@ -81,7 +81,9 @@ OTHERWISE:
 
     ..RESUMING..
 
-  Step 5: Stop. Do not explain. Do not summarize. Do not ask questions. Wait for user.
+  Step 5: Stop. Wait for user.
+
+  Note: README.resume.asc contains guidelines for what to do after ..RESUMING..
 ```
 
 ---
