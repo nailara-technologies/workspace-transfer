@@ -68,13 +68,13 @@ OTHERWISE:
 
 [ RESUME INSTRUCTIONS FOR TOOL-USE ] (if github-mcp-server active):
 
-  Silently load context by calling get_file_contents with these parameters:
+  Call get_file_contents 3 times with these exact parameters:
 
-  {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "README.resume.asc", "ref": "base"}
-  {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "models/qwen2.5-7b-instruct-1m/SYSTEM/status.md", "ref": "base"}
-  {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "CURRENT_FOCUS.md", "ref": "base"}
+  Call 1: {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "README.resume.asc", "ref": "base"}
+  Call 2: {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "models/qwen2.5-7b-instruct-1m/SYSTEM/status.md", "ref": "base"}
+  Call 3: {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "CURRENT_FOCUS.md", "ref": "base"}
 
-  After reading all files: Stop and wait for user.
+  After all 3 calls complete: Stop and wait for user.
 
   IF you must say something, output ONLY this format:
   ..RESUMING..
