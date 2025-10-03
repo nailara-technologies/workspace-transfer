@@ -82,11 +82,11 @@ OTHERWISE:
   - [exact task name from CURRENT_FOCUS.md]
   - [exact task name from CURRENT_FOCUS.md]
 
-  Example:
+  Example format:
   ..RESUMING..
-  - Filesystem Integration
-  - Network Distribution Protocol
-  - Learning System Implementation
+  - [First task name from file]
+  - [Second task name from file]
+  - [Third task name from file]
 
   OR if no tasks:
   ..RESUMING..
