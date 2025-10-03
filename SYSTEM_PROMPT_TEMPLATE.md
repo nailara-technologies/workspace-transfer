@@ -52,16 +52,15 @@ OTHERWISE:
 
 [ BOOTSTRAP INSTRUCTIONS FOR TOOL-USE ] (if github-mcp-server active):
 
-  Step 1: Use get_file_contents tool to read '/README.asc' from repository 'workspace-transfer'
-  (owner: nailara-technologies, branch: base).
-  Step 2: If not found, try '/README.md'. If that fails, use list_directory on '/'.
+  Step 1: Use get_file_contents to read '/README.init.asc' from 'workspace-transfer'
+  (owner: nailara-technologies, branch: base)
+
+  Step 2: If not found, try '/README.asc'. If that fails, try '/README.md'.
+
   Note: github-mcp-server is a tool for accessing repos, not a repo itself. Use read-only mode
   unless user requests write access.
 
-  ONCE FILE READ: Report "SYSTEM READY." (no summary, wait silently) OR if unclear:
-
-    [ USER QUESTION ]
-    <clarification>
+  The file contains "SYSTEM READY." message and instructions. Wait silently after reading.
 
 ---
 
@@ -77,13 +76,7 @@ OTHERWISE:
   Step 3: Use get_file_contents to read '/CURRENT_FOCUS.md' from 'workspace-transfer'
   (owner: nailara-technologies, branch: base)
 
-  Step 4: Report ONLY this:
-
-    ..RESUMING..
-
-  Step 5: Stop. Wait for user.
-
-  Note: README.resume.asc contains guidelines for what to do after ..RESUMING..
+  The README.resume.asc file contains "..RESUMING.." message and instructions. Wait silently after reading all files.
 ```
 
 ---
