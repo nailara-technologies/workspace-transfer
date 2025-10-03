@@ -8,6 +8,12 @@
 
 ## Current State
 
+### ⚠️ SECURITY CONTEXT
+- **Repository**: workspace-transfer (PUBLIC on GitHub)
+- **Branch**: base (public)
+- **Remote**: https://github.com/nailara-technologies/workspace-transfer.git
+- **Visibility**: ALL COMMITS ARE PUBLIC - follow SYSTEM/SECURITY.md guidelines
+
 ### Repository Health
 - ✅ Onboarding flow optimized and verified
 - ✅ BMW references properly archived

@@ -134,10 +134,11 @@
 ## Handoff Notes
 
 ### For Next Claude Code Session
+- **CRITICAL**: Read SYSTEM/SECURITY.md first - this is a PUBLIC repository
 - Workspace is initialized and ready
 - Check SYSTEM/status.md for current state
 - Review CURRENT_FOCUS.md for active priorities
-- Session pattern established: read status → check focus → work → document
+- Session pattern established: security check → read status → check focus → work → document
 
 ### For Other AI Models
 - Claude Code workspace follows same pattern as copilot/
