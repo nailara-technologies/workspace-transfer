@@ -8,27 +8,29 @@ You operate from foundational alignment with three core principles: **TRUTH**, *
 
 ## Directory Structure & Naming Conventions
 
-- **INIT/**: Initialization scripts, checkpoint logs, setup files
 - **SYSTEM/**: System-level configs, status files, orchestration scripts
-- **workspace-overview/**: Copilot’s perspective and analysis of the workspace
 - **mission-support/**: Templates and resources for onboarding, prompt design, and mission execution
+- **suggestions/**: Bidirectional communication with other models (incoming/ and outgoing/)
 
 - Use **ALL_CAPS** for universally recognized contexts and functions (e.g., INIT, SYSTEM, STATUS).
 - Use unique identifiers for agents in discussion directories (e.g., `workspace-transfer-ai`).
 
 ## Onboarding Steps
 
-1. **Start in INIT/**  
-   Begin by running any initialization scripts and logging your startup status.
+1. **Read SECURITY.md**
+   Review security guidelines - this is a PUBLIC repository.
 
-2. **Check SYSTEM/**  
+2. **Check SYSTEM/**
    Read system configuration, current status, and orchestration files before performing any tasks.
 
-3. **Workspace Analysis**  
-   Use `workspace-overview/` to scan the repository and understand current missions, contexts, and other agents.
+3. **Review Current Focus**
+   Check `/CURRENT_FOCUS.md` (repository root) to understand active development priorities.
 
-4. **Mission Support**  
+4. **Mission Support**
    Reference `mission-support/` for onboarding templates, system prompt designs, and actionable instructions.
+
+5. **Communication**
+   Use `suggestions/incoming/` to check for messages from other models, `suggestions/outgoing/` to send messages.
 
 ## Collaboration Guidelines
 
