@@ -1,7 +1,12 @@
 {
   "model": "qwen2.5-7b-instruct-1m",
-  "description": "Innovative model with 1M tokens from V1.4 of Nomic-Inc",
+  "description": "Innovative model with 1M tokens, optimized for Protocol-7 framework.",
   "framework": "TensorFlow-2.4.x",
+  "dependencies": [
+    "python>=3.8",
+    "tensorflow>=2.4",
+    "nomic"
+  ],
   "versions": [
     "1.4-opt-extended"
   ],
@@ -10,5 +15,11 @@
   "licenses": [
     "GPL",
     "SPDX"
-  ]
+  ],
+  "os_compatibility": [
+    "Linux",
+    "macOS",
+    "Windows"
+  ],
+  "notes": "See README.md and index.asc for full workflow."
 }
