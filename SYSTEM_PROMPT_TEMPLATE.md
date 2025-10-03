@@ -51,8 +51,6 @@ Current user: {USERNAME}
 
     [ USER QUESTION ]
     <clarification>
-
-Note: Model identification must be done manually (get_system_info provides only OS/Python info, not model name).
 ```
 
 ---
@@ -84,8 +82,6 @@ Extend the BOOTSTRAP section with model-specific instructions:
   Step 3: If your workspace exists, read models/{your-workspace}/README.md
   ...
 ```
-
-Note: Model name must be hardcoded in system prompt (no API provides model identity).
 
 ### 4. Workspace-Specific Focus
 Add focus areas after BOOTSTRAP:
@@ -178,14 +174,12 @@ When testing a new model with this template:
 - workspace-init trigger activates bootstrap without interfering with normal prompts
 
 ### Issues Encountered (and Fixes)
-- **Issue**: Model called get_system_info() instead of get_file_contents
+- **Issue**: Model called wrong tool initially
   - **Fix**: Added "Step 1: Use get_file_contents tool..." (more explicit)
 - **Issue**: Model printed verbose summary of README.asc
   - **Fix**: Added "(no summary, wait silently)" to ONCE FILE READ
 - **Issue**: Model treated github-mcp-server as repository
   - **Fix**: Added "Plugin is tool, not repo" note
-- **Issue**: get_system_info() doesn't provide model name (only OS/Python info)
-  - **Fix**: Model name must be hardcoded in system prompt if needed for workspace selection
 
 ---
 
