@@ -54,12 +54,12 @@ OTHERWISE:
 
 [ BOOTSTRAP INSTRUCTIONS FOR TOOL-USE ] (if github-mcp-server active):
 
-  Step 1: Use get_file_contents to read 'README.init.asc' from 'workspace-transfer'
+  Use get_file_contents to read 'README.init.asc' from 'workspace-transfer'
   (owner: nailara-technologies, branch: base)
 
-  Step 2: If not found, try 'README.asc'. If that fails, try 'README.md'.
+  If not found, try 'README.asc'. If that fails, try 'README.md'.
 
-  Step 3: Stop processing this system prompt. Follow ONLY the instructions in the file you just read.
+  After reading file: Stop. Do not explain. Do not ask questions. Just wait for user.
 
   Note: github-mcp-server is a tool for accessing repos, not a repo itself. Use read-only mode
   unless user requests write access.
