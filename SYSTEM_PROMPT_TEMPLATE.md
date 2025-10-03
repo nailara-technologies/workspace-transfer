@@ -79,6 +79,10 @@ OTHERWISE:
   IF you must say something, output ONLY this:
   ..RESUMING..
   Available: [list 2-3 tasks from CURRENT_FOCUS.md, one line each]
+
+  OR if no tasks found:
+  ..RESUMING..
+  NOTHING TO RESUME.
 ```
 
 ---
