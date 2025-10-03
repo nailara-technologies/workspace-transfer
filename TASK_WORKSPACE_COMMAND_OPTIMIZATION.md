@@ -61,15 +61,20 @@ System Prompt (Minimal)
 - [x] Design new minimal system prompt template (v2.0)
 - [x] Add github-mcp-server fetch instructions
 - [x] Add command → .asc file mapping
-- [ ] Test with qwen2.5-7b-instruct-1m
+- [x] Fix explicit repo parameter (v2.1)
+- [x] Test workspace-init with qwen2.5-7b-instruct-1m (SUCCESS)
+- [ ] Test workspace-resume with qwen model
+- [ ] Test workspace-improve with qwen model
+- [ ] Test workspace-edit with qwen model
 - [ ] Document the new pattern
 
 ### Phase 4: Debug & Validate
-- [ ] Test workspace-init flow with new architecture
+- [x] Test workspace-init flow with new architecture (SUCCESS - first retry)
 - [ ] Test workspace-resume flow with new architecture
-- [ ] Identify and fix debugging issues mentioned
-- [ ] Create troubleshooting guide
-- [ ] Update model onboarding docs
+- [ ] Test workspace-improve flow
+- [ ] Test workspace-edit flow
+- [ ] Create troubleshooting guide for remaining edge cases
+- [ ] Update model onboarding docs with validated pattern
 
 ## 🔧 Technical Details
 
@@ -152,7 +157,15 @@ When user invokes a command, fetch the corresponding .asc file and follow its in
   - README.improve.asc: 3 tool calls for infrastructure mode
   - README.edit.asc: 2 tool calls for edit mode
 - ✅ Updated SYSTEM_PROMPT_MINIMAL.md v2.0 with new pattern
-- 🔄 Next: Test with qwen model, verify tool call success
+
+**Test Iteration 1:**
+- ❌ Test failed: Missing repo parameter
+- ✅ Fixed: SYSTEM_PROMPT_MINIMAL.md v2.1 with explicit parameter format
+- ✅ Test passed: workspace-init executed perfectly on first retry
+- ✅ Model output exactly "SYSTEM READY." with no extra text
+- ✅ Clean stop, no verbosity, all tool calls succeeded
+
+**Result:** workspace-init command validated and working
 
 ---
 
