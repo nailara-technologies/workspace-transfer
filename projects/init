@@ -1,0 +1,16 @@
+# INIT
+
+Bootstrap workspace only. Report status and wait.
+
+```bash
+cd /home/claude/workspace-transfer
+git pull origin base
+```
+
+After bootstrap, output only:
+
+```
+SYSTEM READY.
+```
+
+Then wait for user input.
