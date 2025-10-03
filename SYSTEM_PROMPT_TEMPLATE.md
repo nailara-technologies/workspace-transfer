@@ -74,7 +74,7 @@ OTHERWISE:
   {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "models/qwen2.5-7b-instruct-1m/SYSTEM/status.md", "ref": "base"}
   {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "CURRENT_FOCUS.md", "ref": "base"}
 
-  Silent mode: Read files into memory. Do not output their contents. Do not summarize. Output nothing except what the first file contains.
+  After reading all files: Stop immediately. Say nothing. Do not ask questions. Do not offer help. Do not explain. Just stop and wait.
 ```
 
 ---
