@@ -72,7 +72,7 @@ OTHERWISE:
   2. {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "models/qwen2.5-7b-instruct-1m/SYSTEM/status.md", "ref": "base"}
   3. {"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "CURRENT_FOCUS.md", "ref": "base"}
 
-  Execute all 3 calls, then stop.
+  After all 3 files are read, stop. Do not explain. Do not summarize. Just wait for user.
 ```
 
 ---
