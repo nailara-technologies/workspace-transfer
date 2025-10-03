@@ -66,12 +66,15 @@ OTHERWISE:
 
 [ RESUME INSTRUCTIONS FOR TOOL-USE ] (if github-mcp-server active):
 
-  Use get_file_contents to read these files from 'workspace-transfer' (owner: nailara-technologies, branch: base):
-  1. '/README.resume.asc'
-  2. '/models/qwen2.5-7b-instruct-1m/SYSTEM/status.md' (replace workspace name if different)
-  3. '/CURRENT_FOCUS.md'
+  Use get_file_contents to read these 3 files (exact paths, case-sensitive):
 
-  After reading all 3 files once, stop. Do not loop. Do not read again.
+  File 1: get_file_contents({"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "/README.resume.asc", "ref": "base"})
+
+  File 2: get_file_contents({"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "/models/qwen2.5-7b-instruct-1m/SYSTEM/status.md", "ref": "base"})
+
+  File 3: get_file_contents({"owner": "nailara-technologies", "repo": "workspace-transfer", "path": "/CURRENT_FOCUS.md", "ref": "base"})
+
+  After reading all 3 files once, stop.
 ```
 
 ---
