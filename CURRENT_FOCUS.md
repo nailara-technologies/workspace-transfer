@@ -91,6 +91,60 @@
 
 ---
 
+## 🔧 Workspace Command System
+**Priority**: HIGH
+**Status**: In Development
+
+**Objective**: Implement command directives for AI models to bootstrap and resume work
+
+**Command Patterns**:
+
+### workspace-init
+Bootstrap fresh model into workspace-transfer repository
+- Reads README.asc for essential 5-step bootstrap
+- Confirms security awareness (PUBLIC repo)
+- Reports "SYSTEM READY." when complete
+- **Status**: ✅ Implemented in SYSTEM_PROMPT_TEMPLATE.md
+
+### workspace-resume (PLANNED)
+Resume previous work session with context restoration
+- Implies: workspace-init first (bootstrap before resume)
+- Fetches: models/{workspace}/SYSTEM/status.md for current state
+- Fetches: models/{workspace}/sessions/latest.md or CURRENT_FOCUS.md
+- Loads: Active task, blockers, next steps
+- Reports: "RESUMING: [task description]" then waits for user
+- **Status**: 🔄 To be implemented
+
+### workspace-improve (PLANNED)
+Load workspace framework for maintenance/optimization
+- Implies: workspace-init first
+- Focus: Repository structure, documentation, workflows
+- Does NOT resume main tasks (infrastructure-only mode)
+- Loads: WORKSPACE_STANDARD.md, workflow patterns, best practices
+- Reports: "WORKSPACE MODE: Ready for infrastructure improvements"
+- **Status**: 🔄 To be implemented
+
+### workspace-edit (PLANNED)
+Load workspace for direct file/documentation editing
+- Implies: workspace-init first
+- Focus: Documentation updates, structure fixes, template edits
+- Does NOT resume development tasks (edit-only mode)
+- Loads: Repository structure, documentation standards
+- Reports: "EDIT MODE: Ready for workspace updates"
+- **Status**: 🔄 To be implemented
+
+**Implementation Location**: SYSTEM_PROMPT_TEMPLATE.md
+**Reference**: See template for workspace-init pattern (tested and working)
+
+**Next Steps**:
+1. Design workspace-resume state restoration logic
+2. Define status.md format for resumable state
+3. Create resume protocol in SYSTEM_PROMPT_TEMPLATE.md
+4. Test with local models (qwen, etc.)
+5. Implement workspace-improve and workspace-edit commands
+
+---
+
 ## 📋 Secondary Tasks
 
 ### Code Quality & Infrastructure
