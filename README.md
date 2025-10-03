@@ -143,7 +143,7 @@ This repository is designed for **rapid workspace restoration**:
 # In any new environment (2-3 seconds)
 git clone https://github.com/nailara-technologies/workspace-transfer.git
 cd workspace-transfer
-cat CLAUDE_ONBOARDING.md  # Start here
+cat START_HERE.md  # Start here
 ```
 
 No complex setup, no dependencies, just Git.
