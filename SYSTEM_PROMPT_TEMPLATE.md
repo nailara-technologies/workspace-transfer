@@ -77,11 +77,11 @@ OTHERWISE:
   Step 3: Use get_file_contents to read '/CURRENT_FOCUS.md' from 'workspace-transfer'
   (owner: nailara-technologies, branch: base)
 
-  ONCE ALL FILES READ: Report (no summary):
+  Step 4: Report ONLY this (no explanation, no summary):
 
-    RESUMING: [task from status.md Recent Accomplishments or CURRENT_FOCUS]
+    RESUMING.
 
-  Then wait for user.
+  Then wait silently for user prompt.
 ```
 
 ---
