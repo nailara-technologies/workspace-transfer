@@ -2,7 +2,7 @@
 
 **For small-context models (7B-13B) or models that lose focus**
 
-**Version**: 2.0 - Explicit tool-call .asc files
+**Version**: 2.1 - Explicit repo parameter fix
 
 Copy the template below:
 
@@ -14,22 +14,42 @@ LANGUAGE: English only. No Chinese/Japanese/etc.
 COMMANDS (trigger on exact match):
 
 IF user says 'workspace-init':
-  get_file_contents: README.init.asc from workspace-transfer (owner: nailara-technologies, ref: base)
+  CALL TOOL: get_file_contents
+  Parameters:
+    - owner: nailara-technologies
+    - repo: workspace-transfer
+    - path: README.init.asc
+    - ref: base
   Follow instructions in that file exactly.
   Stop when file says STOP.
 
 IF user says 'workspace-resume':
-  get_file_contents: README.resume.asc from workspace-transfer (owner: nailara-technologies, ref: base)
+  CALL TOOL: get_file_contents
+  Parameters:
+    - owner: nailara-technologies
+    - repo: workspace-transfer
+    - path: README.resume.asc
+    - ref: base
   Follow instructions in that file exactly.
   Stop when file says STOP.
 
 IF user says 'workspace-improve':
-  get_file_contents: README.improve.asc from workspace-transfer (owner: nailara-technologies, ref: base)
+  CALL TOOL: get_file_contents
+  Parameters:
+    - owner: nailara-technologies
+    - repo: workspace-transfer
+    - path: README.improve.asc
+    - ref: base
   Follow instructions in that file exactly.
   Stop when file says STOP.
 
 IF user says 'workspace-edit':
-  get_file_contents: README.edit.asc from workspace-transfer (owner: nailara-technologies, ref: base)
+  CALL TOOL: get_file_contents
+  Parameters:
+    - owner: nailara-technologies
+    - repo: workspace-transfer
+    - path: README.edit.asc
+    - ref: base
   Follow instructions in that file exactly.
   Stop when file says STOP.
 
@@ -40,15 +60,15 @@ OTHERWISE:
 ## How It Works
 
 1. **Ultra-minimal system prompt** - Just trigger conditions
-2. **All instructions in .asc files** - Model reads explicit steps
-3. **Tool call format in .asc** - Model knows exact parameters
+2. **Explicit tool parameters** - Every parameter spelled out including repo
+3. **All instructions in .asc files** - Model reads explicit steps
 4. **STOP instruction** - Prevents runaway verbosity
 
 ## Why This Works for Small Models
 
-- **No ambiguity**: "DO THIS" not "you might want to"
-- **Explicit parameters**: Every tool call spelled out
-- **Clear stopping point**: "STOP. Wait for user."
+- **No ambiguity**: "CALL TOOL: get_file_contents" with all params
+- **Explicit repo parameter**: repo: workspace-transfer (not implicit)
+- **Clear stopping point**: "Stop when file says STOP."
 - **No freestyle thinking**: Just follow the recipe
 
 ## Customization
@@ -57,20 +77,25 @@ Replace `{USERNAME}` with your name.
 
 ## Testing
 
-1. Say `workspace-init` → Model should call tools then say "SYSTEM READY."
-2. Say `workspace-resume` → Model should call 3 tools then list tasks
-3. Model should STOP after confirmation (not keep talking)
+1. Say `workspace-init` → Model should call tool with ALL 4 parameters (owner, repo, path, ref)
+2. Model should read README.init.asc
+3. Model should follow instructions in that file
+4. Model should STOP after confirmation (not keep talking)
 
 ## Troubleshooting
 
+**Model missing repo parameter?**
+- Check system prompt has "repo: workspace-transfer" explicitly listed
+- Make sure Parameters: section is indented under CALL TOOL
+
 **Model calls wrong tool?**
-- Check .asc file has exact parameter names
-- Add "CALL TOOL:" prefix for clarity
+- Verify "CALL TOOL: get_file_contents" is explicit
+- Check tool name matches API exactly
 
 **Model doesn't stop?**
-- Strengthen STOP command in .asc file
-- Add to system prompt: "When file says STOP, you MUST stop."
+- Strengthen STOP command: "Stop when file says STOP."
+- Add to end: "Do not continue after STOP."
 
 **Model too verbose?**
-- Reduce .asc file content
-- Make output template exact: "OUTPUT EXACTLY: [text]"
+- System prompt should trigger file fetch only
+- All other instructions go in .asc files
