@@ -376,7 +376,89 @@ perl scripts/load-context-checkpoint.pl --session-name=work --decrypt
 
 ---
 
-### Phase 0.7: No-Shell Checkpoint Strategy (LOW PRIORITY)
+### Phase 0.7: Claude Code Handoff Optimization (HIGH PRIORITY)
+
+**Status**: 🚀 IN PROGRESS
+
+**Goal**: Seamless handoff between Claude Console and Claude Code sessions
+
+**Implementation**:
+1. **Quick handoff script**: `scripts/handoff-to-code.pl`
+   - Detect current location (workspace-transfer, protocol-7, or other)
+   - Export minimal context checkpoint
+   - Generate Claude Code startup command
+   - Include repository state and current task
+
+2. **Return handoff**: `scripts/handoff-from-code.pl`
+   - Import changes from Claude Code session
+   - Update context with completed work
+   - Generate summary for Console continuation
+
+3. **Universal launcher**: Works from any filesystem location
+   - Auto-detect which repository we're in
+   - Fall back to workspace-transfer if elsewhere
+   - Include breadcrumbs for navigation
+
+**Benefits**:
+- 💎 Leverage Claude Code credits during low Console credit periods
+- 🚀 Use Code for implementation, Console for planning/review
+- ✨ Maintain context across tool boundaries
+- 🔄 Bi-directional handoff capability
+
+---
+
+### Phase 0.8: Webhook Infrastructure (HIGH PRIORITY)
+
+**Status**: 📋 TODO - Ready to implement
+
+**Goal**: Direct webhook integration into Protocol-7 httpd zenka
+
+**Resources Available**:
+- 2 idle servers online
+- Server 1: 8GB RAM, 32GB/month traffic allowance
+- Perfect for distributed Protocol-7 philosophy
+
+**Implementation Plan**:
+1. **Webhook Receiver in httpd zenka**:
+   - Accept GitHub push notifications
+   - Protocol-7 message format compatibility
+   - Auto-sync workspace-transfer changes
+   - Trigger checkpoint creation on commits
+
+2. **Webhook Sender capabilities**:
+   - Send status updates to external services
+   - Checkpoint completion notifications
+   - Cross-instance Protocol-7 messaging
+   - Distributed task coordination
+
+3. **Security Layer**:
+   - HMAC signature verification (GitHub webhooks)
+   - Protocol-7 authentication integration
+   - Rate limiting and DDoS protection
+   - Encrypted payload support
+
+4. **Use Cases**:
+   - Auto-deploy on git push
+   - Distributed checkpoint storage
+   - Cross-server Protocol-7 synchronization
+   - External service integration (CI/CD)
+
+**Technical Details**:
+- Integrate with existing httpd zenka codebase
+- Use Protocol-7's event system for handling
+- Store webhook configs in Protocol-7's config format
+- Support both JSON and Protocol-7 message formats
+
+**Benefits**:
+- 🌐 True distributed operation
+- 💾 Reduce Claude token usage (external processing)
+- 🔄 Real-time synchronization
+- 🚀 Leverage idle server resources
+- 🔒 Secure, authenticated communication
+
+---
+
+### Phase 0.9: No-Shell Checkpoint Strategy (MEDIUM PRIORITY)
 
 **Status**: 📋 TODO - Planning phase
 
