@@ -6,7 +6,7 @@ use JSON::PP;
 
 # Signature Validation Tool
 # Provides validate_signature and ask_user tools for models
-# Uses ELF4/ELF7 checksums for Protocol-7 aligned validation
+# Uses ELF7 checksums for Protocol-7 aligned validation
 
 my $VERSION = '1.0';
 
@@ -106,8 +106,9 @@ sub tool_validate_signature {
     
     if ($content =~ /payload:\s*\|\n(.*)/s) {
         my $payload_section = $1;
-        # Remove indentation
-        $payload = join("\n", map { s/^  //; $_ } split /\n/, $payload_section);
+        # Remove exactly 2 spaces of indentation from each line
+        my @lines = split /\n/, $payload_section;
+        $payload = join("\n", map { s/^  //; $_ } @lines);
     }
     
     unless ($signature && $payload) {
@@ -190,7 +191,7 @@ sub sign_file {
     
     # Write signed file
     open my $out, '>', $output_file or die "Cannot write $output_file: $!";
-    
+
     print $out "# SIGNED WORKSPACE COMMAND\n";
     print $out "# Protocol-7 ELF checksum validation\n";
     print $out "# DO NOT MODIFY - signature will become invalid\n";
@@ -206,12 +207,14 @@ sub sign_file {
     print $out "\n";
     print $out "# PAYLOAD (signed content)\n";
     print $out "payload: |\n";
-    
-    # Indent payload
-    for my $line (split /\n/, $payload) {
-        print $out "  $line\n";
+
+    # Indent payload, preserving exact line structure including trailing newline
+    my @lines = split /\n/, $payload, -1;  # -1 keeps trailing empty strings
+    for (my $i = 0; $i < @lines; $i++) {
+        print $out "  $lines[$i]";
+        print $out "\n" if $i < @lines - 1 || $payload =~ /\n$/;
     }
-    
+
     close $out;
     
     return $signature;
