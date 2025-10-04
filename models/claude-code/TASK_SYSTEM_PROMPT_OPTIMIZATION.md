@@ -169,16 +169,29 @@ A successful solution would:
 
 ## Current Experiments
 
+### SYSTEM_PROMPT_SIGNATURE.md (NEW - Cryptographic Approach)
+Uses validate-signature.pl tool to cryptographically verify command files.
+- Models verify signatures themselves via tool calls
+- Trust through verification, not agreement
+- Protocol-7 ELF checksums (ELF4/ELF7 with BMW pattern)
+- Tamper-proof: any modification invalidates signature
+- Status: Implemented, signatures validated successfully
+
 ### SYSTEM_PROMPT_MINIMAL.md
-16-line prompt with inline tool calls. Testing now.
+16-line prompt with AGREED SILENT EXECUTION MODE keywords.
+- Uses EXECUTE: and OUTPUT-STOP: keywords
+- Agreement-based protocol
+- Fallback for models without signature validation tools
 
 ### SYSTEM_PROMPT_TEMPLATE.md
 Full template (~200 lines) with all documentation. Works but overwhelming.
 
 ### File Structure
-- `README.init.asc`: "SYSTEM READY.\n\nThis is workspace initialization. Context loaded. Wait for user instruction."
-- `README.resume.asc`: "..RESUMING.." (just signal)
-- Qwen model successfully reads files but gets confused on execution
+- `README.init.asc`: Unsigned version with EXECUTE: keywords
+- `README.init.elf7.asc`: Signed version (checksum: 1047b26)
+- `README.resume.asc`: Unsigned version
+- `README.resume.elf7.asc`: Signed version (checksum: 0a00101)
+- `validate-signature.pl`: Signature creation and validation tool
 
 ---
 
