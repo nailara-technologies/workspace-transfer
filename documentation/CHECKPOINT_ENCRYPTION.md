@@ -71,21 +71,46 @@ perl scripts/decrypt-checkpoint.pl --input=checkpoint.enc
 
 ## 🔑 Key Management
 
-### Key Sources (Priority Order)
+### How Keys Are Resolved
 
-1. **--key-file** (recommended)
+**When Claude runs encryption/decryption scripts, keys are resolved in this priority order:**
+
+1. **Explicit key in conversation context** (highest priority)
+   - User says: "Use key ABC123 for this checkpoint"
+   - Claude uses ABC123 for that specific operation
+
+2. **Key in Project custom instructions** (automatic)
+   - If `CHECKPOINT_KEY=...` present in project instructions
+   - Claude automatically sets: `export CHECKPOINT_KEY="..."`
+   - **No user action required** - happens transparently
+
+3. **Ask user** (fallback)
+   - If no key in context or instructions
+   - Claude prompts: "Please provide decryption key"
+   - User can provide key or key file location
+
+**This means:**
+- ✅ Set key once in Project instructions → Works automatically in all sessions
+- ✅ Override with different key in chat → Uses specified key instead
+- ✅ No key anywhere → Claude asks (secure fallback)
+
+### Key Sources (Perl Script Priority Order)
+
+**Note:** The Perl scripts themselves check these sources. Claude bridges between project instructions and environment variables automatically.
+
+1. **--key-file** (recommended for local work)
    ```bash
    echo "my-secret-key" > .checkpoint-key
    perl scripts/encrypt-checkpoint.pl --input=checkpoint.md --key-file=.checkpoint-key
    ```
 
-2. **CHECKPOINT_KEY environment variable**
+2. **CHECKPOINT_KEY environment variable** (auto-set by Claude)
    ```bash
    export CHECKPOINT_KEY="my-secret-key"
    perl scripts/encrypt-checkpoint.pl --input=checkpoint.md
    ```
 
-3. **Interactive prompt** (most secure)
+3. **Interactive prompt** (manual fallback)
    ```bash
    perl scripts/encrypt-checkpoint.pl --input=checkpoint.md
    # Prompts for key (no echo)
@@ -94,19 +119,21 @@ perl scripts/decrypt-checkpoint.pl --input=checkpoint.enc
 ### Storage Recommendations
 
 **Best**: Claude Projects custom instructions
-- Add key to Projects environment
-- Available to all sessions
+- Add key to Projects custom instructions: `CHECKPOINT_KEY=your-key-here`
+- Claude automatically uses it in all sessions
 - Not visible in code/commits
+- **Recommended workflow**: Set once, works everywhere
 
 **Good**: Local .checkpoint-key file
 - Keep in .gitignore
 - Never commit this file!
 - Share securely with team
+- Useful for local development
 
 **Acceptable**: Environment variable
 - Set in ~/.bashrc or session
 - Not persisted in git
-- Easy to use
+- Easy to use locally
 
 **Avoid**: --key parameter
 - Visible in process list (ps aux)
@@ -116,6 +143,52 @@ perl scripts/decrypt-checkpoint.pl --input=checkpoint.enc
 ---
 
 ## 📋 Common Workflows
+
+### With Claude Projects (Recommended - Automatic)
+
+**Setup once in Projects custom instructions:**
+```
+CHECKPOINT_KEY=7AW00I004BQT4
+```
+
+**Then use naturally in conversations:**
+
+```
+User: "Create an encrypted checkpoint for today's work"
+
+Claude: [automatically uses CHECKPOINT_KEY from instructions]
+  export CHECKPOINT_KEY="7AW00I004BQT4"
+  perl scripts/export-context-checkpoint.pl --session-name=daily-work
+  perl scripts/encrypt-checkpoint.pl --input=context-checkpoints/CHECKPOINT_*_daily-work.md
+  ✓ Checkpoint encrypted
+
+User: "Decrypt that checkpoint"
+
+Claude: [automatically uses same key]
+  export CHECKPOINT_KEY="7AW00I004BQT4"
+  perl scripts/decrypt-checkpoint.pl --input=context-checkpoints/CHECKPOINT_*_daily-work.enc
+  ✓ Checkpoint decrypted
+```
+
+**Benefits:**
+- ✅ No manual key management needed
+- ✅ Works across all sessions automatically
+- ✅ Claude handles environment variable bridging
+- ✅ Secure (key not exposed in chat or commits)
+
+### Override Key for Specific Use
+
+**If you need a different key for one checkpoint:**
+
+```
+User: "Encrypt this with key ABC123 instead"
+
+Claude: [uses specified key, not default]
+  export CHECKPOINT_KEY="ABC123"
+  perl scripts/encrypt-checkpoint.pl --input=checkpoint.md
+```
+
+**The conversation context takes priority over project instructions.**
 
 ### Daily Work Checkpoint
 
