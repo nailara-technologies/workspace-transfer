@@ -283,6 +283,64 @@ Total: 57k tokens consumed
 - [ ] Time to reinitialize is < 2 minutes
 - [ ] Process feels natural, not disruptive
 
+### ⚠️ CRITICAL SECURITY WARNING
+
+**PROBLEM**: Checkpoints may contain sensitive data!
+- API keys, tokens, credentials
+- Private repository information
+- Confidential project details
+- Internal architecture secrets
+
+**DANGER**: workspace-transfer is PUBLIC on GitHub!
+- All commits are visible to everyone
+- Checkpoint files in git = exposed secrets
+- Cannot be fully deleted from git history
+
+**IMMEDIATE ACTIONS REQUIRED**:
+1. **Add to .gitignore**: `context-checkpoints/*.md` (except examples)
+2. **Review before commit**: Check for secrets in checkpoints
+3. **Implement encryption**: See Phase 0.5 below
+
+**TEMPORARY MITIGATION**:
+- Keep checkpoints LOCAL only (not in git)
+- Manual review before any commit
+- Use placeholders for sensitive data
+- Reference secure vault for actual keys
+
+### Phase 0.5: Checkpoint Encryption (HIGH PRIORITY)
+
+**Status**: 🔴 CRITICAL - Required before production use
+
+**Goal**: Encrypt checkpoint files for safe storage in public repository
+
+**Encryption Strategy**:
+1. **Symmetric encryption**: Twofish cipher (BASE32 encoded)
+2. **Key storage**: Claude Projects custom instructions (secure)
+3. **Later addition**: C25519 public key encryption
+4. **Fallback**: Direct key entry when not in Projects
+
+**Implementation**:
+- `scripts/encrypt-checkpoint.pl` - Encrypt checkpoint file
+- `scripts/decrypt-checkpoint.pl` - Decrypt for use
+- Modified export script with `--encrypt` option
+- Modified load script with automatic decryption
+
+**Workflow**:
+```bash
+# Export encrypted checkpoint
+perl scripts/export-context-checkpoint.pl --session-name=work --encrypt
+
+# Load with decryption (prompts for key if needed)
+perl scripts/load-context-checkpoint.pl --session-name=work --decrypt
+```
+
+**Benefits**:
+- ✅ Safe to commit encrypted checkpoints
+- ✅ Public repository stays public
+- ✅ Sensitive data protected
+- ✅ Key in secure Projects environment
+- ✅ Fallback to manual key entry
+
 ---
 
 ## 📦 Phase 2: Integration Tasks
