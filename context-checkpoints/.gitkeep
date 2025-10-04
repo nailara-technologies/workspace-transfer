@@ -1,0 +1,19 @@
+# Context Checkpoints Directory
+
+This directory stores conversation state checkpoints for efficient chat resets.
+
+## Usage
+
+Create checkpoint:
+  perl scripts/export-context-checkpoint.pl [--session-name=NAME]
+
+List checkpoints:
+  perl scripts/load-context-checkpoint.pl --list
+
+Load checkpoint:
+  perl scripts/load-context-checkpoint.pl [--session-name=NAME]
+
+## Purpose
+
+Checkpoints allow resetting chat context while preserving essential state,
+reducing token baseline by 80-90% for continued work.
