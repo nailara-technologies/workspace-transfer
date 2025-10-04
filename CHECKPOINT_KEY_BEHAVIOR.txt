@@ -1,0 +1,48 @@
+# Checkpoint Key Behavior Summary
+
+## How Claude Automatically Handles Encryption Keys
+
+### Resolution Priority (Conversation → Instructions → Ask)
+
+1. **Explicit in conversation** (highest priority)
+   - User: "Use key ABC123 for this"
+   - Claude uses ABC123
+
+2. **From project instructions** (automatic)
+   - CHECKPOINT_KEY=7AW00I004BQT4 in instructions
+   - Claude sets: export CHECKPOINT_KEY="7AW00I004BQT4"
+   - No user action needed
+
+3. **Ask user** (fallback)
+   - No key found anywhere
+   - Claude: "Please provide encryption key"
+
+### Example Flow
+
+**Setup once:**
+Add to Claude Projects custom instructions:
+```
+CHECKPOINT_KEY=your-key-here
+```
+
+**Use anywhere:**
+```
+User: "Encrypt checkpoint"
+Claude: [automatically uses key from instructions]
+        export CHECKPOINT_KEY="your-key-here"
+        perl scripts/encrypt-checkpoint.pl ...
+        ✓ Done
+```
+
+### Documentation Files
+
+- documentation/CHECKPOINT_ENCRYPTION.md (complete guide)
+- documentation/CHECKPOINT_KEY_RESOLUTION.md (quick reference)
+- TODO_BACKUP_RESTORE.md (Phase 0.5 marked complete)
+
+### Commits
+
+- 562de5c - Docs: Clarify automatic key resolution
+- 573b32e - Add quick reference for key resolution
+- 7a1ee30 - Update CURRENT_FOCUS: Phase 0 complete
+
