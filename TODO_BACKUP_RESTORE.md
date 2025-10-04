@@ -309,21 +309,21 @@ Total: 57k tokens consumed
 
 ### Phase 0.5: Checkpoint Encryption (HIGH PRIORITY)
 
-**Status**: 🔴 CRITICAL - Required before production use
+**Status**: ✅ COMPLETED (with CryptX)
 
 **Goal**: Encrypt checkpoint files for safe storage in public repository
 
 **Encryption Strategy**:
-1. **Symmetric encryption**: Twofish cipher (BASE32 encoded)
+1. **Symmetric encryption**: Twofish cipher (BASE32 encoded) via CryptX
 2. **Key storage**: Claude Projects custom instructions (secure)
 3. **Later addition**: C25519 public key encryption
 4. **Fallback**: Direct key entry when not in Projects
 
 **Implementation**:
-- `scripts/encrypt-checkpoint.pl` - Encrypt checkpoint file
-- `scripts/decrypt-checkpoint.pl` - Decrypt for use
-- Modified export script with `--encrypt` option
-- Modified load script with automatic decryption
+- ✅ `scripts/encrypt-checkpoint.pl` - Encrypt checkpoint file (using CryptX)
+- ✅ `scripts/decrypt-checkpoint.pl` - Decrypt for use (using CryptX)
+- ✅ Modified export script with `--encrypt` option
+- ✅ Modified load script with automatic decryption
 
 **Workflow**:
 ```bash
@@ -340,6 +340,93 @@ perl scripts/load-context-checkpoint.pl --session-name=work --decrypt
 - ✅ Sensitive data protected
 - ✅ Key in secure Projects environment
 - ✅ Fallback to manual key entry
+
+**Completed**: 2025-10-04
+- Migrated from Crypt::Twofish2 to CryptX (Crypt::Mode::CBC)
+- Uses standard Ubuntu packages (libcryptx-perl)
+- Tested encryption/decryption round-trip successfully
+
+---
+
+### Phase 0.6: Protocol-7 Encryption Cleanup (MEDIUM PRIORITY)
+
+**Status**: 📋 TODO
+
+**Goal**: Migrate Protocol-7 from deprecated Crypt::Twofish2 to CryptX
+
+**Affected Files**:
+- `data/lib-path/pm/AMOS7/Twofish.pm` (main encryption module)
+- `modules/keys.console.create`
+- `modules/keys.console.gen-pwd-keyfile`
+- `modules/keys.console.get-sp-pub-key`
+
+**Migration Path**:
+1. Update AMOS7::Twofish to use `Crypt::Mode::CBC` with Twofish
+2. Replace all `Crypt::Twofish2->new()` calls with CryptX equivalent
+3. Update mode constants (MODE_CBC, etc.)
+4. Test all key generation and encryption modules
+5. Update installation docs to require libcryptx-perl
+6. Remove Crypt-Twofish2-*.tar.gz from data/lib-path/pm-src/
+
+**Benefits**:
+- ✅ Use maintained, standard libraries
+- ✅ Available in Ubuntu repositories
+- ✅ Better security (audited code)
+- ✅ Consistent with workspace-transfer
+
+---
+
+### Phase 0.7: No-Shell Checkpoint Strategy (LOW PRIORITY)
+
+**Status**: 📋 TODO - Planning phase
+
+**Problem**: Checkpoint encryption requires shell access and file system
+- GitHub Copilot: No shell, no file system access
+- Local LLMs: May lack Perl/dependencies
+- Web-only interfaces: No execution environment
+
+**Goal**: Enable checkpoint encryption/handoff in shell-less environments
+
+**Potential Solutions**:
+
+**Option A: Pure-Text Encrypted Format**
+- BASE64/BASE32 encode encrypted checkpoint directly in chat
+- User copies encrypted text block from one chat to another
+- Decryption happens in new environment with shell access
+- Pro: Works everywhere, no tools needed
+- Con: Large text blocks in chat (token overhead)
+
+**Option B: Browser-Based Encryption**
+- JavaScript implementation of Twofish + BASE32
+- HTML artifact with encryption/decryption UI
+- User encrypts in browser, copies result
+- Pro: Works in any environment with artifact support
+- Con: Requires JavaScript implementation
+
+**Option C: Hybrid Approach**
+- For shell environments: Use existing Perl scripts
+- For no-shell: Provide encrypted text directly
+- For browser-only: JavaScript encryption artifact
+- Pro: Best of all worlds
+- Con: Maintain multiple implementations
+
+**Option D: Protocol-7 BASE32 Encoding**
+- Leverage existing Protocol-7 covert channel techniques
+- Encode checkpoint state in BASE32 with error correction
+- No encryption, but obscured and compressed
+- Pro: Works universally, no crypto needed
+- Con: Security through obscurity only
+
+**Recommended**: Start with Option C (Hybrid)
+1. Phase 1: Keep current Perl implementation
+2. Phase 2: Add JavaScript artifact for browser-only
+3. Phase 3: Add plain-text fallback for minimal environments
+
+**Future Considerations**:
+- API-based encryption service?
+- Cloud-based key management?
+- Integration with Projects file storage?
+- Cross-model checkpoint compatibility testing
 
 ---
 
