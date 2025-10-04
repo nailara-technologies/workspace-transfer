@@ -4,7 +4,8 @@ use strict;
 use warnings;
 use Getopt::Long;
 use File::Basename;
-use Crypt::Twofish;
+use Crypt::Mode::CBC;
+use Crypt::PRNG qw(random_bytes);
 use Crypt::Misc qw(encode_b32r decode_b32r);
 use Digest::SHA qw(sha256);
 
@@ -116,35 +117,20 @@ sub encrypt_checkpoint {
     # Derive 256-bit key from passphrase using SHA-256
     my $key = sha256($passphrase);
     
-    # Pad plaintext to 16-byte blocks (Twofish block size)
-    my $block_size = 16;
-    my $pad_length = $block_size - (length($plaintext) % $block_size);
-    $plaintext .= chr($pad_length) x $pad_length;
+    # Generate random IV (16 bytes for Twofish)
+    my $iv = random_bytes(16);
     
-    # Initialize Twofish cipher
-    my $cipher = Crypt::Twofish->new($key);
+    # Initialize CBC mode with Twofish cipher
+    my $cbc = Crypt::Mode::CBC->new('Twofish');
     
-    # Encrypt in CBC mode with simple IV (zeros)
-    # Note: For production, use random IV and prepend to ciphertext
-    my $iv = "\x00" x $block_size;
-    my $ciphertext = '';
+    # Encrypt (CBC mode handles padding automatically)
+    my $ciphertext = $cbc->encrypt($plaintext, $key, $iv);
     
-    for (my $i = 0; $i < length($plaintext); $i += $block_size) {
-        my $block = substr($plaintext, $i, $block_size);
-        
-        # XOR with IV (CBC mode)
-        $block ^= $iv;
-        
-        # Encrypt block
-        my $encrypted_block = $cipher->encrypt($block);
-        $ciphertext .= $encrypted_block;
-        
-        # Use encrypted block as next IV
-        $iv = $encrypted_block;
-    }
+    # Prepend IV to ciphertext
+    my $encrypted_data = $iv . $ciphertext;
     
     # Encode as BASE32
-    my $encoded = encode_b32r($ciphertext);
+    my $encoded = encode_b32r($encrypted_data);
     
     # Create encrypted file format
     my $output = <<"END_HEADER";
