@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Getopt::Long;
 use File::Basename;
-use Crypt::Twofish;
+use Crypt::Mode::CBC;
 use Crypt::Misc qw(encode_b32r decode_b32r);
 use Digest::SHA qw(sha256);
 
@@ -123,52 +123,24 @@ sub decrypt_checkpoint {
     my $key = sha256($passphrase);
     
     # Decode from BASE32
-    my $ciphertext = decode_b32r($ciphertext_b32);
+    my $encrypted_data = eval { decode_b32r($ciphertext_b32) };
+    return undef unless defined $encrypted_data;
     
-    # Initialize Twofish cipher
-    my $cipher = Crypt::Twofish->new($key);
+    # Check minimum size (at least IV + one block)
+    return undef if length($encrypted_data) < 32;
     
-    # Decrypt in CBC mode
-    my $block_size = 16;
-    my $iv = "\x00" x $block_size;
-    my $plaintext = '';
+    # Extract IV (first 16 bytes)
+    my $iv = substr($encrypted_data, 0, 16);
+    my $ciphertext = substr($encrypted_data, 16);
     
-    for (my $i = 0; $i < length($ciphertext); $i += $block_size) {
-        my $encrypted_block = substr($ciphertext, $i, $block_size);
-        
-        # Decrypt block
-        my $decrypted_block = $cipher->decrypt($encrypted_block);
-        
-        # XOR with IV (CBC mode)
-        $decrypted_block ^= $iv;
-        
-        $plaintext .= $decrypted_block;
-        
-        # Use encrypted block as next IV
-        $iv = $encrypted_block;
-    }
+    # Initialize CBC mode with Twofish cipher
+    my $cbc = Crypt::Mode::CBC->new('Twofish');
     
-    # Remove padding
-    my $pad_length = ord(substr($plaintext, -1));
+    # Decrypt (CBC mode handles unpadding automatically)
+    my $plaintext = eval { $cbc->decrypt($ciphertext, $key, $iv) };
+    return $plaintext if defined $plaintext;
     
-    # Validate padding
-    if ($pad_length > 0 && $pad_length <= $block_size) {
-        # Check if all padding bytes are correct
-        my $valid_padding = 1;
-        for (my $i = 1; $i <= $pad_length; $i++) {
-            if (ord(substr($plaintext, -$i, 1)) != $pad_length) {
-                $valid_padding = 0;
-                last;
-            }
-        }
-        
-        if ($valid_padding) {
-            $plaintext = substr($plaintext, 0, length($plaintext) - $pad_length);
-            return $plaintext;
-        }
-    }
-    
-    # Padding validation failed - wrong key or corrupted
+    # Decryption failed - wrong key or corrupted
     return undef;
 }
 
