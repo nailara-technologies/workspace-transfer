@@ -8,6 +8,13 @@
 .github-token
 credentials.conf
 
+# Checkpoint files (may contain sensitive data - keep local only)
+# Encrypted checkpoints (.enc) are safe to commit
+context-checkpoints/*.md
+!context-checkpoints/.gitkeep
+!context-checkpoints/*EXAMPLE*.md
+!context-checkpoints/*.enc
+
 # Session markers (local only)
 .initialized
 
