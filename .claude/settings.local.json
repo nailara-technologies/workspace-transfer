@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(find:*)",
+      "Bash(test:*)",
+      "Bash(if [ -f .git/hooks/pre-commit ])",
+      "Bash(then head -10 .git/hooks/pre-commit)",
+      "Bash(fi)",
+      "Bash(perl validate-signature.pl sign:*)",
+      "Bash(perl validate-signature.pl:*)",
+      "Bash(perl:*)",
+      "Bash(git log:*)",
+      "Bash(git filter-branch:*)"
+    ],
+    "deny": [],
+    "ask": []
+  },
+  "git": {
+    "commit_metadata": {
+      "strip_author_info": true,
+      "message": "Do not include author metadata in commit messages"
+    }
+  }
+}
