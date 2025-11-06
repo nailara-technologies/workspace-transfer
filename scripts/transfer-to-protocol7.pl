@@ -5,16 +5,18 @@
 use v5.24;
 use strict;
 use warnings;
-use File::Basename;
+use File::Spec;
 use File::Copy;
 use File::Path qw(make_path);
 use Cwd qw(abs_path getcwd);
+use FindBin qw($RealBin);
 
-# Configuration
-my $WORKSPACE_ROOT = abs_path(dirname(__FILE__) . '/..');
-my $STAGING_DIR = "$WORKSPACE_ROOT/protocol7-staging";
-my $TARGET_REPO = "$WORKSPACE_ROOT/../protocol-7";
-my $MANIFEST_FILE = "$STAGING_DIR/.manifest.yaml";
+# Configuration - using Protocol-7 pattern for robust path resolution
+my $up_dir = File::Spec->updir;
+my $WORKSPACE_ROOT = abs_path(File::Spec->rel2abs(File::Spec->catdir($RealBin, $up_dir)));
+my $STAGING_DIR = File::Spec->catdir($WORKSPACE_ROOT, 'protocol7-staging');
+my $TARGET_REPO = abs_path(File::Spec->catdir($WORKSPACE_ROOT, $up_dir, 'protocol-7'));
+my $MANIFEST_FILE = File::Spec->catfile($STAGING_DIR, '.manifest.yaml');
 
 # Command line options
 my $DRY_RUN = grep { $_ eq '--dry-run' } @ARGV;
