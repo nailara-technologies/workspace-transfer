@@ -1,0 +1,101 @@
+# Transfer Manifest - Protocol-7 Staging to Main Repository
+# This file defines what gets transferred and where
+
+---
+manifest_version: "1.0"
+last_updated: "2025-11-06"
+
+# Repository paths (relative to workspace-transfer root)
+source_repo: "protocol7-staging"
+target_repo: "../protocol-7"
+
+---
+# Transfer Rules
+# Each entry defines source → destination mapping
+
+transfers:
+  # Test transfer - workspace-transfer to protocol-7 integration
+  - source: "modules/test.workspace_transfer"
+    dest: "modules/test.workspace_transfer"
+    action: "copy"
+    description: "Test module demonstrating workspace-transfer staging workflow"
+    preserve_signatures: true
+
+# Additional example entries (uncomment and modify as needed):
+#
+# - source: "modules/httpd.new_feature"
+#   dest: "modules/httpd.new_feature"
+#   action: "copy"  # copy | move | sync
+#   description: "New HTTP feature implementation"
+#   preserve_signatures: true
+#
+# - source: "data/yaml/docs/feature-guide.yaml"
+#   dest: "data/yaml/docs/feature-guide.yaml"
+#   action: "copy"
+#   description: "Documentation for new feature"
+#
+# - source: "bin/dev/test-tool"
+#   dest: "bin/dev/test-tool"
+#   action: "copy"
+#   chmod: "0755"  # Make executable
+#   description: "Development testing tool"
+
+---
+# Transfer Options
+options:
+  # Create backups before overwriting
+  backup_enabled: true
+  backup_suffix: ".bak"
+
+  # Preserve file permissions
+  preserve_permissions: true
+
+  # Preserve AMOS7 signatures
+  preserve_signatures: true
+
+  # Git integration
+  auto_git_add: false  # Don't auto-add transferred files
+  check_git_status: true  # Warn if uncommitted changes
+
+  # Verification
+  verify_after_transfer: true  # Check files after transfer
+  dry_run_by_default: false
+
+---
+# Exclusion Patterns
+exclude:
+  - "*.bak"
+  - "*.tmp"
+  - "*~"
+  - ".DS_Store"
+  - ".gitignore"
+  - "README.md"  # Don't transfer staging README
+
+---
+# Custom Actions (run after transfer)
+post_transfer_hooks: []
+
+# Example hooks:
+# - command: "perl ../protocol-7/bin/dev/update-version"
+#   when: "modules transferred"
+#
+# - command: "git -C ../protocol-7 status"
+#   when: "always"
+
+---
+# Notes
+notes: |
+  Add transfer entries above as you stage work for Protocol-7.
+
+  Action types:
+  - copy: Copy file (leave source intact)
+  - move: Move file (remove from staging)
+  - sync: Synchronize (update if changed)
+
+  Use the transfer script:
+  ../scripts/transfer-to-protocol7.pl --dry-run    # Preview
+  ../scripts/transfer-to-protocol7.pl --interactive # Confirm each
+  ../scripts/transfer-to-protocol7.pl --auto       # Auto-transfer
+
+---
+version: "1.0"

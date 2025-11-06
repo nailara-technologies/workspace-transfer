@@ -1,0 +1,9 @@
+## [:< ##
+
+# name = test.workspace_transfer
+# descr = Test module from workspace-transfer staging area
+
+say "✅ Test module loaded successfully from workspace-transfer!";
+say "This module was staged in workspace-transfer and transferred to protocol-7.";
+
+return TRUE;
