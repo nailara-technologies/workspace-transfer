@@ -1,0 +1,159 @@
+# Active Tasks - Compressed Format
+# Optimized for token efficiency - completed tasks moved to archive
+# Target: <500 tokens for active task list
+
+---
+metadata:
+  version: "1.0"
+  last_updated: "2025-11-06"
+  total_active: 0
+  total_completed: 47  # See archive for history
+  archive_location: "archive/completed-tasks/"
+
+---
+# High Priority (DO THESE FIRST)
+high_priority: []
+
+# Example format:
+# - id: "fs_001"
+#   name: "Implement FUSE filesystem mount"
+#   status: "in_progress"
+#   assignee: "claude-code"
+#   progress: "60%"
+#   blocker: null
+#   detail: "See documentation/tasks/fs_001_fuse_mount.md"
+
+---
+# Medium Priority (DO AFTER HIGH)
+medium_priority: []
+
+# Example format:
+# - id: "learn_002"
+#   name: "Pattern tracking database"
+#   status: "pending"
+#   assignee: null
+#   progress: "0%"
+#   blocker: "Waiting for filesystem integration"
+#   detail: "See CURRENT_FOCUS.md:L73-L92"
+
+---
+# Low Priority (NICE TO HAVE)
+low_priority: []
+
+---
+# Blocked (CAN'T PROCEED)
+blocked:
+  tasks: []
+  # Format:
+  # - id: "net_005"
+  #   name: "Network node discovery"
+  #   blocker: "Needs external library not yet available"
+  #   blocked_since: "2025-11-01"
+
+---
+# Quick Add Template (for new tasks)
+quick_add_template: |
+  - id: "[category]_[number]"
+    name: "Brief task description"
+    status: "pending | in_progress | review | blocked"
+    assignee: "claude | claude-code | qwen | null"
+    progress: "0-100%"
+    blocker: null | "Description of blocker"
+    detail: "File reference or brief notes"
+
+---
+# Task State Definitions
+states:
+  pending: "Defined but not started"
+  in_progress: "Actively being worked on"
+  review: "Complete, awaiting review"
+  blocked: "Cannot proceed due to external dependency"
+  completed: "Done - moved to archive"
+
+---
+# Task Categories
+categories:
+  fs: "Filesystem integration"
+  net: "Network protocol"
+  learn: "Learning system"
+  arch: "Archive system"
+  cmd: "Workspace commands"
+  doc: "Documentation"
+  infra: "Infrastructure/tooling"
+
+---
+# Completed Count by Category
+completed_summary:
+  total: 47
+  by_category:
+    bmw: 12  # BMW resumability work (archived)
+    truth: 8  # 5/13 truth harmonic analysis (archived)
+    covert: 6  # 1-bit covert channel (archived)
+    checkpoint: 9  # Checkpoint encryption system (archived)
+    bootstrap: 7  # Bootstrap and init system (archived)
+    other: 5
+
+  archive_access: |
+    For completed task details:
+    - archive/bmw-resumability/
+    - archive/truth-harmonic/
+    - archive/checkpoint-system/
+    See archive/INDEX.md for navigation
+
+---
+# Active Sprint (if applicable)
+current_sprint:
+  name: null
+  start_date: null
+  end_date: null
+  goals: []
+  active: false
+
+---
+# Next Task to Pick Up
+suggested_next:
+  recommendation: "Check CURRENT_FOCUS.md for current priorities"
+  rationale: |
+    No active tasks currently defined. This is a clean slate.
+    Review CURRENT_FOCUS.md to identify what to work on next,
+    then add tasks here using the quick_add_template.
+
+---
+# Usage Instructions
+usage: |
+  ## Adding a Task
+  1. Choose priority level (high/medium/low)
+  2. Copy quick_add_template
+  3. Fill in details
+  4. Assign unique ID (category_number)
+  5. Commit changes
+
+  ## Updating a Task
+  1. Change status field
+  2. Update progress percentage
+  3. Add/remove blocker as needed
+  4. Commit with message: "task: Update [id] status to [status]"
+
+  ## Completing a Task
+  1. Change status to "completed"
+  2. Move entry to appropriate archive/[category]/
+  3. Increment completed_summary.total
+  4. Commit with message: "task: Complete [id] - [brief description]"
+
+  ## Blocking a Task
+  1. Change status to "blocked"
+  2. Move to blocked section
+  3. Set blocker field with clear description
+  4. Set blocked_since date
+
+---
+# Maintenance Policy
+maintenance:
+  frequency: "Update on every task status change"
+  cleanup: "Archive completed tasks within 24 hours"
+  review: "Review blocked tasks weekly"
+  max_active: "Aim for <10 active tasks for focus"
+
+---
+version: "1.0"
+optimized_for: "Quick task overview with <500 token load time"

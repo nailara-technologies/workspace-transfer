@@ -1,0 +1,194 @@
+# Session Handover Template
+# Use this template for efficient context transfer between AI sessions
+# Optimized for minimal token usage while preserving essential state
+
+---
+handover_metadata:
+  version: "1.0"
+  timestamp: "YYYY-MM-DDTHH:MM:SSZ"
+  from_session: "session_id_or_model_name"
+  to_session: "next_session_or_any"
+  handover_type: "completion | mid-task | blocked | exploratory"
+  estimated_tokens: 800  # Update based on content
+
+---
+context_summary:
+  # Brief (2-3 sentences) of what was being worked on
+  task: |
+    Working on [brief description of main task or feature].
+    Current approach: [one-line summary of method/strategy].
+
+  # What got done in this session
+  progress: |
+    - ✅ [Major accomplishment 1]
+    - ✅ [Major accomplishment 2]
+    - 🔄 [In-progress item with XX% complete]
+
+  # What prevented completion (if applicable)
+  blockers: |
+    - ⚠️ [Blocker 1: description and why it's blocking]
+    - ❓ [Question needing user input]
+    - None (if no blockers)
+
+  # Clear, ordered list of what to do next
+  next_steps:
+    - "[ ] Step 1: [Specific actionable task]"
+    - "[ ] Step 2: [Next task with file/function references]"
+    - "[ ] Step 3: [Validation or testing step]"
+
+---
+repository_state:
+  # Git information
+  repo: "nailara-technologies/workspace-transfer"
+  branch: "base"
+  last_commit_sha: "abc123def"
+  last_commit_msg: "Brief commit message"
+
+  # Working tree status
+  uncommitted_changes:
+    modified: ["path/to/file1.md", "path/to/file2.pl"]
+    untracked: ["new/file.yaml"]
+    staged: []
+
+  # Should next session commit? Push?
+  pending_git_action: "commit and push" | "commit only" | "none"
+
+---
+insights_and_learnings:
+  # Key discoveries made during this session
+  discoveries: |
+    - Found that [important discovery about codebase/architecture]
+    - Realized [architectural insight or pattern]
+
+  # What worked well (for future reference)
+  effective_approaches: |
+    - [Approach that saved tokens/time]
+    - [Tool or method that was particularly useful]
+
+  # What to avoid
+  ineffective_approaches: |
+    - Avoid [approach that didn't work]
+    - Don't [action that wasted time/tokens]
+
+  # Files that consumed lots of tokens
+  token_heavy_files: []
+
+---
+context_loading_recommendations:
+  # Minimum files to load for continuation
+  essential_files:
+    - file: "CURRENT_FOCUS.md"
+      reason: "Active priorities and task context"
+      tokens: ~2000
+
+    - file: "quick-start.yaml"
+      reason: "Project structure and key facts"
+      tokens: ~800
+
+  # Load these if needed for specific work
+  conditional_files:
+    - file: "documentation/specific-guide.md"
+      load_if: "working on feature X"
+      tokens: ~4000
+
+  # Total recommended token budget for startup
+  estimated_startup_tokens: 3000
+
+---
+task_specific_context:
+  # Files modified in this session
+  files_worked_on:
+    - path: "path/to/file.pl"
+      changes: "Added function X, refactored Y"
+      lines_changed: "+45, -12"
+
+    - path: "documentation/guide.md"
+      changes: "Updated section on Z"
+      lines_changed: "+30, -5"
+
+  # Key functions/modules touched
+  code_locations:
+    - "module_name::function_name (line 123-156)"
+    - "script.pl::main_routine (line 45-89)"
+
+  # Tests run and results
+  tests_status: |
+    - ✅ Unit tests passing (perl test-suite.pl)
+    - ⏳ Integration tests not yet run
+    - ❌ Edge case in function X failing
+
+---
+user_preferences_noted:
+  # Things user indicated they prefer
+  preferences: |
+    - Prefers YAML over JSON for structured data
+    - Wants commit messages in conventional format
+    - Likes concise summaries with bullet points
+
+  # Decisions made with user
+  decisions: |
+    - Decided to use approach A over B because [reason]
+    - Agreed to defer feature X until Y is complete
+
+---
+resource_inventory:
+  # Token usage in this session
+  tokens_consumed: 45000
+  tokens_remaining: 155000
+  token_efficiency_notes: |
+    - Spent ~8K tokens on file exploration (could reduce next time)
+    - YAML files were ~40% more efficient than markdown equivalents
+
+  # Time spent (if known)
+  session_duration: "~2 hours" | "unknown"
+
+  # External resources accessed
+  external_resources:
+    - "https://docs.example.com/api-reference"
+    - "GitHub issue #123"
+
+---
+handover_checklist:
+  # Ensure these before ending session
+  pre_handover:
+    - "[ ] All insights documented in this file"
+    - "[ ] Git status checked and documented"
+    - "[ ] Next steps are clear and actionable"
+    - "[ ] Token-heavy operations identified"
+    - "[ ] Blockers clearly stated"
+
+  # Next session should start with these
+  post_handover:
+    - "[ ] Review this handover file (< 2 min)"
+    - "[ ] Load only essential_files initially"
+    - "[ ] Verify git branch and status"
+    - "[ ] Confirm next_steps are still valid"
+    - "[ ] Start work on first next_step"
+
+---
+# Quick Resume Prompt (copy-paste to start new session)
+resume_prompt: |
+  I'm resuming work on workspace-transfer from a previous session.
+
+  Repo: nailara-technologies/workspace-transfer
+  Branch: base
+  Handover: [attach this file]
+
+  Please:
+  1. Review the handover context
+  2. Verify current git state matches what's documented
+  3. Load only the essential files mentioned
+  4. Confirm the next steps
+  5. Ready to proceed with first task
+
+---
+# Notes for future sessions
+future_notes: |
+  - [Any long-term considerations]
+  - [Architectural decisions to remember]
+  - [Patterns that emerged]
+
+---
+# Template Version Log
+# v1.0 - Initial template with comprehensive sections
+# Future: Add sections as needed, maintain backward compatibility

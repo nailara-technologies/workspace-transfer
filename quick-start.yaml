@@ -1,0 +1,143 @@
+# Quick Start - Ultra-Compact Session Bootstrap
+# Target: <1000 tokens for immediate context
+# Load this FIRST, then load specific docs as needed
+
+---
+repository:
+  name: "workspace-transfer"
+  org: "nailara-technologies"
+  url: "https://github.com/nailara-technologies/workspace-transfer"
+  branch: "base"  # NOT main!
+  purpose: "AI collaboration workspace for Protocol-7 development"
+
+---
+current_status:
+  last_updated: "2025-10-04"
+  state: "🟢 Clean workspace - Ready for new development"
+  active_branch: "base"
+  git_status: "clean"
+
+---
+immediate_priorities:
+  # From CURRENT_FOCUS.md - check there for full details
+  high:
+    - "Filesystem Integration (Living Tree mount with BASE32)"
+    - "Network Distribution Protocol (Resonant pairs across nodes)"
+    - "Workspace Command System (resume, improve, edit)"
+
+  medium:
+    - "Learning System Implementation (Pattern tracking)"
+    - "Archive System (BASE32 encoded .tar.xz)"
+
+---
+quick_commands:
+  bootstrap: "perl bootstrap.pl"
+  verify: "perl init.pl"
+  status: "perl status-check.pl"
+  checkpoint: "perl creative-checkpoint.pl"
+
+---
+directory_structure:
+  code: "core/"
+  docs: "documentation/"
+  demos: "demos/"
+  archive: "archive/"
+  checkpoints: "context-checkpoints/"
+  tasks: "."  # Task files at root
+  models: "models/"  # Model-specific configs
+
+---
+rules:
+  - "Clone external repos to /home/claude/work/"
+  - "Build artifacts stay in /home/claude/work/"
+  - "Outputs go to /mnt/user-data/outputs/"
+  - "Never commit binaries to workspace-transfer"
+  - "Branch is 'base' NOT 'main'"
+
+---
+key_files_map:
+  # Load based on what you're doing
+  onboarding: "START_HERE.md → bootstrap → status-check.pl"
+  priorities: "CURRENT_FOCUS.md (~2K tokens)"
+  quick_status: "QUICK_STATUS.md (~800 tokens)"
+  collaboration: "COLLABORATION_PROTOCOL.md (~1.5K tokens)"
+  handover: "session-handover-template.yaml (for creating handoffs)"
+
+---
+recent_completions:
+  - "✅ Phase 0: Checkpoint encryption (Oct 4, 2025)"
+  - "✅ BMW Resumability Analysis (archived)"
+  - "✅ 5/13 Truth Harmonic Analysis (archived)"
+  - "✅ Bootstrap system with creative checkpoint"
+
+---
+token_budget_guide:
+  minimal_start: "<1K - This file only"
+  light_start: "~3K - This + QUICK_STATUS.md + CURRENT_FOCUS.md"
+  full_start: "~8K - Above + onboarding docs"
+  deep_dive: "15K+ - Include detailed docs and code review"
+
+---
+first_actions:
+  new_session:
+    1: "Read this file (quick-start.yaml)"
+    2: "Run: perl bootstrap.pl && perl init.pl"
+    3: "Run: perl status-check.pl"
+    4: "Load CURRENT_FOCUS.md for active priorities"
+    5: "Start work or ask user for direction"
+
+  resume_work:
+    1: "Read this file + latest handover from context-checkpoints/"
+    2: "git pull origin base"
+    3: "Verify git status matches handover"
+    4: "Load only essential files mentioned in handover"
+    5: "Continue with documented next_steps"
+
+---
+protocol7_context:
+  # Minimal Protocol-7 awareness
+  what: "Harmonic computing framework with multi-agent architecture"
+  agents: "Called 'zenki' (plural) or 'zenka' (singular)"
+  routing: "Cube zenka handles message routing"
+  manager: "V7 zenka manages lifecycle"
+  math: "Harmonic principles, esp. division by 13"
+  checksums: "BMW384, ELF7, AMOS signatures"
+
+---
+ai_coordination:
+  models_in_use:
+    - "Claude (web) - Architecture, planning, docs"
+    - "Claude Code (WSL) - Implementation, debugging"
+    - "Qwen 2.5 (local) - Autonomous execution, testing"
+    - "Others - As needed"
+
+  handoff_method: "Git commits + handover files in context-checkpoints/"
+  collaboration: "See COLLABORATION_PROTOCOL.md"
+
+---
+troubleshooting:
+  "Can't find bootstrap.pl": "cd /home/claude/workspace-transfer"
+  "Permission denied": "chmod +x *.pl"
+  "Wrong branch": "git checkout base"
+  "Need credentials": "Copy .credentials.template to .credentials"
+
+---
+next_file_to_load:
+  for_new_work: "CURRENT_FOCUS.md"
+  for_resume: "context-checkpoints/CHECKPOINT_[latest].md"
+  for_overview: "QUICK_STATUS.md"
+  for_deep_dive: "START_HERE.md"
+
+---
+# Template: Quick Status Update (copy to new handover)
+status_template: |
+  Status: [Clean | Modified | Blocked]
+  Working on: [Brief task description]
+  Progress: [What's done]
+  Next: [Immediate next step]
+  Tokens used: [X of Y remaining]
+
+---
+version: "1.0"
+created: "2025-11-06"
+optimized_for: "Fast session startup with minimal token overhead"

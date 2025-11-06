@@ -1,0 +1,301 @@
+# Token Metadata - File Size and Token Cost Reference
+# Helps AI models budget token usage efficiently
+# Update this file when adding significant new documentation
+
+---
+metadata:
+  version: "1.0"
+  last_updated: "2025-11-06"
+  purpose: "Token-aware documentation loading"
+  methodology: "Rough estimates: ~1.3 tokens per word, ~4-5 tokens per line"
+
+---
+# Quick Reference Files (<1000 tokens)
+quick_reference:
+  - file: "quick-start.yaml"
+    lines: ~140
+    tokens: ~900
+    load_for: ["all new sessions", "quick bootstrap"]
+    priority: "ALWAYS"
+
+  - file: "QUICK_STATUS.md"
+    lines: ~65
+    tokens: ~800
+    load_for: ["30-second overview", "status check"]
+    priority: "HIGH"
+
+  - file: "session-handover-template.yaml"
+    lines: ~220
+    tokens: ~1400
+    load_for: ["creating handovers", "understanding handover format"]
+    priority: "MEDIUM"
+
+---
+# Essential Documentation (1K-3K tokens)
+essential_docs:
+  - file: "START_HERE.md"
+    lines: ~131
+    tokens: ~1200
+    load_for: ["first-time initialization", "understanding bootstrap"]
+    priority: "HIGH (first session only)"
+
+  - file: "CURRENT_FOCUS.md"
+    lines: ~277
+    tokens: ~2000
+    load_for: ["understanding current priorities", "task context"]
+    priority: "HIGH"
+
+  - file: "README.md"
+    lines: ~186
+    tokens: ~1400
+    load_for: ["repository overview", "directory structure"]
+    priority: "MEDIUM"
+
+  - file: "COLLABORATION_PROTOCOL.md"
+    lines: ~200
+    tokens: ~1500
+    load_for: ["multi-AI coordination", "handoff protocols"]
+    priority: "MEDIUM"
+
+---
+# Comprehensive Documentation (3K-8K tokens)
+comprehensive_docs:
+  - file: "CLAUDE_ONBOARDING.md"
+    lines: ~385
+    tokens: ~6000
+    load_for: ["detailed mission context", "BMW resumability task"]
+    priority: "TASK-SPECIFIC"
+    note: "Contains old mission details - check CURRENT_FOCUS.md first"
+
+  - file: "COMPLETE_ARCHITECTURE.md"
+    lines: ~200
+    tokens: ~3500
+    load_for: ["Protocol-7 architecture understanding"]
+    priority: "AS-NEEDED"
+
+  - file: "DNS_RHIZOME.md"
+    lines: ~300
+    tokens: ~4500
+    load_for: ["network discovery research"]
+    priority: "AS-NEEDED"
+
+---
+# Session Summaries (2K-5K tokens)
+session_summaries:
+  - file: "SESSION_SUMMARY_2025-10-04.md"
+    lines: ~250
+    tokens: ~3500
+    load_for: ["understanding Oct 4 session work"]
+    priority: "ARCHIVE-REFERENCE"
+
+  - file: "SESSION_SUMMARY_2025-10-04_code-integration.md"
+    lines: ~180
+    tokens: ~2500
+    load_for: ["code integration patterns"]
+    priority: "ARCHIVE-REFERENCE"
+
+  - file: "SESSION_SUMMARY_2025-10-04_encryption-fix.md"
+    lines: ~220
+    tokens: ~3000
+    load_for: ["checkpoint encryption details"]
+    priority: "ARCHIVE-REFERENCE"
+
+---
+# Context Checkpoints (500-2K tokens)
+checkpoints:
+  - file: "context-checkpoints/CHECKPOINT_20251004_140529_test-checkpoint.md"
+    lines: ~51
+    tokens: ~600
+    load_for: ["understanding checkpoint format"]
+    priority: "REFERENCE"
+
+  note: |
+    Checkpoints are lightweight by design (500-1000 tokens each).
+    They provide just enough context to resume work without
+    loading full session history.
+
+---
+# System Prompts (3K-6K tokens)
+system_prompts:
+  - file: "SYSTEM_PROMPT_MINIMAL.md"
+    lines: ~180
+    tokens: ~3000
+    load_for: ["minimal local LLM setup"]
+    model: "local LLMs"
+
+  - file: "SYSTEM_PROMPT_v5.1_TOOLS.md"
+    lines: ~350
+    tokens: ~5500
+    load_for: ["tool-enabled model setup"]
+    model: "local LLMs with tool calling"
+
+  - file: "SYSTEM_PROMPT_TEMPLATE.md"
+    lines: ~320
+    tokens: ~4800
+    load_for: ["understanding system prompt patterns"]
+    model: "all"
+
+---
+# Workspace Command Files (300-600 tokens)
+workspace_commands:
+  - file: "workspace-init.yaml"
+    lines: ~25
+    tokens: ~300
+    load_for: ["workspace initialization command"]
+    model: "local LLMs"
+
+  - file: "workspace-resume.yaml"
+    lines: ~30
+    tokens: ~400
+    load_for: ["workspace resume command"]
+    model: "local LLMs"
+
+  - file: "workspace-improve.yaml"
+    lines: ~35
+    tokens: ~450
+    load_for: ["workspace improvement mode"]
+    model: "local LLMs"
+
+---
+# Scripts (Variable - don't load unless needed)
+scripts:
+  note: |
+    Perl scripts should NOT be loaded for reading unless actively
+    working on them. Instead, use 'grep' or targeted reading.
+
+  - file: "bootstrap.pl"
+    lines: ~120
+    tokens: ~1000
+    action: "RUN, don't read"
+
+  - file: "status-check.pl"
+    lines: ~130
+    tokens: ~1100
+    action: "RUN, don't read"
+
+  - file: "creative-checkpoint.pl"
+    lines: ~250
+    tokens: ~2000
+    action: "RUN, then read output only"
+
+---
+# Token Budget Recommendations
+budget_strategies:
+  minimal_session:
+    description: "Quick task or status check"
+    total_tokens: ~2000
+    files:
+      - "quick-start.yaml (900)"
+      - "QUICK_STATUS.md (800)"
+      - "User interaction buffer (300)"
+
+  standard_session:
+    description: "Normal development work"
+    total_tokens: ~5000
+    files:
+      - "quick-start.yaml (900)"
+      - "CURRENT_FOCUS.md (2000)"
+      - "Latest checkpoint or handover (600-1000)"
+      - "Work buffer (1500)"
+
+  comprehensive_session:
+    description: "Architecture work or new feature"
+    total_tokens: ~10000
+    files:
+      - "quick-start.yaml (900)"
+      - "CURRENT_FOCUS.md (2000)"
+      - "COMPLETE_ARCHITECTURE.md (3500)"
+      - "Relevant session summary (2500)"
+      - "Work buffer (1100)"
+
+  deep_research_session:
+    description: "Learning codebase or complex analysis"
+    total_tokens: ~20000
+    files:
+      - "All essential docs (5000)"
+      - "Multiple comprehensive docs (8000)"
+      - "Code exploration (5000)"
+      - "Work buffer (2000)"
+
+---
+# Loading Strategies
+strategies:
+  new_to_workspace:
+    1: "Load quick-start.yaml (900 tokens)"
+    2: "Run bootstrap.pl and status-check.pl (read outputs only)"
+    3: "Load CURRENT_FOCUS.md (2000 tokens)"
+    4: "Ask user for specific task direction"
+    total: "~3000 tokens"
+
+  resuming_work:
+    1: "Load quick-start.yaml (900 tokens)"
+    2: "Load latest handover from context-checkpoints/ (600-1000 tokens)"
+    3: "git pull and verify state"
+    4: "Load ONLY files mentioned in handover's 'essential_files'"
+    5: "Start work immediately"
+    total: "~2000-3000 tokens"
+
+  exploratory:
+    1: "Load quick-start.yaml (900 tokens)"
+    2: "Load QUICK_STATUS.md (800 tokens)"
+    3: "Ask user what they want to explore"
+    4: "Load targeted docs based on user response"
+    total: "Starts at ~1700, grows as needed"
+
+---
+# File Size Growth Tracking
+growth_tracking:
+  note: |
+    Monitor these files and split/archive when they get too large:
+    - CURRENT_FOCUS.md - Should stay under 3K tokens
+    - QUICK_STATUS.md - Should stay under 1K tokens
+    - Session summaries - Archive after 30 days
+
+  thresholds:
+    warning: "5000 tokens (consider splitting)"
+    critical: "10000 tokens (must split or archive)"
+
+  archive_policy: |
+    When comprehensive docs exceed 8K tokens:
+    1. Move to archive/
+    2. Create condensed version (2-3K tokens)
+    3. Add pointer to archive for full details
+
+---
+# Efficiency Metrics
+efficiency_notes:
+  yaml_vs_markdown:
+    observation: "YAML format is ~40% more token-efficient for structured data"
+    recommendation: "Use YAML for: configs, task lists, handovers, status"
+    use_markdown_for: "Narratives, tutorials, explanations, discussions"
+
+  code_in_docs:
+    observation: "Code blocks are token-heavy (~5-6 tokens per line)"
+    recommendation: "Link to actual files rather than embedding large code blocks"
+
+  headers_and_formatting:
+    observation: "Markdown headers/formatting add ~10-15% overhead"
+    recommendation: "Worth it for human readability, acceptable cost"
+
+---
+# Anti-Patterns (Avoid These)
+anti_patterns:
+  - pattern: "Loading full session history to understand current state"
+    better: "Load latest checkpoint/handover only"
+    savings: "~10-20K tokens"
+
+  - pattern: "Reading all comprehensive docs on every session"
+    better: "Load quick-start.yaml + task-specific docs only"
+    savings: "~15K tokens"
+
+  - pattern: "Loading scripts to understand what they do"
+    better: "Run scripts and read their outputs, or grep for specific functions"
+    savings: "~5-10K tokens per script"
+
+  - pattern: "Embedding code examples in handover files"
+    better: "Reference file:line instead"
+    savings: "~1-3K tokens per handover"
+
+---
+version: "1.0"
+maintenance: "Update when adding docs >1K tokens or restructuring repository"
