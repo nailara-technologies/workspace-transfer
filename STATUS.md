@@ -144,6 +144,7 @@ workspace-transfer/
 │   ├── checkpoint           # Creative excellence checkpoint
 │   ├── status               # Workspace status
 │   ├── transfer             # Transfer to protocol-7
+│   ├── push-to-base         # Automated push with PAT auth & cleanup
 │   ├── track-tokens         # Token tracking (+ positive reinforcement)
 │   ├── suggest-handover     # Proactive handover recommendations
 │   ├── session-tokens       # Session token counter
@@ -190,6 +191,12 @@ bin/token-report init --detail       # Detailed stats for task
 bin/token-report --trends            # Visualize trends
 
 # See: docs/reference/TOKEN_TRACKING_GUIDE.md for full documentation
+
+# Git automation (recurring patterns)
+bin/push-to-base                     # Push to base with PAT auth
+bin/push-to-base --cleanup-branch <name>  # Push + cleanup feature branch
+
+# See: docs/reference/RECURRING_PATTERNS.md for session workflows
 
 # View full documentation
 ls docs/

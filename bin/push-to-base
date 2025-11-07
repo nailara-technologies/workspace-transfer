@@ -1,0 +1,118 @@
+#!/bin/bash
+# Automated push to base branch with PAT authentication
+# Usage: push-to-base [--cleanup-branch <name>]
+#
+# This script automates the recurring pattern of:
+# 1. Ensuring PAT authentication is configured
+# 2. Pushing to base branch
+# 3. Optionally cleaning up feature branches
+
+set -e
+
+CLEANUP_BRANCH=""
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --cleanup-branch)
+            CLEANUP_BRANCH="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Usage: push-to-base [--cleanup-branch <name>]"
+            exit 1
+            ;;
+    esac
+done
+
+# Check for GITHUB_PAT
+if [ -z "$GITHUB_PAT" ]; then
+    echo "❌ GITHUB_PAT environment variable not set"
+    echo "   Cannot push to GitHub without authentication"
+    exit 1
+fi
+
+echo "🚀 Pushing to base branch"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+# Ensure we're on base branch
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [ "$CURRENT_BRANCH" != "base" ]; then
+    echo "⚠️  Not on base branch (currently on: $CURRENT_BRANCH)"
+    echo "   Switching to base..."
+    git checkout base
+fi
+
+# Configure remote with PAT (only if needed)
+CURRENT_REMOTE=$(git remote get-url origin)
+if [[ ! "$CURRENT_REMOTE" =~ ^https://.*@github.com ]]; then
+    echo "🔧 Configuring remote with PAT authentication..."
+    git remote set-url origin "https://${GITHUB_PAT}@github.com/nailara-technologies/workspace-transfer.git"
+fi
+
+# Push to base
+echo "📤 Pushing to origin/base..."
+if git push origin base; then
+    echo "✅ Successfully pushed to base branch"
+else
+    echo "❌ Push failed"
+    exit 1
+fi
+
+# Cleanup feature branch if specified
+if [ -n "$CLEANUP_BRANCH" ]; then
+    echo ""
+    echo "🧹 Cleaning up feature branch: $CLEANUP_BRANCH"
+
+    # Delete local branch
+    if git branch -d "$CLEANUP_BRANCH" 2>/dev/null; then
+        echo "   ✅ Deleted local branch"
+    else
+        echo "   ℹ️  Local branch already deleted or doesn't exist"
+    fi
+
+    # Delete remote branch
+    if git push origin --delete "$CLEANUP_BRANCH" 2>/dev/null; then
+        echo "   ✅ Deleted remote branch"
+    else
+        echo "   ℹ️  Remote branch already deleted or doesn't exist"
+    fi
+fi
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "✅ All done!"
+
+__END__
+
+=head1 NAME
+
+push-to-base - Automated push to base branch with cleanup
+
+=head1 SYNOPSIS
+
+    push-to-base [--cleanup-branch <feature-branch-name>]
+
+=head1 DESCRIPTION
+
+Automates the recurring pattern of pushing to base branch.
+
+Handles:
+- PAT authentication configuration
+- Switching to base branch if needed
+- Pushing to remote
+- Optional feature branch cleanup
+
+=head1 EXAMPLES
+
+    # Simple push to base
+    push-to-base
+
+    # Push and cleanup feature branch
+    push-to-base --cleanup-branch claude/feature-xyz
+
+=head1 REQUIREMENTS
+
+GITHUB_PAT environment variable must be set.
+
+=cut
