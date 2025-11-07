@@ -46,6 +46,15 @@ bin/push-to-base --cleanup-branch <feature-branch-name>
 - Consistent workflow every time
 - One command instead of 6
 
+**💡 Pro Tip - Direct GitHub Operations**:
+When you need to connect to GitHub directly (gh CLI, API calls, or manual git operations), remember that **GITHUB_PAT is available** in the environment or can be read from `.credentials`. The PAT works for:
+- Pushing to base branch: `git remote set-url origin https://${GITHUB_PAT}@github.com/owner/repo.git`
+- GitHub CLI: `gh auth login --with-token <<< "$GITHUB_PAT"`
+- API calls: `curl -H "Authorization: token $GITHUB_PAT"`
+- Any git operation requiring authentication
+
+No need to ask the user for credentials - use the PAT that's already configured!
+
 ---
 
 ### Branch Naming Convention
