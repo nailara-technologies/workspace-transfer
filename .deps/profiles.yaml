@@ -1,0 +1,73 @@
+# Dependency Profiles
+# Defines dependencies for different session types
+# Format: profile -> package_manager -> packages
+
+profiles:
+  base:
+    description: "Basic workspace dependencies"
+    apt:
+      - git
+      - perl
+      - curl
+    cpan:
+      - Time::Piece
+      - File::Path
+      - FindBin
+
+  filesystem:
+    description: "FUSE filesystem development"
+    apt:
+      - libfuse-dev
+      - fuse
+      - pkg-config
+    cpan:
+      - Fuse
+
+  network:
+    description: "Network distribution protocol"
+    apt:
+      - libssl-dev
+      - libnet-ssleay-perl
+    cpan:
+      - IO::Socket::SSL
+      - Net::SSLeay
+
+  learning:
+    description: "Learning system with SQLite"
+    apt:
+      - sqlite3
+      - libsqlite3-dev
+    cpan:
+      - DBD::SQLite
+      - DBI
+
+  visualization:
+    description: "Token visualization and graphing"
+    apt:
+      - gnuplot
+      - imagemagick
+      - libgd-dev
+    cpan:
+      - GD::Graph
+      - GD::SVG
+      - Chart::Gnuplot
+    system:
+      - gnuplot
+      - convert  # ImageMagick
+
+  archive:
+    description: "Archive system with compression"
+    apt:
+      - xz-utils
+      - tar
+      - gzip
+
+  development:
+    description: "Full development environment (all profiles)"
+    includes:
+      - base
+      - filesystem
+      - network
+      - learning
+      - visualization
+      - archive

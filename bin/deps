@@ -1,0 +1,447 @@
+#!/usr/bin/env perl
+# Dependency management system
+# Pre-flight checks and one-command installation by session type
+
+use strict;
+use warnings;
+use FindBin qw($RealBin);
+use File::Spec;
+use File::Path qw(make_path);
+use File::Basename;
+
+my $WORKSPACE_ROOT = dirname($RealBin);
+my $DEPS_DIR = File::Spec->catdir($WORKSPACE_ROOT, '.deps');
+my $PROFILES_FILE = File::Spec->catfile($DEPS_DIR, 'profiles.yaml');
+my $CACHE_DIR = File::Spec->catdir($DEPS_DIR, 'cache');
+
+# Ensure cache directory exists
+make_path($CACHE_DIR) unless -d $CACHE_DIR;
+
+# Parse command
+my $cmd = shift @ARGV || 'help';
+
+if ($cmd eq 'check') {
+    check_profile(@ARGV);
+} elsif ($cmd eq 'install') {
+    install_profile(@ARGV);
+} elsif ($cmd eq 'list') {
+    list_profiles();
+} elsif ($cmd eq 'status') {
+    status_all();
+} elsif ($cmd eq 'clear-cache') {
+    clear_cache();
+} elsif ($cmd eq 'help' || $cmd eq '--help' || $cmd eq '-h') {
+    show_help();
+} else {
+    die "Unknown command: $cmd\nRun 'bin/deps help' for usage.\n";
+}
+
+sub check_profile {
+    my ($profile_name, $opts) = @_;
+
+    unless ($profile_name) {
+        die "Usage: bin/deps check <profile> [--no-cache]\n";
+    }
+
+    my $use_cache = !($opts && $opts eq '--no-cache');
+
+    # Check cache first
+    if ($use_cache) {
+        my $cached = check_cache($profile_name);
+        if (defined $cached) {
+            if ($cached) {
+                print "✅ $profile_name: All dependencies installed (cached)\n";
+                return 0;
+            } else {
+                print "❌ $profile_name: Missing dependencies (cached - use --no-cache to recheck)\n";
+                return 1;
+            }
+        }
+    }
+
+    # Load profile
+    my $profiles = load_profiles();
+    unless (exists $profiles->{$profile_name}) {
+        die "❌ Unknown profile: $profile_name\nRun 'bin/deps list' to see available profiles.\n";
+    }
+
+    my $profile = $profiles->{$profile_name};
+
+    print "🔍 Checking dependencies for: $profile_name\n";
+    print "   $profile->{description}\n\n";
+
+    # Handle includes
+    if ($profile->{includes}) {
+        print "📦 Profile includes: " . join(', ', @{$profile->{includes}}) . "\n\n";
+        my $all_ok = 1;
+        for my $included (@{$profile->{includes}}) {
+            my $result = check_profile($included, '--no-cache');
+            $all_ok = 0 if $result != 0;
+        }
+        update_cache($profile_name, $all_ok);
+        return $all_ok ? 0 : 1;
+    }
+
+    my @missing;
+    my $total = 0;
+
+    # Check APT packages
+    if ($profile->{apt}) {
+        print "Checking APT packages...\n";
+        for my $pkg (@{$profile->{apt}}) {
+            $total++;
+            if (check_apt($pkg)) {
+                print "  ✅ $pkg\n";
+            } else {
+                print "  ❌ $pkg (missing)\n";
+                push @missing, "apt:$pkg";
+            }
+        }
+        print "\n";
+    }
+
+    # Check CPAN modules
+    if ($profile->{cpan}) {
+        print "Checking CPAN modules...\n";
+        for my $module (@{$profile->{cpan}}) {
+            $total++;
+            if (check_cpan($module)) {
+                print "  ✅ $module\n";
+            } else {
+                print "  ❌ $module (missing)\n";
+                push @missing, "cpan:$module";
+            }
+        }
+        print "\n";
+    }
+
+    # Check system commands
+    if ($profile->{system}) {
+        print "Checking system commands...\n";
+        for my $cmd (@{$profile->{system}}) {
+            $total++;
+            if (check_command($cmd)) {
+                print "  ✅ $cmd\n";
+            } else {
+                print "  ❌ $cmd (missing)\n";
+                push @missing, "system:$cmd";
+            }
+        }
+        print "\n";
+    }
+
+    # Summary
+    my $ok = @missing == 0;
+    if ($ok) {
+        print "✅ All dependencies installed ($total/$total)\n";
+        update_cache($profile_name, 1);
+        return 0;
+    } else {
+        print "❌ Missing " . scalar(@missing) . " dependencies\n";
+        print "\n💡 Install with: bin/deps install $profile_name\n";
+        update_cache($profile_name, 0);
+        return 1;
+    }
+}
+
+sub install_profile {
+    my ($profile_name, $opts) = @_;
+
+    unless ($profile_name) {
+        die "Usage: bin/deps install <profile> [--dry-run]\n";
+    }
+
+    my $dry_run = ($opts && $opts eq '--dry-run');
+
+    # Load profile
+    my $profiles = load_profiles();
+    unless (exists $profiles->{$profile_name}) {
+        die "❌ Unknown profile: $profile_name\nRun 'bin/deps list' to see available profiles.\n";
+    }
+
+    my $profile = $profiles->{$profile_name};
+
+    print "📦 Installing dependencies for: $profile_name\n";
+    print "   $profile->{description}\n\n";
+
+    if ($dry_run) {
+        print "🔍 DRY RUN - No actual installation\n\n";
+    }
+
+    # Handle includes
+    if ($profile->{includes}) {
+        print "📦 Profile includes: " . join(', ', @{$profile->{includes}}) . "\n\n";
+        for my $included (@{$profile->{includes}}) {
+            install_profile($included, $opts);
+        }
+        return;
+    }
+
+    my @apt_packages;
+    my @cpan_modules;
+
+    # Collect missing packages
+    if ($profile->{apt}) {
+        for my $pkg (@{$profile->{apt}}) {
+            unless (check_apt($pkg)) {
+                push @apt_packages, $pkg;
+            }
+        }
+    }
+
+    if ($profile->{cpan}) {
+        for my $module (@{$profile->{cpan}}) {
+            unless (check_cpan($module)) {
+                push @cpan_modules, $module;
+            }
+        }
+    }
+
+    # Install APT packages
+    if (@apt_packages) {
+        print "📥 Installing APT packages: " . join(', ', @apt_packages) . "\n";
+
+        if ($dry_run) {
+            print "   [DRY RUN] Would run: sudo apt-get install -y " . join(' ', @apt_packages) . "\n\n";
+        } else {
+            my $cmd = "sudo apt-get update -qq && sudo apt-get install -y " . join(' ', @apt_packages);
+            print "   Running: $cmd\n";
+
+            my $result = system($cmd);
+            if ($result == 0) {
+                print "   ✅ APT packages installed\n\n";
+            } else {
+                print "   ❌ APT installation failed (exit code: $result)\n\n";
+            }
+        }
+    }
+
+    # Install CPAN modules
+    if (@cpan_modules) {
+        print "📥 Installing CPAN modules: " . join(', ', @cpan_modules) . "\n";
+
+        if ($dry_run) {
+            print "   [DRY RUN] Would run: cpan " . join(' ', @cpan_modules) . "\n\n";
+        } else {
+            for my $module (@cpan_modules) {
+                print "   Installing $module...\n";
+                my $result = system("cpan -T $module 2>&1 | grep -v 'Loading internal'");
+
+                if ($result == 0) {
+                    print "   ✅ $module installed\n";
+                } else {
+                    print "   ❌ $module installation failed\n";
+                }
+            }
+            print "\n";
+        }
+    }
+
+    if (@apt_packages == 0 && @cpan_modules == 0) {
+        print "✅ All dependencies already installed\n\n";
+    }
+
+    # Clear cache to force recheck
+    clear_cache_for($profile_name);
+
+    unless ($dry_run) {
+        print "💡 Verify installation: bin/deps check $profile_name --no-cache\n";
+    }
+}
+
+sub list_profiles {
+    my $profiles = load_profiles();
+
+    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print "AVAILABLE DEPENDENCY PROFILES\n";
+    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+
+    for my $name (sort keys %$profiles) {
+        my $profile = $profiles->{$name};
+        print "📦 $name\n";
+        print "   $profile->{description}\n";
+
+        if ($profile->{includes}) {
+            print "   Includes: " . join(', ', @{$profile->{includes}}) . "\n";
+        } else {
+            my @types;
+            push @types, scalar(@{$profile->{apt}}) . " apt" if $profile->{apt};
+            push @types, scalar(@{$profile->{cpan}}) . " cpan" if $profile->{cpan};
+            push @types, scalar(@{$profile->{system}}) . " system" if $profile->{system};
+            print "   Packages: " . join(', ', @types) . "\n" if @types;
+        }
+        print "\n";
+    }
+
+    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print "Usage:\n";
+    print "  bin/deps check <profile>       # Check if dependencies are installed\n";
+    print "  bin/deps install <profile>     # Install missing dependencies\n";
+    print "  bin/deps status                # Check all profiles\n";
+    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+}
+
+sub status_all {
+    my $profiles = load_profiles();
+
+    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print "DEPENDENCY STATUS\n";
+    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+
+    for my $name (sort keys %$profiles) {
+        next if $name eq 'development';  # Skip meta-profile
+
+        print "Checking $name...\n";
+        check_profile($name);
+        print "\n";
+    }
+
+    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+}
+
+sub clear_cache {
+    if (-d $CACHE_DIR) {
+        system("rm -rf $CACHE_DIR/*");
+        print "🗑️  Cache cleared\n";
+    }
+}
+
+sub clear_cache_for {
+    my ($profile) = @_;
+    my $cache_file = File::Spec->catfile($CACHE_DIR, "$profile.cache");
+    unlink $cache_file if -f $cache_file;
+}
+
+sub show_help {
+    print <<'HELP';
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DEPS - Dependency Management System
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USAGE:
+  bin/deps <command> [args]
+
+COMMANDS:
+  check <profile> [--no-cache]    Check if dependencies are installed
+  install <profile> [--dry-run]   Install missing dependencies
+  list                            List available profiles
+  status                          Check all profiles
+  clear-cache                     Clear verification cache
+  help                            Show this help
+
+PROFILES:
+  base           Basic workspace dependencies
+  filesystem     FUSE filesystem development
+  network        Network distribution protocol
+  learning       Learning system with SQLite
+  visualization  Token visualization and graphing
+  archive        Archive system with compression
+  development    Full development environment (all profiles)
+
+EXAMPLES:
+  bin/deps list                    # List all profiles
+  bin/deps check visualization     # Check visualization deps
+  bin/deps install filesystem      # Install filesystem deps
+  bin/deps install base --dry-run  # Preview installation
+  bin/deps status                  # Check all profiles
+
+CACHING:
+  Dependency checks are cached for performance. Use --no-cache to force recheck.
+  Clear cache with: bin/deps clear-cache
+
+TOKEN SAVINGS:
+  - Per session with deps: ~500-2000 tokens (automated checking/installing)
+  - Applies to ~20-30% of sessions
+  - Compound over 100 sessions: ~20k-60k tokens
+
+FILES:
+  .deps/profiles.yaml    Dependency definitions
+  .deps/cache/           Verification cache (gitignored)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+HELP
+}
+
+# Helper functions
+
+sub load_profiles {
+    my %profiles;
+
+    open my $fh, '<', $PROFILES_FILE or die "Cannot read $PROFILES_FILE: $!\n";
+
+    my $current_profile = undef;
+    my $current_section = undef;
+
+    while (my $line = <$fh>) {
+        chomp $line;
+        next if $line =~ /^#/ || $line =~ /^\s*$/;
+        next if $line =~ /^profiles:/;
+
+        if ($line =~ /^  (\w+):$/) {
+            # New profile
+            $current_profile = $1;
+            $profiles{$current_profile} = {};
+        } elsif ($current_profile && $line =~ /^    (\w+):\s*(.*)$/) {
+            my ($key, $val) = ($1, $2);
+
+            if ($key eq 'description') {
+                $val =~ s/^"(.*)"$/$1/;
+                $profiles{$current_profile}{description} = $val;
+            } elsif ($key eq 'includes' || $key eq 'apt' || $key eq 'cpan' || $key eq 'system') {
+                $current_section = $key;
+                $profiles{$current_profile}{$key} = [];
+            }
+        } elsif ($current_profile && $current_section && $line =~ /^      - (.+)$/) {
+            push @{$profiles{$current_profile}{$current_section}}, $1;
+        }
+    }
+
+    close $fh;
+
+    return \%profiles;
+}
+
+sub check_apt {
+    my ($package) = @_;
+    my $result = `dpkg -l $package 2>/dev/null | grep -q '^ii' && echo 'installed'`;
+    return $result =~ /installed/;
+}
+
+sub check_cpan {
+    my ($module) = @_;
+    my $result = system("perl -M$module -e 1 2>/dev/null");
+    return $result == 0;
+}
+
+sub check_command {
+    my ($cmd) = @_;
+    my $result = `which $cmd 2>/dev/null`;
+    return $result ne '';
+}
+
+sub check_cache {
+    my ($profile) = @_;
+    my $cache_file = File::Spec->catfile($CACHE_DIR, "$profile.cache");
+
+    return undef unless -f $cache_file;
+
+    # Check if cache is fresh (< 24 hours old)
+    my $age = time() - (stat($cache_file))[9];
+    return undef if $age > 86400;  # 24 hours
+
+    open my $fh, '<', $cache_file or return undef;
+    my $status = <$fh>;
+    close $fh;
+
+    chomp $status if defined $status;
+    return $status eq 'OK' ? 1 : 0;
+}
+
+sub update_cache {
+    my ($profile, $ok) = @_;
+    my $cache_file = File::Spec->catfile($CACHE_DIR, "$profile.cache");
+
+    open my $fh, '>', $cache_file or return;
+    print $fh $ok ? 'OK' : 'MISSING';
+    close $fh;
+}

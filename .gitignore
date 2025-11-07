@@ -29,6 +29,9 @@ context-checkpoints/*.md
 .todos/
 .research/
 
+# Dependency management cache
+.deps/cache/
+
 # Build artifacts
 *.o
 *.so

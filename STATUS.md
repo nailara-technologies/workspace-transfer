@@ -23,6 +23,7 @@
 - **Token tracking & anomaly detection** (compound efficiency monitoring)
 - **Status automation** (.user/ directory with quick status summaries)
 - **Context management** (persistent todos and research tracking)
+- **Dependency management** (profile-based pre-flight checks and installation)
 
 ### Recently Completed ✅
 - Phase 0: Checkpoint encryption system (Oct 4, 2025)
@@ -34,6 +35,7 @@
 - **Token tracking system with statistical anomaly detection** (Nov 7, 2025)
 - **Status automation system** (Nov 7, 2025) - Offload STATUS.md parsing to .user/ files
 - **Context management system** (Nov 7, 2025) - Persistent todos and research tracking
+- **Dependency management system** (Nov 7, 2025) - Profile-based pre-flight checks and installation
 
 ---
 
@@ -148,6 +150,9 @@ workspace-transfer/
 │   ├── QUICK_START          # Entry point commands
 │   ├── CURRENT              # Recent activity
 │   └── HEALTH               # Session health metrics
+├── .deps/                    # Dependency management
+│   ├── profiles.yaml        # Dependency definitions by session type
+│   └── cache/               # Verification cache (local-only)
 ├── bin/                      # All executables
 │   ├── init                 # Single-command initialization
 │   ├── checkpoint           # Creative excellence checkpoint
@@ -161,6 +166,7 @@ workspace-transfer/
 │   ├── token-report         # Token analytics & trends
 │   ├── todo                 # Persistent task management
 │   ├── research             # Research question tracking
+│   ├── deps                 # Dependency management (check/install)
 │   └── lib/                 # Shared libraries
 ├── protocol7-staging/        # Stage Protocol-7 work here
 │   ├── modules/
@@ -206,6 +212,12 @@ bin/research ask "<question>" [pri]  # Track question (blocking|high|medium|low)
 bin/research list [filter]           # List questions
 bin/research answer <id> ["answer"]  # Mark answered
 # See: docs/reference/CONTEXT_MANAGEMENT.md for full guide
+
+# Dependency management (pre-flight checks for session types)
+bin/deps list                        # List available profiles
+bin/deps check <profile>             # Check if dependencies installed
+bin/deps install <profile>           # Install missing dependencies
+# See: docs/reference/DEPENDENCY_MANAGEMENT.md for profiles and usage
 
 # Transfer to protocol-7 (dry run)
 bin/transfer --dry-run

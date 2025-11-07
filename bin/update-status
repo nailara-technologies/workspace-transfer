@@ -108,10 +108,12 @@ sub generate_quick_start {
     print $out "bin/session-tokens reset    # Start tracking\n";
     print $out "\n";
 
-    print $out "🔧 IMPROVE WORKSPACE\n";
+    print $out "🔧 SETUP SESSION (if needed)\n";
     print $out "────────────────────────────────────────────────────────────────────\n";
-    print $out "cat docs/reference/RECURRING_PATTERNS.md\n";
-    print $out "cat docs/reference/TOKEN_TRACKING_GUIDE.md\n";
+    print $out "bin/deps list                   # List dependency profiles\n";
+    print $out "bin/deps check <profile>        # Check if deps installed\n";
+    print $out "bin/deps install <profile>      # Install missing deps\n";
+    print $out "# Profiles: base, filesystem, network, learning, visualization, archive\n";
     print $out "\n";
 
     print $out "📝 DURING WORK\n";
