@@ -1,0 +1,9 @@
+#!/bin/bash
+# Transfer files from protocol7-staging to protocol-7 repository
+# Wrapper for scripts/transfer-to-protocol7.pl
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WORKSPACE_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+cd "$WORKSPACE_ROOT"
+exec perl scripts/transfer-to-protocol7.pl "$@"

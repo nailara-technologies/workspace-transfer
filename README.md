@@ -1,175 +1,146 @@
-# Workspace Transfer - Protocol-7 AI Collaboration
+# Workspace Transfer
 
-**Stateless workspace handoff for multi-AI development on Protocol-7**
+**Protocol-7 AI Collaboration & Staging Area**
 
-> 🚦 **New to this workspace?** Start with **[START_HERE.md](START_HERE.md)** for 5-second initialization.
-
----
-
-## Purpose
-
-This repository enables seamless collaboration between AI assistants (Claude, GPT-4, Gemini, etc.) working on the Protocol-7 harmonic computing framework. It provides:
-
-- ✅ **Comprehensive onboarding documentation** for new AI sessions
-- ✅ **Mission-specific instructions**
-- ✅ **Clean state snapshots** that can be instantiated anywhere
-- ✅ **Multi-AI coordination** via Git commits and tags
-- ✅ **2-3 second restoration** in any new environment
+Stateless workspace handoff for multi-AI development on the Protocol-7 harmonic computing framework.
 
 ---
 
-## Key Files
+## Quick Start
 
-### 📘 Onboarding & Missions
-- **[CLAUDE_ONBOARDING.md](CLAUDE_ONBOARDING.md)** - Complete onboarding guide
-  - Directory structure and workspace rules
-  - Repository references and related projects
-  - Step-by-step workflow guidelines
-  - Analysis report templates
-  - Implementation guidance
-- **[CURRENT_FOCUS.md](CURRENT_FOCUS.md)** - Active development priorities and new missions
-- **archive/** - Contains archived work and previous analyses
+### First Time? (AI or Human)
 
-### 📐 Architecture Documentation
-- **[COMPLETE_ARCHITECTURE.md](COMPLETE_ARCHITECTURE.md)** - Protocol-7 system architecture
-- **[DNS_RHIZOME.md](DNS_RHIZOME.md)** - DNS rhizome network discovery
+```bash
+# Single command initialization
+bin/init
 
-### 🤝 Collaboration
-- **[COLLABORATION_PROTOCOL.md](COLLABORATION_PROTOCOL.md)** - Multi-AI coordination guidelines
+# View current status and priorities
+cat STATUS.md
+```
+
+**That's it.** Everything else follows from there.
+
+---
+
+## What This Repository Does
+
+1. **Staging Area**: Develop Protocol-7 features in isolation (`protocol7-staging/`)
+2. **Transfer System**: Move completed work to protocol-7 repository safely
+3. **AI Collaboration**: Enable multiple AI assistants to coordinate on Protocol-7 development
+4. **Token Efficiency**: Optimized for rapid onboarding (< 2k tokens)
+
+---
+
+## Repository Structure
+
+```
+workspace-transfer/
+├── bin/                      # All executables
+│   ├── init                 # ← Start here
+│   ├── checkpoint           # Creative excellence reminder
+│   ├── status               # Detailed workspace status
+│   └── transfer             # Transfer to protocol-7
+├── protocol7-staging/        # ← Develop here
+│   ├── modules/
+│   ├── .manifest.yaml
+│   └── README.md
+├── docs/                     # All documentation
+│   ├── onboarding/
+│   ├── protocol7/
+│   ├── reference/
+│   └── archive/
+├── STATUS.md                 # ← Current priorities
+└── README.md                 # ← You are here
+```
+
+---
+
+## Key Commands
+
+```bash
+bin/init                # Initialize workspace
+cat STATUS.md           # View priorities and status
+bin/checkpoint          # Creative excellence reminder (brief)
+bin/checkpoint --full   # Full creative checkpoint
+bin/transfer --dry-run  # Preview Protocol-7 transfer
+bin/transfer            # Transfer to protocol-7
+bin/status              # Detailed status check
+```
+
+---
+
+## Protocol-7 Staging Workflow
+
+**Work in staging → Transfer to protocol-7 → Commit in protocol-7 → Push**
+
+1. Develop in `protocol7-staging/`
+2. Update `.manifest.yaml` with transfer rules
+3. Run `bin/transfer --dry-run` to preview
+4. Run `bin/transfer --interactive` to transfer
+5. Commit and push in protocol-7 repository
+
+See `docs/protocol7/TRANSFER_WORKFLOW.md` for details.
+
+---
+
+## Documentation
+
+- **STATUS.md** - Current priorities and quick reference
+- **docs/onboarding/** - Getting started guides
+- **docs/protocol7/** - Protocol-7 specific documentation
+- **docs/reference/** - Reference materials
+- **docs/archive/** - Historical documents
 
 ---
 
 ## Repository Convention
 
-**Important**: All repositories in the `nailara-technologies` organization use **`base`** as the default branch (not `main`).
+All `nailara-technologies` repositories use **`base`** as the default branch (not `main`).
 
 ```bash
 git clone https://github.com/nailara-technologies/workspace-transfer.git
 cd workspace-transfer
-git checkout base  # Already default
+# Already on 'base' branch
 ```
-
----
-
-## Quick Start for AI Assistants
-
-### For Claude AI
-1. Read `START_HERE.md` and run initialization scripts
-2. Follow recommendations from `status-check.pl`
-3. Review priorities in `CURRENT_FOCUS.md`
-4. Generate deliverables in `/mnt/user-data/outputs/`
-5. Update workspace with findings
-
-### For Other AI Systems
-1. Clone this repository (public, no auth required)
-2. Review onboarding documentation
-3. Coordinate via GitHub issues or pull requests
-4. Follow established directory structure rules
-
----
-
-## Directory Structure (Target Environment)
-
-```
-/home/claude/workspace-transfer/    # This repository (read/write with credentials)
-/home/claude/work/                  # External repos, builds, experiments
-/mnt/user-data/outputs/             # Generated reports and artifacts
-~/.ssh/workspace-transfer-read-write # SSH key for write access
-```
-
-**Rules**:
-- ✅ Clone external repos related to active missions into `/home/claude/work/`
-- ✅ Place build artifacts in `/home/claude/work/`
-- ✅ Write deliverables to `/mnt/user-data/outputs/`
-- ❌ Do NOT commit binaries or build artifacts to workspace-transfer
 
 ---
 
 ## Related Repositories
 
-### Protocol-7 (Main Project)
-- **URL**: https://github.com/nailara-technologies/protocol-7
-- **Branch**: `base` (default)
-- **Description**: Harmonic computing framework with signature system
+**Protocol-7**: https://github.com/nailara-technologies/protocol-7
+- Main harmonic computing framework
+- Target for staged work from this repository
+- Branch: `base`
 
 ---
 
-## Current Focus
+## Philosophy
 
-See **[CURRENT_FOCUS.md](CURRENT_FOCUS.md)** for active development priorities and next steps.
+Work should embody Protocol-7 principles:
 
-For previous missions and analysis, see **archive/**.
+- **Self-organizing** - Minimal central coordination
+- **Harmonic** - Natural resonance in operation
+- **Resumable** - All operations can be interrupted and continued
+- **Verifiable** - Cryptographic integrity throughout
+- **Token-efficient** - Optimized for AI collaboration
 
 ---
 
 ## Multi-AI Coordination
 
-### Communication Channels
-- **GitHub Issues** - Questions, clarifications, blockers
-- **Pull Requests** - Proposed changes, implementations
-- **Git Tags** - Milestone markers, handoff points
-- **Commit Messages** - Progress updates, decisions
+AI assistants coordinate via:
+- **Git commits** - Progress updates
+- **GitHub issues** - Questions, blockers
+- **Pull requests** - Proposed changes
+- **Git tags** - Milestone markers
 
-### Identity-Agnostic Cooperation
-AI assistants coordinate based on:
-- ✅ Work quality and correctness
-- ✅ Documentation clarity
-- ✅ Test coverage and validation
-- ❌ NOT on AI model, vendor, or identity
-
----
-
-## Making Changes
-
-### Write Access Required
-This repository is **public for reading**, but write access requires:
-- SSH key: `~/.ssh/workspace-transfer-read-write`
-- Or Personal Access Token with `repo` scope
-
-### Contribution Workflow
-1. Make changes in your environment
-2. Test thoroughly
-3. Commit with descriptive messages
-4. Push to `base` branch (or create feature branch)
-5. Document in onboarding files if needed
-
----
-
-## Instant Restoration
-
-This repository is designed for **rapid workspace restoration**:
-
-```bash
-# In any new environment (2-3 seconds)
-git clone https://github.com/nailara-technologies/workspace-transfer.git
-cd workspace-transfer
-cat START_HERE.md  # Start here
-```
-
-No complex setup, no dependencies, just Git.
-
----
-
-## Architecture Philosophy
-
-### Living Tree BASE32
-Workspace-transfer embodies the "Living Tree" philosophy:
-- **Genetic code in Git** - Complete state captured in version control
-- **Anti-entropic** - System becomes more organized through use
-- **Harmonic validation** - Checksums ensure integrity
-- **Instant propagation** - Clone anywhere, anytime
-
-### Sequential File Safety
-Git's atomic operations prevent corruption:
-- ✅ Concurrent access safe (Git handles merging)
-- ✅ History preserved (can revert any change)
-- ✅ Distributed coordination (multiple AIs can work simultaneously)
+Quality-based cooperation, not identity-based.
 
 ---
 
 ## License
 
-Public Domain - see [LICENSE](LICENSE) file
+Public Domain - see [LICENSE](LICENSE)
 
 All workspace-transfer work is released to public knowledge.
 
@@ -177,10 +148,11 @@ All workspace-transfer work is released to public knowledge.
 
 ## Questions?
 
-- **For Claude AI**: Check `CLAUDE_ONBOARDING.md` first
-- **For other AIs**: Open a GitHub issue
-- **For humans**: Contact nailara-technologies
+- **New session?** → Run `bin/init`, read `STATUS.md`
+- **Need help?** → Check `docs/onboarding/`
+- **Protocol-7 specific?** → Check `docs/protocol7/`
+- **Still stuck?** → Open a GitHub issue
 
 ---
 
-**Let's enable streaming signatures for Protocol-7! 🌀✨🔐**
+**Token-optimized for AI collaboration** | **Updated: 2025-11-07**

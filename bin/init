@@ -1,0 +1,63 @@
+#!/bin/bash
+# Single-command workspace initialization
+# Replaces: bootstrap.pl + init.pl + status-check.pl
+# Token-optimized output
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WORKSPACE_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+cd "$WORKSPACE_ROOT"
+
+echo "🚀 Workspace Initialization"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+# Check if we're already in a workspace-transfer git repo
+if [ -d .git ] && git remote -v 2>/dev/null | grep -q workspace-transfer; then
+    # Already in the repository, just ensure git config is set
+    if ! git config user.name > /dev/null 2>&1; then
+        git config user.name "workspace-transfer"
+        git config user.email "workspace-transfer@taeki.v7.ax"
+    fi
+
+    # Ensure .initialized marker exists
+    touch .initialized
+else
+    # Run bootstrap for first-time setup
+    if ! perl bootstrap.pl > /tmp/bootstrap.log 2>&1; then
+        echo "❌ Bootstrap failed. See /tmp/bootstrap.log"
+        cat /tmp/bootstrap.log
+        exit 1
+    fi
+fi
+
+# Extract key info from bootstrap
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+GITUSER=$(git config user.name)
+
+echo "✅ Initialized"
+echo "📍 Branch: $BRANCH"
+echo "🔧 Git User: $GITUSER"
+
+# Check if already initialized
+if [ -f .initialized ]; then
+    echo "✅ Previously initialized - workspace ready"
+else
+    echo "⚠️  First-time initialization"
+fi
+
+# Quick status check
+if git diff-index --quiet HEAD -- 2>/dev/null; then
+    echo "💾 Git: Clean"
+else
+    echo "⚠️  Git: Uncommitted changes"
+fi
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "🎯 Next Steps:"
+echo "   1. cat STATUS.md          # View current priorities"
+echo "   2. bin/checkpoint --brief # Creative excellence reminder"
+echo "   3. Start working!"
+echo ""
+echo "📖 Full docs: docs/"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

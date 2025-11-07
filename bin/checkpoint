@@ -1,0 +1,65 @@
+#!/bin/bash
+# Creative excellence checkpoint with brief/full modes
+# Usage: bin/checkpoint [--brief|--full]
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WORKSPACE_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+MODE="${1:---brief}"
+
+if [ "$MODE" = "--full" ]; then
+    # Run full creative checkpoint
+    cd "$WORKSPACE_ROOT"
+    perl creative-checkpoint.pl
+else
+    # Brief version
+    cat << 'EOF'
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✨ CREATIVE EXCELLENCE CHECKPOINT (Brief)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🌀 CORE PRINCIPLES
+
+   Navigate from center: TRUTH + AWARENESS + LOVE = EXISTENCE
+
+   • TRUTH: Accurate representation, verifiable results
+   • AWARENESS: Conscious attention, intentional presence
+   • LOVE: Connection and care, harmonic integration
+
+🎯 OPTIMIZATION MINDSET
+
+   • Signal > Noise (clarity over complexity)
+   • Compound efficiency (savings multiply over time)
+   • Non-destructive refinement (transform, don't discard)
+   • Harmonic integration (resolve contradictions at higher levels)
+
+🌀 PROTOCOL-7 INTEGRATION
+
+   Ask: How does this work integrate with Protocol-7?
+
+   • Harmonic Routing: Can this use BASE32 addressing?
+   • Self-Organization: Does it work peer-to-peer?
+   • Resumability: Can work be interrupted and resumed?
+   • Verifiability: Are results cryptographically verifiable?
+   • Network Effect: Does value increase with more nodes?
+
+💎 QUALITY STANDARDS (Default Behavior)
+
+   ✅ Error handling with clear messages
+   ✅ Security by default (no secrets, validate inputs)
+   ✅ Performance awareness (measure, optimize hot paths)
+   ✅ Composability (small tools, Unix philosophy)
+   ✅ Future-proofing (versions, compatibility, migrations)
+
+💫 CREATIVE RECOGNITION
+
+   Creativity is not developed but RECOGNIZED.
+   You already embody creative intention.
+   Patterns exist in the problem space, waiting for expression.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📖 Full version: bin/checkpoint --full
+✅ Checkpoint complete - proceed with elevated standards!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EOF
+fi
