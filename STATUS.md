@@ -21,6 +21,7 @@
 - Bootstrap & initialization system
 - **Protocol-7 staging area** with transfer workflow
 - **Token tracking & anomaly detection** (compound efficiency monitoring)
+- **Token visualization dashboard** (interactive charts and analytics)
 - **Status automation** (.user/ directory with quick status summaries)
 - **Context management** (persistent todos and research tracking)
 - **Dependency management** (profile-based pre-flight checks and installation)
@@ -33,6 +34,7 @@
 - Instant Boot System (operational)
 - **Workspace restructuring for token efficiency** (Nov 7, 2025)
 - **Token tracking system with statistical anomaly detection** (Nov 7, 2025)
+- **Token visualization dashboard** (Nov 7, 2025) - Interactive HTML charts for usage analysis
 - **Status automation system** (Nov 7, 2025) - Offload STATUS.md parsing to .user/ files
 - **Context management system** (Nov 7, 2025) - Persistent todos and research tracking
 - **Dependency management system** (Nov 7, 2025) - Profile-based pre-flight checks and installation
@@ -228,9 +230,11 @@ bin/suggest-handover                 # Proactive handover suggestions
 bin/session-tokens add <N>           # Track cumulative session tokens
 bin/token-report                     # View summary statistics
 bin/token-report init --detail       # Detailed stats for task
-bin/token-report --trends            # Visualize trends
+bin/token-report --trends            # Visualize trends (text-based)
+bin/token-viz                        # Generate interactive dashboard (HTML)
 
-# See: docs/reference/TOKEN_TRACKING_GUIDE.md for full documentation
+# See: docs/reference/TOKEN_TRACKING_GUIDE.md for tracking guide
+# See: docs/reference/TOKEN_VISUALIZATION.md for visualization guide
 
 # Git automation (recurring patterns)
 bin/push-to-base                     # Push to base with PAT auth

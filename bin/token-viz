@@ -1,0 +1,177 @@
+#!/usr/bin/perl
+# Generate and display token usage visualization dashboard
+# Usage: token-viz [--output file.html]
+
+use v5.24;
+use strict;
+use warnings;
+use FindBin qw($RealBin);
+use File::Spec;
+use JSON::PP;
+use Getopt::Long;
+
+# Configuration
+my $up_dir = File::Spec->updir;
+my $WORKSPACE_ROOT = File::Spec->rel2abs(File::Spec->catdir($RealBin, $up_dir));
+my $LOG_FILE = File::Spec->catfile($WORKSPACE_ROOT, '.token-stats.log');
+my $TEMPLATE = File::Spec->catfile($WORKSPACE_ROOT, 'visualizations', 'token-usage-dashboard.html');
+
+# Parse arguments
+my $output_file;
+GetOptions(
+    'output=s' => \$output_file,
+) or die "Usage: $0 [--output file.html]\n";
+
+# Set default output location
+unless ($output_file) {
+    $output_file = File::Spec->catfile($WORKSPACE_ROOT, 'visualizations', 'token-dashboard-current.html');
+}
+
+# Read template
+unless (-f $TEMPLATE) {
+    die "❌ Template not found: $TEMPLATE\n";
+}
+
+open my $template_fh, '<', $TEMPLATE or die "Cannot read template: $!";
+my $html = do { local $/; <$template_fh> };
+close $template_fh;
+
+# Load token data
+my @entries;
+if (-f $LOG_FILE) {
+    @entries = load_token_data();
+}
+
+# Convert to JavaScript array
+my $js_data = entries_to_json(\@entries);
+
+# Inject data into HTML
+$html =~ s{/\*TOKEN_DATA_PLACEHOLDER\*/\[\]}{$js_data};
+
+# Write output
+open my $output_fh, '>', $output_file or die "Cannot write to $output_file: $!";
+print $output_fh $html;
+close $output_fh;
+
+say "✅ Token visualization generated: $output_file";
+say "";
+
+# Try to open in browser
+if (@entries) {
+    say "📊 Visualization contains " . scalar(@entries) . " tracked sessions";
+} else {
+    say "⚠️  No tracking data found - showing sample data";
+    say "   Start tracking with: bin/track-tokens <task> <tokens>";
+}
+
+say "";
+say "To view:";
+say "  - Open file: file://$output_file";
+
+# Attempt to auto-open based on platform
+my $opened = 0;
+
+if ($ENV{WSL_DISTRO_NAME}) {
+    # WSL - use windows browser
+    my $win_path = $output_file;
+    $win_path =~ s{^/mnt/([a-z])/}{$1:/}i;
+    system("cmd.exe /c start \"\" \"$win_path\" 2>/dev/null");
+    $opened = 1;
+} elsif ($^O eq 'darwin') {
+    # macOS
+    system("open", $output_file);
+    $opened = 1;
+} elsif ($^O eq 'linux') {
+    # Linux - try common browsers
+    for my $browser (qw(xdg-open firefox chromium-browser google-chrome)) {
+        if (system("which $browser >/dev/null 2>&1") == 0) {
+            system("$browser", $output_file, "&");
+            $opened = 1;
+            last;
+        }
+    }
+}
+
+if ($opened) {
+    say "  - Opening in browser...";
+} else {
+    say "  - Manual open required";
+}
+
+exit 0;
+
+# ============================================================================
+# Functions
+# ============================================================================
+
+sub load_token_data {
+    open my $fh, '<', $LOG_FILE or die "Cannot read $LOG_FILE: $!";
+    my @entries;
+
+    while (my $line = <$fh>) {
+        chomp $line;
+        next if $line =~ /^#/ || $line =~ /^\s*$/;
+
+        my ($timestamp, $task, $tokens) = split /\|/, $line;
+        next unless defined $tokens && $tokens =~ /^\d+$/;
+
+        # Clean up whitespace
+        $timestamp =~ s/^\s+|\s+$//g;
+        $task =~ s/^\s+|\s+$//g;
+        $tokens =~ s/^\s+|\s+$//g;
+
+        push @entries, {
+            timestamp => $timestamp,
+            task => $task,
+            tokens => int($tokens)
+        };
+    }
+
+    close $fh;
+    return @entries;
+}
+
+sub entries_to_json {
+    my ($entries) = @_;
+
+    my $json = JSON::PP->new->utf8->canonical->pretty;
+    return $json->encode($entries);
+}
+
+__END__
+
+=head1 NAME
+
+token-viz - Generate token usage visualization dashboard
+
+=head1 SYNOPSIS
+
+    token-viz [--output file.html]
+
+=head1 DESCRIPTION
+
+Generates an interactive HTML dashboard visualizing token usage statistics
+from the .token-stats.log file. Includes charts, trends, and analytics.
+
+=head1 OPTIONS
+
+    --output FILE    Output HTML file path (default: visualizations/token-dashboard-current.html)
+
+=head1 EXAMPLES
+
+    # Generate and auto-open dashboard
+    bin/token-viz
+
+    # Generate to specific file
+    bin/token-viz --output /tmp/tokens.html
+
+=head1 FEATURES
+
+    - Timeline chart with moving average
+    - Bar chart by task type
+    - Distribution pie chart
+    - Statistical table with trends
+    - Auto-opens in browser
+    - Works with no data (sample demo)
+
+=cut

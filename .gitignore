@@ -21,6 +21,7 @@ context-checkpoints/*.md
 # Token tracking data (local analytics only)
 .token-stats.log
 .current-session
+visualizations/token-dashboard-current.html
 
 # Status automation (regenerated locally)
 .user/local/
