@@ -21,6 +21,7 @@
 - Bootstrap & initialization system
 - **Protocol-7 staging area** with transfer workflow
 - **Token tracking & anomaly detection** (compound efficiency monitoring)
+- **Status automation** (.user/ directory with quick status summaries)
 
 ### Recently Completed ✅
 - Phase 0: Checkpoint encryption system (Oct 4, 2025)
@@ -30,6 +31,7 @@
 - Instant Boot System (operational)
 - **Workspace restructuring for token efficiency** (Nov 7, 2025)
 - **Token tracking system with statistical anomaly detection** (Nov 7, 2025)
+- **Status automation system** (Nov 7, 2025) - Offload STATUS.md parsing to .user/ files
 
 ---
 
@@ -139,11 +141,17 @@ See `docs/protocol7/TRANSFER_WORKFLOW.md` for full details.
 
 ```
 workspace-transfer/
+├── .user/                    # Status automation (local-only, regenerated)
+│   ├── STATUS               # Quick workspace overview
+│   ├── QUICK_START          # Entry point commands
+│   ├── CURRENT              # Recent activity
+│   └── HEALTH               # Session health metrics
 ├── bin/                      # All executables
 │   ├── init                 # Single-command initialization
 │   ├── checkpoint           # Creative excellence checkpoint
 │   ├── status               # Workspace status
 │   ├── transfer             # Transfer to protocol-7
+│   ├── update-status        # Generate .user/ status files
 │   ├── push-to-base         # Automated push with PAT auth & cleanup
 │   ├── track-tokens         # Token tracking (+ positive reinforcement)
 │   ├── suggest-handover     # Proactive handover recommendations
@@ -173,7 +181,14 @@ workspace-transfer/
 # Initialize workspace
 bin/init
 
-# View this status
+# Status automation (token-efficient)
+cat .user/STATUS                     # Quick workspace overview
+cat .user/QUICK_START                # Entry point commands
+cat .user/CURRENT                    # Recent activity
+cat .user/HEALTH                     # Session health metrics
+bin/update-status                    # Regenerate .user/ files
+
+# Full status (detailed)
 cat STATUS.md
 
 # Creative checkpoint (brief)

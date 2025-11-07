@@ -2,7 +2,8 @@
 # Session token counter
 # Usage: session-tokens [add <N>] [set <N>] [get] [reset]
 
-WORKSPACE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WORKSPACE_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 SESSION_FILE="$WORKSPACE_ROOT/.current-session"
 
 # Parse command
@@ -16,6 +17,9 @@ case "$CMD" in
         NEW=$((CURRENT + VALUE))
         echo "$NEW" > "$SESSION_FILE"
         echo "$NEW"
+
+        # Update status files
+        "$SCRIPT_DIR/update-status" 2>/dev/null || true
 
         # Check if handover should be suggested
         bin/suggest-handover --session-tokens "$NEW" --quiet
@@ -40,6 +44,9 @@ case "$CMD" in
         # Reset to zero (new session)
         echo "0" > "$SESSION_FILE"
         echo "Session tokens reset to 0"
+
+        # Update status files
+        "$SCRIPT_DIR/update-status" 2>/dev/null || true
         ;;
 
     *)

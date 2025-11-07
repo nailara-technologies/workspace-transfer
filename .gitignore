@@ -22,6 +22,9 @@ context-checkpoints/*.md
 .token-stats.log
 .current-session
 
+# Status automation (regenerated locally)
+.user/
+
 # Build artifacts
 *.o
 *.so

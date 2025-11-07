@@ -1,0 +1,390 @@
+#!/usr/bin/perl
+# Status automation - Generate user-friendly status files
+# Usage: update-status [--quiet]
+#
+# Parses STATUS.md and generates concise summaries in .user/
+# Offloads status parsing from model to script
+
+use v5.24;
+use strict;
+use warnings;
+use FindBin qw($RealBin);
+use File::Spec;
+use POSIX qw(strftime);
+
+# Configuration
+my $up_dir = File::Spec->updir;
+my $WORKSPACE_ROOT = File::Spec->rel2abs(File::Spec->catdir($RealBin, $up_dir));
+my $USER_DIR = File::Spec->catdir($WORKSPACE_ROOT, '.user');
+my $STATUS_FILE = File::Spec->catfile($WORKSPACE_ROOT, 'STATUS.md');
+
+my $QUIET = grep { $_ eq '--quiet' } @ARGV;
+
+# Ensure .user directory exists
+mkdir $USER_DIR unless -d $USER_DIR;
+
+# Generate status files
+generate_status();
+generate_quick_start();
+generate_current();
+generate_health();
+
+say "✅ Status files updated in .user/" unless $QUIET;
+
+# ============================================================================
+# Generators
+# ============================================================================
+
+sub generate_status {
+    my $output = File::Spec->catfile($USER_DIR, 'STATUS');
+
+    open my $out, '>', $output or die "Cannot write $output: $!";
+
+    print $out "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print $out "WORKSPACE STATUS\n";
+    print $out "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print $out "\n";
+
+    # Parse STATUS.md for key info
+    if (-f $STATUS_FILE) {
+        my ($active_systems, $recent_completed, $priorities) = parse_status_md();
+
+        print $out "🟢 ACTIVE SYSTEMS:\n";
+        for my $system (@$active_systems) {
+            print $out "   • $system\n";
+        }
+        print $out "\n";
+
+        print $out "✅ RECENTLY COMPLETED:\n";
+        for my $item (@$recent_completed) {
+            print $out "   • $item\n";
+        }
+        print $out "\n";
+
+        print $out "🎯 CURRENT PRIORITIES:\n";
+        my $count = 0;
+        for my $priority (@$priorities) {
+            print $out "   $priority->{num}. $priority->{title} ($priority->{status})\n";
+            $count++;
+            last if $count >= 3;  # Top 3 priorities only
+        }
+    } else {
+        print $out "⚠️  STATUS.md not found\n";
+    }
+
+    print $out "\n";
+    print $out "📄 Full details: cat STATUS.md\n";
+    print $out "📊 Quick start: cat .user/QUICK_START\n";
+    print $out "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+
+    close $out;
+}
+
+sub generate_quick_start {
+    my $output = File::Spec->catfile($USER_DIR, 'QUICK_START');
+
+    open my $out, '>', $output or die "Cannot write $output: $!";
+
+    print $out "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print $out "QUICK START GUIDE\n";
+    print $out "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print $out "\n";
+
+    print $out "🆕 FIRST TIME / FRESH SESSION\n";
+    print $out "────────────────────────────────────────────────────────────────────\n";
+    print $out "bin/init                    # Initialize workspace (~500 tokens)\n";
+    print $out "cat .user/STATUS            # View current state (~200 tokens)\n";
+    print $out "bin/checkpoint --brief      # Creative excellence (~300 tokens)\n";
+    print $out "bin/session-tokens reset    # Start session tracking\n";
+    print $out "\n";
+    print $out "Total: ~1k tokens (vs ~24k without optimization)\n";
+    print $out "\n";
+
+    print $out "🔄 RESUME EXISTING WORK\n";
+    print $out "────────────────────────────────────────────────────────────────────\n";
+    print $out "cat .user/STATUS            # Current state\n";
+    print $out "cat .user/CURRENT           # Recent activity\n";
+    print $out "git log --oneline -5        # Recent commits\n";
+    print $out "bin/session-tokens reset    # Start tracking\n";
+    print $out "\n";
+
+    print $out "🔧 IMPROVE WORKSPACE\n";
+    print $out "────────────────────────────────────────────────────────────────────\n";
+    print $out "cat docs/reference/RECURRING_PATTERNS.md\n";
+    print $out "cat docs/reference/TOKEN_TRACKING_GUIDE.md\n";
+    print $out "\n";
+
+    print $out "📝 DURING WORK\n";
+    print $out "────────────────────────────────────────────────────────────────────\n";
+    print $out "bin/track-tokens <task> <N>     # Track usage\n";
+    print $out "bin/session-tokens add <N>       # Update session total\n";
+    print $out "bin/suggest-handover             # Check health (every ~30k tokens)\n";
+    print $out "\n";
+
+    print $out "✅ COMMIT & PUSH\n";
+    print $out "────────────────────────────────────────────────────────────────────\n";
+    print $out "git add -A\n";
+    print $out "git commit -m \"Description\"\n";
+    print $out "bin/push-to-base                 # Push to base branch\n";
+    print $out "\n";
+
+    print $out "🔀 HANDOVER SESSION\n";
+    print $out "────────────────────────────────────────────────────────────────────\n";
+    print $out "git add -A && git commit -m \"WIP: Description\"\n";
+    print $out "bin/push-to-base\n";
+    print $out "# Document state in STATUS.md or commit message\n";
+    print $out "bin/session-tokens reset\n";
+    print $out "# Start fresh session\n";
+    print $out "\n";
+
+    print $out "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print $out "Updated: " . strftime("%Y-%m-%d %H:%M:%S", localtime) . "\n";
+    print $out "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+
+    close $out;
+}
+
+sub generate_current {
+    my $output = File::Spec->catfile($USER_DIR, 'CURRENT');
+
+    open my $out, '>', $output or die "Cannot write $output: $!";
+
+    print $out "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print $out "CURRENT ACTIVITY\n";
+    print $out "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print $out "\n";
+
+    # Git status
+    chdir $WORKSPACE_ROOT;
+    my $branch = `git rev-parse --abbrev-ref HEAD 2>/dev/null`;
+    chomp $branch if $branch;
+
+    print $out "📍 Branch: $branch\n";
+
+    my $git_status = `git status --porcelain 2>/dev/null`;
+    if ($git_status && $git_status =~ /\S/) {
+        my @changes = split /\n/, $git_status;
+        my $count = scalar @changes;
+        print $out "📝 Uncommitted changes: $count files\n";
+    } else {
+        print $out "✅ Git: Clean (no uncommitted changes)\n";
+    }
+
+    # Recent commits
+    my @commits = `git log --oneline -3 2>/dev/null`;
+    if (@commits) {
+        print $out "\n";
+        print $out "Recent commits:\n";
+        for my $commit (@commits) {
+            chomp $commit;
+            print $out "   $commit\n";
+        }
+    }
+
+    # Session tokens (if tracked)
+    my $session_file = File::Spec->catfile($WORKSPACE_ROOT, '.current-session');
+    if (-f $session_file) {
+        open my $sfh, '<', $session_file;
+        my $tokens = <$sfh>;
+        chomp $tokens if defined $tokens;
+        close $sfh;
+
+        if ($tokens && $tokens =~ /^\d+$/) {
+            print $out "\n";
+            print $out "💾 Session tokens: " . format_number($tokens) . "\n";
+
+            # Suggest handover check if approaching threshold
+            if ($tokens >= 60_000) {
+                print $out "   💡 Consider: bin/suggest-handover\n";
+            }
+        }
+    }
+
+    print $out "\n";
+    print $out "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print $out "Updated: " . strftime("%Y-%m-%d %H:%M:%S", localtime) . "\n";
+    print $out "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+
+    close $out;
+}
+
+sub generate_health {
+    my $output = File::Spec->catfile($USER_DIR, 'HEALTH');
+
+    open my $out, '>', $output or die "Cannot write $output: $!";
+
+    print $out "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print $out "SESSION HEALTH\n";
+    print $out "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print $out "\n";
+
+    # Session tokens
+    my $session_file = File::Spec->catfile($WORKSPACE_ROOT, '.current-session');
+    my $tokens = 0;
+    if (-f $session_file) {
+        open my $sfh, '<', $session_file;
+        my $val = <$sfh>;
+        chomp $val if defined $val;
+        $tokens = $val if $val && $val =~ /^\d+$/;
+        close $sfh;
+    }
+
+    print $out "💾 Session Tokens: " . format_number($tokens) . "\n";
+
+    # Health indicators
+    if ($tokens == 0) {
+        print $out "📊 Status: Fresh session (no tracking yet)\n";
+        print $out "   💡 Tip: bin/session-tokens reset\n";
+    } elsif ($tokens < 40_000) {
+        print $out "📊 Status: ✅ Healthy (plenty of context available)\n";
+    } elsif ($tokens < 70_000) {
+        print $out "📊 Status: ⚠️  Moderate (approaching handover range)\n";
+        print $out "   💡 Tip: bin/suggest-handover  # Check if at checkpoint\n";
+    } elsif ($tokens < 100_000) {
+        print $out "📊 Status: 🟡 Caution (optimal handover range)\n";
+        print $out "   ⚠️  Recommend: bin/suggest-handover\n";
+    } else {
+        print $out "📊 Status: 🔴 Critical (approaching context limit)\n";
+        print $out "   ⚠️  ACTION: Hand over session NOW\n";
+    }
+
+    # Token stats (if available)
+    my $log_file = File::Spec->catfile($WORKSPACE_ROOT, '.token-stats.log');
+    if (-f $log_file) {
+        my @recent = get_recent_stats();
+        if (@recent) {
+            print $out "\n";
+            print $out "Recent efficiency:\n";
+            for my $entry (@recent) {
+                print $out "   $entry->{task}: $entry->{tokens} tokens\n";
+            }
+        }
+    }
+
+    print $out "\n";
+    print $out "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print $out "Commands:\n";
+    print $out "  bin/suggest-handover    # Detailed health check\n";
+    print $out "  bin/token-report        # Full statistics\n";
+    print $out "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print $out "Updated: " . strftime("%Y-%m-%d %H:%M:%S", localtime) . "\n";
+    print $out "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+
+    close $out;
+}
+
+# ============================================================================
+# Helpers
+# ============================================================================
+
+sub parse_status_md {
+    return ([], [], []) unless -f $STATUS_FILE;
+
+    open my $fh, '<', $STATUS_FILE or return ([], [], []);
+
+    my @active_systems;
+    my @recent_completed;
+    my @priorities;
+
+    my $section = '';
+
+    while (my $line = <$fh>) {
+        chomp $line;
+
+        # Detect sections
+        if ($line =~ /^### Active Systems/) {
+            $section = 'active';
+            next;
+        } elsif ($line =~ /^### Recently Completed/) {
+            $section = 'completed';
+            next;
+        } elsif ($line =~ /^## Current Development Priorities/) {
+            $section = 'priorities';
+            next;
+        } elsif ($line =~ /^##[^#]/ && $section eq 'priorities') {
+            $section = '';  # End of priorities
+        }
+
+        # Parse content
+        if ($section eq 'active' && $line =~ /^- (.+)$/) {
+            push @active_systems, $1;
+        } elsif ($section eq 'completed' && $line =~ /^- (.+)$/) {
+            push @recent_completed, $1;
+        } elsif ($section eq 'priorities' && $line =~ /^### (\d+)\. (.+)/) {
+            my ($num, $rest) = ($1, $2);
+            my ($title, $status) = split / \| /, $rest, 2;
+            $status ||= 'Status unknown';
+            $status =~ s/\*\*Status\*\*:\s*//;
+            push @priorities, { num => $num, title => $title, status => $status };
+        }
+    }
+
+    close $fh;
+
+    return (\@active_systems, \@recent_completed, \@priorities);
+}
+
+sub get_recent_stats {
+    my $log_file = File::Spec->catfile($WORKSPACE_ROOT, '.token-stats.log');
+    return () unless -f $log_file;
+
+    open my $fh, '<', $log_file or return ();
+    my @entries;
+
+    while (my $line = <$fh>) {
+        chomp $line;
+        next if $line =~ /^#/ || $line =~ /^\s*$/;
+
+        my ($timestamp, $task, $tokens) = split /\|/, $line;
+        next unless defined $tokens;
+
+        push @entries, { task => $task, tokens => $tokens };
+    }
+
+    close $fh;
+
+    # Return last 3
+    return reverse((@entries)[-3..-1]);
+}
+
+sub format_number {
+    my $num = shift;
+    return '0' unless defined $num;
+    my $formatted = sprintf("%.0f", $num);
+    $formatted =~ s/(\d)(?=(\d{3})+$)/$1,/g;
+    return $formatted;
+}
+
+__END__
+
+=head1 NAME
+
+update-status - Generate user-friendly status summaries
+
+=head1 SYNOPSIS
+
+    update-status [--quiet]
+
+=head1 DESCRIPTION
+
+Parses STATUS.md and generates concise summaries in .user/
+
+Offloads status parsing from model to script - instead of reading
+1-2k tokens from STATUS.md, model reads 100-300 tokens from .user/ files.
+
+=head1 GENERATED FILES
+
+.user/STATUS       - Current workspace status (active systems, priorities)
+.user/QUICK_START  - Entry point commands for different scenarios
+.user/CURRENT      - Recent activity (git status, commits, session tokens)
+.user/HEALTH       - Session health metrics and suggestions
+
+=head1 INTEGRATION
+
+Call from:
+- bin/init (after initialization)
+- bin/session-tokens (after updates)
+- bin/track-tokens (after tracking)
+- Manually as needed
+
+=cut

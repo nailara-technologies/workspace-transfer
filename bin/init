@@ -52,12 +52,16 @@ else
     echo "⚠️  Git: Uncommitted changes"
 fi
 
+# Generate status automation
+"$SCRIPT_DIR/update-status" 2>/dev/null || true
+
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 echo "🎯 Next Steps:"
-echo "   1. cat STATUS.md          # View current priorities"
-echo "   2. bin/checkpoint --brief # Creative excellence reminder"
-echo "   3. Start working!"
+echo "   1. cat .user/STATUS       # Quick workspace overview"
+echo "   2. cat .user/QUICK_START  # Entry point commands"
+echo "   3. bin/checkpoint --brief # Creative excellence reminder"
+echo "   4. Start working!"
 echo ""
 echo "📖 Full docs: docs/"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
