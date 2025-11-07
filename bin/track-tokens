@@ -185,6 +185,17 @@ sub print_report {
             print "   - Verbose output?\n";
             print "   - Repeated documentation reading?\n";
             print "   - Missing optimization opportunities?\n";
+        } elsif ($pct < -15 && $stats->{count} >= 3) {
+            # Significant improvement detected!
+            print "✅ EFFICIENCY IMPROVEMENT DETECTED!\n";
+            print "   Current: " . format_number($tokens) . " tokens (" . sprintf("%.1f%%", $pct) . " from baseline)\n";
+            print "\n";
+            print "   Excellent work! This optimization will compound:\n";
+            my $savings_per = abs($diff);
+            print "   - Over 10 sessions:  ~" . format_number($savings_per * 10) . " tokens saved\n";
+            print "   - Over 100 sessions: ~" . format_number($savings_per * 100) . " tokens saved\n";
+            print "\n";
+            print "   💡 Keep this pattern for future similar tasks.\n";
         } elsif (abs($pct) > 10) {
             print "📈 Variance: " . sprintf("%+.1f%%", $pct) . " from average\n";
             if ($diff < 0) {

@@ -1,0 +1,55 @@
+#!/bin/bash
+# Session token counter
+# Usage: session-tokens [add <N>] [set <N>] [get] [reset]
+
+WORKSPACE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SESSION_FILE="$WORKSPACE_ROOT/.current-session"
+
+# Parse command
+CMD="${1:-get}"
+VALUE="${2:-0}"
+
+case "$CMD" in
+    add)
+        # Add tokens to current session
+        CURRENT=$(cat "$SESSION_FILE" 2>/dev/null || echo "0")
+        NEW=$((CURRENT + VALUE))
+        echo "$NEW" > "$SESSION_FILE"
+        echo "$NEW"
+
+        # Check if handover should be suggested
+        bin/suggest-handover --session-tokens "$NEW" --quiet
+        if [ $? -eq 1 ]; then
+            echo "" >&2
+            echo "💡 Tip: bin/suggest-handover  # Check if handover recommended" >&2
+        fi
+        ;;
+
+    set)
+        # Set explicit token count
+        echo "$VALUE" > "$SESSION_FILE"
+        echo "$VALUE"
+        ;;
+
+    get)
+        # Get current count
+        cat "$SESSION_FILE" 2>/dev/null || echo "0"
+        ;;
+
+    reset)
+        # Reset to zero (new session)
+        echo "0" > "$SESSION_FILE"
+        echo "Session tokens reset to 0"
+        ;;
+
+    *)
+        echo "Usage: session-tokens [add <N>] [set <N>] [get] [reset]"
+        echo ""
+        echo "Commands:"
+        echo "  add <N>   Add N tokens to current session"
+        echo "  set <N>   Set session to N tokens"
+        echo "  get       Get current token count (default)"
+        echo "  reset     Reset counter (start new session)"
+        exit 1
+        ;;
+esac

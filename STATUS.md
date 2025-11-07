@@ -144,7 +144,9 @@ workspace-transfer/
 │   ├── checkpoint           # Creative excellence checkpoint
 │   ├── status               # Workspace status
 │   ├── transfer             # Transfer to protocol-7
-│   ├── track-tokens         # Token usage tracking
+│   ├── track-tokens         # Token tracking (+ positive reinforcement)
+│   ├── suggest-handover     # Proactive handover recommendations
+│   ├── session-tokens       # Session token counter
 │   ├── token-report         # Token analytics & trends
 │   └── lib/                 # Shared libraries
 ├── protocol7-staging/        # Stage Protocol-7 work here
@@ -179,11 +181,15 @@ bin/checkpoint
 # Transfer to protocol-7 (dry run)
 bin/transfer --dry-run
 
-# Token tracking (compound efficiency monitoring)
-bin/track-tokens <task> <tokens>     # Track token usage
+# Token tracking (self-optimizing efficiency system)
+bin/track-tokens <task> <tokens>     # Track usage (+ positive reinforcement)
+bin/suggest-handover                 # Proactive handover suggestions
+bin/session-tokens add <N>           # Track cumulative session tokens
 bin/token-report                     # View summary statistics
 bin/token-report init --detail       # Detailed stats for task
 bin/token-report --trends            # Visualize trends
+
+# See: docs/reference/TOKEN_TRACKING_GUIDE.md for full documentation
 
 # View full documentation
 ls docs/

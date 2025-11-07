@@ -1,0 +1,348 @@
+#!/usr/bin/perl
+# Session handover suggestion system
+# Proactively recommends session handovers at efficient checkpoints
+# Usage: suggest-handover [--session-tokens <count>] [--quiet]
+
+use v5.24;
+use strict;
+use warnings;
+use FindBin qw($RealBin);
+use File::Spec;
+use POSIX qw(strftime);
+
+# Configuration
+my $up_dir = File::Spec->updir;
+my $WORKSPACE_ROOT = File::Spec->rel2abs(File::Spec->catdir($RealBin, $up_dir));
+my $LOG_FILE = File::Spec->catfile($WORKSPACE_ROOT, '.token-stats.log');
+my $SESSION_FILE = File::Spec->catfile($WORKSPACE_ROOT, '.current-session');
+
+# Thresholds
+my $HANDOVER_SOFT_LIMIT = 70_000;  # Start suggesting
+my $HANDOVER_HARD_LIMIT = 100_000; # Strongly recommend
+my $EFFICIENCY_CHECKPOINT = 80_000; # Optimal handover range
+
+# Parse arguments
+my %opts = parse_args(@ARGV);
+my $session_tokens = $opts{session_tokens} || get_session_tokens();
+my $quiet = $opts{quiet} || 0;
+
+# Get recent activity
+my @recent_tasks = get_recent_tasks();
+
+# Determine if handover should be suggested
+my $suggestion = evaluate_handover($session_tokens, \@recent_tasks);
+
+# Display or return quietly
+if ($suggestion->{should_suggest}) {
+    unless ($quiet) {
+        display_suggestion($suggestion, $session_tokens);
+    }
+    exit(1);  # Exit code 1 = handover suggested
+} else {
+    unless ($quiet) {
+        say "✅ Session context healthy (" . format_number($session_tokens) . " tokens used)";
+        say "   Continue working. Handover suggestion at ~" . format_number($HANDOVER_SOFT_LIMIT) . " tokens.";
+    }
+    exit(0);  # Exit code 0 = continue working
+}
+
+# ============================================================================
+# Functions
+# ============================================================================
+
+sub parse_args {
+    my %opts;
+    while (@_) {
+        my $arg = shift;
+        if ($arg eq '--session-tokens') {
+            $opts{session_tokens} = shift;
+        } elsif ($arg eq '--quiet') {
+            $opts{quiet} = 1;
+        }
+    }
+    return %opts;
+}
+
+sub get_session_tokens {
+    # Try to read from session file (if maintained)
+    if (-f $SESSION_FILE) {
+        open my $fh, '<', $SESSION_FILE or return 0;
+        my $tokens = <$fh>;
+        close $fh;
+        chomp $tokens if defined $tokens;
+        return $tokens || 0;
+    }
+
+    # Fallback: sum recent tasks from last hour
+    return estimate_session_tokens();
+}
+
+sub estimate_session_tokens {
+    return 0 unless -f $LOG_FILE;
+
+    open my $fh, '<', $LOG_FILE or return 0;
+    my @recent;
+    my $cutoff = time - 3600;  # Last hour
+
+    while (my $line = <$fh>) {
+        chomp $line;
+        next if $line =~ /^#/ || $line =~ /^\s*$/;
+
+        my ($timestamp, $task, $tokens) = split /\|/, $line;
+        next unless defined $tokens && $tokens =~ /^\d+$/;
+
+        # Parse timestamp
+        if ($timestamp =~ /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/) {
+            use Time::Local;
+            my $epoch = eval {
+                timelocal($6, $5, $4, $3, $2-1, $1-1900);
+            };
+            next unless defined $epoch && $epoch >= $cutoff;
+        }
+
+        push @recent, $tokens;
+    }
+
+    close $fh;
+
+    my $sum = 0;
+    $sum += $_ for @recent;
+    return $sum;
+}
+
+sub get_recent_tasks {
+    return () unless -f $LOG_FILE;
+
+    open my $fh, '<', $LOG_FILE or return ();
+    my @entries;
+    my $cutoff = time - 3600;  # Last hour
+
+    while (my $line = <$fh>) {
+        chomp $line;
+        next if $line =~ /^#/ || $line =~ /^\s*$/;
+
+        my ($timestamp, $task, $tokens) = split /\|/, $line;
+        next unless defined $tokens;
+
+        push @entries, {
+            timestamp => $timestamp,
+            task => $task,
+            tokens => $tokens
+        };
+    }
+
+    close $fh;
+
+    # Return last 5 tasks
+    return reverse((@entries)[-5..-1]);
+}
+
+sub evaluate_handover {
+    my ($tokens, $recent_tasks) = @_;
+
+    my %suggestion = (
+        should_suggest => 0,
+        urgency => 'none',
+        reason => '',
+        benefits => [],
+        actions => []
+    );
+
+    if ($tokens >= $HANDOVER_HARD_LIMIT) {
+        $suggestion{should_suggest} = 1;
+        $suggestion{urgency} = 'high';
+        $suggestion{reason} = 'Context window approaching limit';
+        push @{$suggestion{benefits}}, 'Prevent context overflow';
+        push @{$suggestion{benefits}}, 'Maintain response quality';
+        push @{$suggestion{benefits}}, 'Fresh context = better efficiency';
+
+    } elsif ($tokens >= $HANDOVER_SOFT_LIMIT) {
+        # Check if we're at a natural checkpoint
+        my $at_checkpoint = detect_checkpoint($recent_tasks);
+
+        if ($at_checkpoint) {
+            $suggestion{should_suggest} = 1;
+            $suggestion{urgency} = 'medium';
+            $suggestion{reason} = 'Natural checkpoint reached at optimal token range';
+            push @{$suggestion{benefits}}, 'Good stopping point (work completed)';
+            push @{$suggestion{benefits}}, 'Optimal handover range (70k-80k tokens)';
+            push @{$suggestion{benefits}}, 'Fresh session will be more efficient';
+        }
+    }
+
+    # Check for context efficiency degradation (regardless of total tokens)
+    my $efficiency_issue = detect_efficiency_degradation($recent_tasks);
+    if ($efficiency_issue && $tokens >= 40_000) {
+        $suggestion{should_suggest} = 1;
+        $suggestion{urgency} = $suggestion{urgency} eq 'high' ? 'high' : 'medium';
+        $suggestion{reason} .= ($suggestion{reason} ? ' + ' : '') . 'Context efficiency degrading';
+        push @{$suggestion{benefits}}, '⚠️  Recent tasks using more tokens for similar work';
+        push @{$suggestion{benefits}}, 'Fresh context will restore efficiency';
+        push @{$suggestion{benefits}}, 'Prevent compounding inefficiency';
+    }
+
+    # Standard actions for any handover
+    if ($suggestion{should_suggest}) {
+        push @{$suggestion{actions}}, 'Commit current work';
+        push @{$suggestion{actions}}, 'Update STATUS.md with progress';
+        push @{$suggestion{actions}}, 'Document blockers or next steps';
+        push @{$suggestion{actions}}, 'Start fresh session';
+    }
+
+    return \%suggestion;
+}
+
+sub detect_checkpoint {
+    my ($recent_tasks) = @_;
+    return 0 unless @$recent_tasks;
+
+    # Look for completion signals in recent tasks
+    for my $entry (@$recent_tasks) {
+        # Commits, documentation updates, transfers = good checkpoints
+        return 1 if $entry->{task} =~ /commit|transfer|documentation|refactor/i;
+    }
+
+    return 0;
+}
+
+sub detect_efficiency_degradation {
+    my ($recent_tasks) = @_;
+    return 0 unless @$recent_tasks >= 4;
+
+    # Group by task type and check if recent ones use more tokens
+    my %by_task;
+    for my $entry (@$recent_tasks) {
+        push @{$by_task{$entry->{task}}}, $entry->{tokens};
+    }
+
+    # For each task with multiple entries, check if trending upward
+    for my $task (keys %by_task) {
+        my @tokens = @{$by_task{$task}};
+        next unless @tokens >= 3;
+
+        # Compare first half to second half average
+        my $mid = int(@tokens / 2);
+        my @early = @tokens[0..$mid-1];
+        my @late = @tokens[$mid..$#tokens];
+
+        my $early_avg = sum(@early) / @early;
+        my $late_avg = sum(@late) / @late;
+
+        # If recent tasks use >25% more tokens for same task type
+        if ($late_avg > $early_avg * 1.25) {
+            return 1;  # Efficiency degrading
+        }
+    }
+
+    return 0;
+}
+
+sub sum {
+    my $total = 0;
+    $total += $_ for @_;
+    return $total;
+}
+
+sub display_suggestion {
+    my ($suggestion, $tokens) = @_;
+
+    say "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+
+    if ($suggestion->{urgency} eq 'high') {
+        say "🔴 SESSION HANDOVER STRONGLY RECOMMENDED";
+    } elsif ($suggestion->{urgency} eq 'medium') {
+        say "💡 SESSION HANDOVER RECOMMENDED";
+    }
+
+    say "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+    say "";
+    say "Current context: ~" . format_number($tokens) . " tokens used";
+
+    if ($suggestion->{urgency} eq 'high') {
+        say "⚠️  Approaching context limit!";
+    } else {
+        say "Optimal handover range: 70k-80k tokens";
+    }
+
+    say "";
+    say "Reason: $suggestion->{reason}";
+    say "";
+
+    if (@{$suggestion->{benefits}}) {
+        say "Benefits of handing over now:";
+        for my $benefit (@{$suggestion->{benefits}}) {
+            say "  ✓ $benefit";
+        }
+        say "";
+    }
+
+    if (@{$suggestion->{actions}}) {
+        say "Suggested actions:";
+        my $num = 1;
+        for my $action (@{$suggestion->{actions}}) {
+            say "  $num. $action";
+            $num++;
+        }
+        say "";
+    }
+
+    say "💡 Best Practice: Hand over at natural checkpoints";
+    say "   (commits, completed features, before new major tasks)";
+    say "";
+    say "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+}
+
+sub format_number {
+    my $num = shift;
+    return '0' unless defined $num;
+
+    my $formatted = sprintf("%.0f", $num);
+    $formatted =~ s/(\d)(?=(\d{3})+$)/$1,/g;
+    return $formatted;
+}
+
+__END__
+
+=head1 NAME
+
+suggest-handover - Proactive session handover recommendations
+
+=head1 SYNOPSIS
+
+    suggest-handover [--session-tokens <count>] [--quiet]
+
+=head1 DESCRIPTION
+
+Evaluates current session state and suggests handovers at efficient checkpoints.
+
+Prevents context overflow and maintains response quality through strategic handovers.
+
+=head1 OPTIONS
+
+--session-tokens <N>   Specify current session token count
+--quiet                Only return exit code (0=continue, 1=handover)
+
+=head1 EXAMPLES
+
+    # Check if handover recommended
+    suggest-handover --session-tokens 75000
+
+    # Quiet mode (for automation)
+    if suggest-handover --quiet; then
+        echo "Continue working"
+    else
+        echo "Consider handover"
+    fi
+
+=head1 EXIT CODES
+
+0 - Continue working (session healthy)
+1 - Handover suggested (at checkpoint or limit)
+
+=head1 THRESHOLDS
+
+Soft limit: 70,000 tokens (suggest at checkpoints)
+Hard limit: 100,000 tokens (strongly recommend)
+Optimal: 70,000-80,000 tokens
+
+=cut

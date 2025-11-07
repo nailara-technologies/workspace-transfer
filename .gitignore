@@ -20,6 +20,7 @@ context-checkpoints/*.md
 
 # Token tracking data (local analytics only)
 .token-stats.log
+.current-session
 
 # Build artifacts
 *.o
