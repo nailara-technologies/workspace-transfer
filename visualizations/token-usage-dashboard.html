@@ -13,8 +13,8 @@
         }
 
         body {
-            background: linear-gradient(135deg, #0a0015 0%, #1a0030 25%, #0f0025 50%, #1a0030 75%, #0a0015 100%);
-            color: #00ff88;
+            background: linear-gradient(135deg, #0a001a 0%, #1a0045 25%, #0f0030 50%, #1a0045 75%, #0a001a 100%);
+            color: #00ddff;
             font-family: 'Courier New', monospace;
             padding: 20px;
             min-height: 100vh;
@@ -30,25 +30,25 @@
             text-align: center;
             font-size: 3em;
             margin-bottom: 10px;
-            text-shadow: 0 0 20px #00ff88, 0 0 40px #00ff88, 0 0 60px #00ff88;
+            text-shadow: 0 0 20px #00ddff, 0 0 40px #00ddff, 0 0 60px #00ddff;
             animation: glow-pulse 3s ease-in-out infinite;
         }
 
         @keyframes glow-pulse {
             0%, 100% {
-                text-shadow: 0 0 20px #00ff88, 0 0 40px #00ff88, 0 0 60px #00ff88;
+                text-shadow: 0 0 20px #00ddff, 0 0 40px #00ddff, 0 0 60px #00ddff;
             }
             50% {
-                text-shadow: 0 0 30px #ff00ff, 0 0 60px #ff00ff, 0 0 90px #ff00ff;
+                text-shadow: 0 0 30px #cc00ff, 0 0 60px #cc00ff, 0 0 90px #cc00ff;
             }
         }
 
         .subtitle {
             text-align: center;
-            color: #ff00ff;
+            color: #cc00ff;
             font-size: 1.5em;
             margin-bottom: 40px;
-            text-shadow: 0 0 15px #ff00ff;
+            text-shadow: 0 0 15px #cc00ff;
         }
 
         .data-status {
@@ -70,8 +70,8 @@
         }
 
         .metric-card {
-            background: rgba(20, 0, 40, 0.9);
-            border: 2px solid #ff00ff;
+            background: rgba(15, 0, 50, 0.9);
+            border: 2px solid #cc00ff;
             border-radius: 15px;
             padding: 25px;
             text-align: center;
@@ -81,13 +81,13 @@
         }
 
         .metric-card:hover {
-            border-color: #00ff88;
-            box-shadow: 0 0 35px rgba(0, 255, 136, 0.5);
+            border-color: #00ddff;
+            box-shadow: 0 0 35px rgba(0, 221, 255, 0.5);
             transform: translateY(-5px);
         }
 
         .metric-label {
-            color: #ff00ff;
+            color: #aa88ff;
             font-size: 1em;
             margin-bottom: 15px;
             text-transform: uppercase;
@@ -95,15 +95,15 @@
 
         .metric-value {
             font-size: 2.5em;
-            color: #00ff88;
+            color: #00ddff;
             font-weight: bold;
-            text-shadow: 0 0 20px #00ff88;
+            text-shadow: 0 0 20px #00ddff;
             display: block;
             margin: 10px 0;
         }
 
         .metric-subtext {
-            color: #00ccff;
+            color: #88bbff;
             font-size: 0.9em;
         }
 
@@ -115,8 +115,8 @@
         }
 
         .chart-card {
-            background: rgba(20, 0, 40, 0.9);
-            border: 2px solid #00ccff;
+            background: rgba(15, 0, 50, 0.9);
+            border: 2px solid #0099ff;
             border-radius: 15px;
             padding: 30px;
             backdrop-filter: blur(10px);
@@ -124,10 +124,10 @@
         }
 
         .chart-card h2 {
-            color: #00ccff;
+            color: #0099ff;
             font-size: 1.8em;
             margin-bottom: 25px;
-            text-shadow: 0 0 15px #00ccff;
+            text-shadow: 0 0 15px #0099ff;
         }
 
         .chart-container {
@@ -153,13 +153,13 @@
         }
 
         .tasks-table th {
-            background: rgba(255, 0, 255, 0.2);
-            color: #ff00ff;
+            background: rgba(204, 0, 255, 0.2);
+            color: #aa88ff;
             font-weight: bold;
         }
 
         .tasks-table tr:hover {
-            background: rgba(0, 255, 136, 0.1);
+            background: rgba(0, 221, 255, 0.1);
         }
 
         .trend-up {
@@ -167,7 +167,7 @@
         }
 
         .trend-down {
-            color: #00ff88;
+            color: #00ddff;
         }
 
         .trend-stable {
@@ -178,7 +178,7 @@
             text-align: center;
             margin-top: 40px;
             padding: 20px;
-            color: #00ccff;
+            color: #88bbff;
             font-size: 0.9em;
         }
     </style>
@@ -363,7 +363,7 @@
             plugins: {
                 legend: {
                     labels: {
-                        color: '#00ff88',
+                        color: '#00ddff',
                         font: {
                             family: "'Courier New', monospace",
                             size: 12
@@ -404,8 +404,8 @@
                         {
                             label: 'Token Usage',
                             data: tokens,
-                            borderColor: '#00ff88',
-                            backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                            borderColor: '#00ddff',
+                            backgroundColor: 'rgba(0, 221, 255, 0.1)',
                             borderWidth: 2,
                             tension: 0.3,
                             fill: true
@@ -413,7 +413,7 @@
                         {
                             label: 'Moving Average (5)',
                             data: movingAvg,
-                            borderColor: '#ff00ff',
+                            borderColor: '#cc00ff',
                             borderWidth: 2,
                             borderDash: [5, 5],
                             tension: 0.3,
@@ -426,7 +426,7 @@
                     scales: {
                         x: {
                             ticks: {
-                                color: '#00ccff',
+                                color: '#88bbff',
                                 maxRotation: 45,
                                 minRotation: 45,
                                 font: {
@@ -435,18 +435,18 @@
                                 }
                             },
                             grid: {
-                                color: 'rgba(0, 255, 136, 0.1)'
+                                color: 'rgba(0, 221, 255, 0.1)'
                             }
                         },
                         y: {
                             ticks: {
-                                color: '#00ccff',
+                                color: '#88bbff',
                                 font: {
                                     family: "'Courier New', monospace"
                                 }
                             },
                             grid: {
-                                color: 'rgba(255, 0, 255, 0.1)'
+                                color: 'rgba(204, 0, 255, 0.1)'
                             }
                         }
                     }
@@ -472,23 +472,23 @@
                         data: avgTokens,
                         backgroundColor: tasks.map((_, i) => {
                             const colors = [
-                                'rgba(0, 255, 136, 0.7)',
-                                'rgba(255, 0, 255, 0.7)',
-                                'rgba(0, 204, 255, 0.7)',
-                                'rgba(255, 170, 0, 0.7)',
-                                'rgba(255, 100, 100, 0.7)',
-                                'rgba(100, 255, 255, 0.7)'
+                                'rgba(0, 221, 255, 0.7)',
+                                'rgba(204, 0, 255, 0.7)',
+                                'rgba(0, 153, 255, 0.7)',
+                                'rgba(170, 136, 255, 0.7)',
+                                'rgba(255, 100, 255, 0.7)',
+                                'rgba(100, 200, 255, 0.7)'
                             ];
                             return colors[i % colors.length];
                         }),
                         borderColor: tasks.map((_, i) => {
                             const colors = [
-                                '#00ff88',
-                                '#ff00ff',
-                                '#00ccff',
-                                '#ffaa00',
-                                '#ff6464',
-                                '#64ffff'
+                                '#00ddff',
+                                '#cc00ff',
+                                '#0099ff',
+                                '#aa88ff',
+                                '#ff64ff',
+                                '#64c8ff'
                             ];
                             return colors[i % colors.length];
                         }),
@@ -500,24 +500,24 @@
                     scales: {
                         x: {
                             ticks: {
-                                color: '#00ccff',
+                                color: '#88bbff',
                                 font: {
                                     family: "'Courier New', monospace"
                                 }
                             },
                             grid: {
-                                color: 'rgba(0, 255, 136, 0.1)'
+                                color: 'rgba(0, 221, 255, 0.1)'
                             }
                         },
                         y: {
                             ticks: {
-                                color: '#00ccff',
+                                color: '#88bbff',
                                 font: {
                                     family: "'Courier New', monospace"
                                 }
                             },
                             grid: {
-                                color: 'rgba(255, 0, 255, 0.1)'
+                                color: 'rgba(204, 0, 255, 0.1)'
                             }
                         }
                     }
@@ -538,20 +538,20 @@
                     datasets: [{
                         data: totals,
                         backgroundColor: [
-                            'rgba(0, 255, 136, 0.7)',
-                            'rgba(255, 0, 255, 0.7)',
-                            'rgba(0, 204, 255, 0.7)',
-                            'rgba(255, 170, 0, 0.7)',
-                            'rgba(255, 100, 100, 0.7)',
-                            'rgba(100, 255, 255, 0.7)'
+                            'rgba(0, 221, 255, 0.7)',
+                            'rgba(204, 0, 255, 0.7)',
+                            'rgba(0, 153, 255, 0.7)',
+                            'rgba(170, 136, 255, 0.7)',
+                            'rgba(255, 100, 255, 0.7)',
+                            'rgba(100, 200, 255, 0.7)'
                         ],
                         borderColor: [
-                            '#00ff88',
-                            '#ff00ff',
-                            '#00ccff',
-                            '#ffaa00',
-                            '#ff6464',
-                            '#64ffff'
+                            '#00ddff',
+                            '#cc00ff',
+                            '#0099ff',
+                            '#aa88ff',
+                            '#ff64ff',
+                            '#64c8ff'
                         ],
                         borderWidth: 2
                     }]

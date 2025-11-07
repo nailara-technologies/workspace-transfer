@@ -12,8 +12,8 @@
         }
         
         body {
-            background: linear-gradient(135deg, #0a0015 0%, #1a0030 25%, #0f0025 50%, #1a0030 75%, #0a0015 100%);
-            color: #00ff88;
+            background: linear-gradient(135deg, #0a001a 0%, #1a0045 25%, #0f0030 50%, #1a0045 75%, #0a001a 100%);
+            color: #00ddff;
             font-family: 'Courier New', monospace;
             padding: 20px;
             min-height: 100vh;
@@ -29,30 +29,30 @@
             text-align: center;
             font-size: 3em;
             margin-bottom: 20px;
-            text-shadow: 0 0 20px #00ff88, 0 0 40px #00ff88, 0 0 60px #00ff88;
+            text-shadow: 0 0 20px #00ddff, 0 0 40px #00ddff, 0 0 60px #00ddff;
             animation: glow-pulse 3s ease-in-out infinite;
         }
         
         @keyframes glow-pulse {
             0%, 100% { 
-                text-shadow: 0 0 20px #00ff88, 0 0 40px #00ff88, 0 0 60px #00ff88;
+                text-shadow: 0 0 20px #00ddff, 0 0 40px #00ddff, 0 0 60px #00ddff;
             }
             50% { 
-                text-shadow: 0 0 30px #ff00ff, 0 0 60px #ff00ff, 0 0 90px #ff00ff;
+                text-shadow: 0 0 30px #cc00ff, 0 0 60px #cc00ff, 0 0 90px #cc00ff;
             }
         }
         
         .subtitle {
             text-align: center;
-            color: #ff00ff;
+            color: #cc00ff;
             font-size: 1.5em;
             margin-bottom: 40px;
-            text-shadow: 0 0 15px #ff00ff;
+            text-shadow: 0 0 15px #cc00ff;
         }
         
         .analysis-banner {
-            background: rgba(20, 0, 40, 0.9);
-            border: 2px solid #00ccff;
+            background: rgba(15, 0, 50, 0.9);
+            border: 2px solid #0099ff;
             border-radius: 20px;
             padding: 30px;
             margin-bottom: 40px;
@@ -61,10 +61,10 @@
         }
         
         .analysis-banner h2 {
-            color: #00ccff;
+            color: #0099ff;
             font-size: 2em;
             margin-bottom: 15px;
-            text-shadow: 0 0 15px #00ccff;
+            text-shadow: 0 0 15px #0099ff;
         }
         
         .comparison-grid {
@@ -75,7 +75,7 @@
         }
         
         .comparison-panel {
-            background: rgba(20, 0, 40, 0.9);
+            background: rgba(15, 0, 50, 0.9);
             border: 2px solid;
             border-radius: 15px;
             padding: 30px;
@@ -94,12 +94,12 @@
         }
         
         .comparison-panel.after {
-            border-color: #00ff88;
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            border-color: #00ddff;
+            box-shadow: 0 0 20px rgba(0, 221, 255, 0.3);
         }
         
         .comparison-panel.after:hover {
-            box-shadow: 0 0 40px rgba(0, 255, 136, 0.5);
+            box-shadow: 0 0 40px rgba(0, 221, 255, 0.5);
             transform: scale(1.02);
         }
         
@@ -110,7 +110,7 @@
         }
         
         .comparison-panel.before h3 { color: #ff3366; }
-        .comparison-panel.after h3 { color: #00ff88; }
+        .comparison-panel.after h3 { color: #00ddff; }
         
         .friction-list {
             background: rgba(0, 0, 0, 0.5);
@@ -157,24 +157,24 @@
         }
         
         .metric-card {
-            background: rgba(20, 0, 40, 0.9);
-            border: 2px solid #ff00ff;
+            background: rgba(15, 0, 50, 0.9);
+            border: 2px solid #cc00ff;
             border-radius: 15px;
             padding: 25px;
             text-align: center;
             backdrop-filter: blur(10px);
-            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+            box-shadow: 0 0 20px rgba(204, 0, 255, 0.3);
             transition: all 0.3s ease;
         }
         
         .metric-card:hover {
-            border-color: #00ff88;
-            box-shadow: 0 0 35px rgba(0, 255, 136, 0.5);
+            border-color: #00ddff;
+            box-shadow: 0 0 35px rgba(0, 221, 255, 0.5);
             transform: translateY(-5px);
         }
         
         .metric-label {
-            color: #ff00ff;
+            color: #cc00ff;
             font-size: 1em;
             margin-bottom: 15px;
             text-transform: uppercase;
@@ -182,20 +182,20 @@
         
         .metric-value {
             font-size: 3em;
-            color: #00ff88;
+            color: #00ddff;
             font-weight: bold;
-            text-shadow: 0 0 20px #00ff88;
+            text-shadow: 0 0 20px #00ddff;
             display: block;
             margin: 10px 0;
         }
         
         .metric-change {
-            color: #00ccff;
+            color: #0099ff;
             font-size: 1.2em;
         }
         
         .files-panel {
-            background: rgba(20, 0, 40, 0.9);
+            background: rgba(15, 0, 50, 0.9);
             border: 2px solid #ffaa00;
             border-radius: 15px;
             padding: 30px;
@@ -219,26 +219,26 @@
         
         .file-card {
             background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #00ff88;
+            border: 1px solid #00ddff;
             border-radius: 10px;
             padding: 20px;
             transition: all 0.3s ease;
         }
         
         .file-card:hover {
-            border-color: #ff00ff;
-            background: rgba(255, 0, 255, 0.05);
+            border-color: #cc00ff;
+            background: rgba(204, 0, 255, 0.05);
             transform: translateX(5px);
         }
         
         .file-card h3 {
-            color: #00ff88;
+            color: #00ddff;
             font-size: 1.3em;
             margin-bottom: 10px;
         }
         
         .file-card .purpose {
-            color: #00ccff;
+            color: #0099ff;
             margin-bottom: 10px;
         }
         
@@ -248,24 +248,24 @@
         }
         
         .conversation-log {
-            background: rgba(20, 0, 40, 0.9);
-            border: 2px solid #ff00ff;
+            background: rgba(15, 0, 50, 0.9);
+            border: 2px solid #cc00ff;
             border-radius: 15px;
             padding: 30px;
             margin-bottom: 40px;
-            box-shadow: 0 0 30px rgba(255, 0, 255, 0.3);
+            box-shadow: 0 0 30px rgba(204, 0, 255, 0.3);
         }
         
         .conversation-log h2 {
-            color: #ff00ff;
+            color: #cc00ff;
             font-size: 2em;
             margin-bottom: 20px;
-            text-shadow: 0 0 15px #ff00ff;
+            text-shadow: 0 0 15px #cc00ff;
         }
         
         .log-entry {
             background: rgba(0, 0, 0, 0.6);
-            border-left: 4px solid #00ccff;
+            border-left: 4px solid #0099ff;
             padding: 15px;
             margin: 15px 0;
             border-radius: 5px;
@@ -276,7 +276,7 @@
         }
         
         .log-entry.success {
-            border-left-color: #00ff88;
+            border-left-color: #00ddff;
         }
         
         .log-timestamp {
@@ -291,27 +291,27 @@
         }
         
         .impact-summary {
-            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(255, 0, 255, 0.2), rgba(0, 204, 255, 0.2));
-            border: 3px solid #00ff88;
+            background: linear-gradient(135deg, rgba(0, 221, 255, 0.2), rgba(204, 0, 255, 0.2), rgba(0, 204, 255, 0.2));
+            border: 3px solid #00ddff;
             border-radius: 20px;
             padding: 40px;
             text-align: center;
-            box-shadow: 0 0 60px rgba(0, 255, 136, 0.5);
+            box-shadow: 0 0 60px rgba(0, 221, 255, 0.5);
             animation: impact-pulse 4s ease-in-out infinite;
         }
         
         @keyframes impact-pulse {
             0%, 100% {
-                box-shadow: 0 0 60px rgba(0, 255, 136, 0.5);
-                border-color: #00ff88;
+                box-shadow: 0 0 60px rgba(0, 221, 255, 0.5);
+                border-color: #00ddff;
             }
             33% {
-                box-shadow: 0 0 60px rgba(255, 0, 255, 0.5);
-                border-color: #ff00ff;
+                box-shadow: 0 0 60px rgba(204, 0, 255, 0.5);
+                border-color: #cc00ff;
             }
             66% {
                 box-shadow: 0 0 60px rgba(0, 204, 255, 0.5);
-                border-color: #00ccff;
+                border-color: #0099ff;
             }
         }
         
@@ -323,9 +323,9 @@
         
         .impact-summary .big-number {
             font-size: 5em;
-            color: #00ff88;
+            color: #00ddff;
             font-weight: bold;
-            text-shadow: 0 0 30px #00ff88;
+            text-shadow: 0 0 30px #00ddff;
             display: block;
             margin: 20px 0;
         }
@@ -352,7 +352,7 @@
         <div class="analysis-banner">
             <h2>🔍 Analyzed: qwen2.5-7b-instruct-1m Conversation Log</h2>
             <p style="color: #cccccc; margin-top: 15px;">First successful local model using github-mcp-server</p>
-            <p style="color: #00ff88; margin-top: 10px;">Identified 5 friction points • Implemented systematic optimizations • Created reusable templates</p>
+            <p style="color: #00ddff; margin-top: 10px;">Identified 5 friction points • Implemented systematic optimizations • Created reusable templates</p>
         </div>
         
         <div class="comparison-grid">
@@ -386,30 +386,30 @@
                 <h3>✅ After Optimization</h3>
                 <div class="friction-list">
                     <div class="solution-item">
-                        <strong style="color: #00ff88;">WHO_AM_I.md</strong><br>
+                        <strong style="color: #00ddff;">WHO_AM_I.md</strong><br>
                         Identity quick reference • Eliminates confusion
                     </div>
                     <div class="solution-item">
-                        <strong style="color: #00ff88;">NAVIGATION.md</strong><br>
+                        <strong style="color: #00ddff;">NAVIGATION.md</strong><br>
                         Complete directory map • Wrong/right path examples
                     </div>
                     <div class="solution-item">
-                        <strong style="color: #00ff88;">TOOL_REFERENCE.md</strong><br>
+                        <strong style="color: #00ddff;">TOOL_REFERENCE.md</strong><br>
                         Copy-paste ready examples • Best practices
                     </div>
                     <div class="solution-item">
-                        <strong style="color: #00ff88;">WORKFLOW_GUIDE.md</strong><br>
+                        <strong style="color: #00ddff;">WORKFLOW_GUIDE.md</strong><br>
                         Daily operations • Clear branch strategy
                     </div>
                     <div class="solution-item">
-                        <strong style="color: #00ff88;">generate-manifest.pl</strong><br>
+                        <strong style="color: #00ddff;">generate-manifest.pl</strong><br>
                         Automated directory discovery • JSON manifest
                     </div>
                 </div>
             </div>
         </div>
         
-        <h2 style="color: #ff00ff; text-align: center; font-size: 2.5em; margin-bottom: 30px; text-shadow: 0 0 20px #ff00ff;">📊 Optimization Metrics</h2>
+        <h2 style="color: #cc00ff; text-align: center; font-size: 2.5em; margin-bottom: 30px; text-shadow: 0 0 20px #cc00ff;">📊 Optimization Metrics</h2>
         
         <div class="metrics-grid">
             <div class="metric-card">
@@ -520,15 +520,15 @@
         </div>
         
         <div class="impact-summary">
-            <h2 style="color: #00ff88;">🎯 Expected Impact</h2>
+            <h2 style="color: #00ddff;">🎯 Expected Impact</h2>
             <span class="big-number">60%</span>
-            <p style="font-size: 1.5em; color: #ff00ff; margin-bottom: 20px;">Reduction in Overall Friction</p>
+            <p style="font-size: 1.5em; color: #cc00ff; margin-bottom: 20px;">Reduction in Overall Friction</p>
             <p style="font-size: 1.2em; color: #cccccc; line-height: 1.8;">
                 Path errors down 80% • Identity confusion eliminated<br>
                 Tool confidence up 50% • Workflow crystal clear<br>
                 Directory discovery automated • Model autonomy maximized
             </p>
-            <p style="margin-top: 30px; font-size: 1.3em; color: #00ccff;">
+            <p style="margin-top: 30px; font-size: 1.3em; color: #0099ff;">
                 <strong>Applicable to ALL models using github-mcp-server!</strong>
             </p>
         </div>

@@ -12,8 +12,8 @@
         }
         
         body {
-            background: linear-gradient(135deg, #0a0015 0%, #1a0030 25%, #0f0025 50%, #1a0030 75%, #0a0015 100%);
-            color: #00ff88;
+            background: linear-gradient(135deg, #0a001a 0%, #1a0045 25%, #0f0030 50%, #1a0045 75%, #0a001a 100%);
+            color: #00ddff;
             font-family: 'Courier New', monospace;
             padding: 20px;
             min-height: 100vh;
@@ -29,30 +29,30 @@
             text-align: center;
             font-size: 3em;
             margin-bottom: 20px;
-            text-shadow: 0 0 20px #00ff88, 0 0 40px #00ff88, 0 0 60px #00ff88;
+            text-shadow: 0 0 20px #00ddff, 0 0 40px #00ddff, 0 0 60px #00ddff;
             animation: glow-pulse 3s ease-in-out infinite;
         }
         
         @keyframes glow-pulse {
             0%, 100% { 
-                text-shadow: 0 0 20px #00ff88, 0 0 40px #00ff88, 0 0 60px #00ff88;
+                text-shadow: 0 0 20px #00ddff, 0 0 40px #00ddff, 0 0 60px #00ddff;
             }
             50% { 
-                text-shadow: 0 0 30px #ff00ff, 0 0 60px #ff00ff, 0 0 90px #ff00ff;
+                text-shadow: 0 0 30px #cc00ff, 0 0 60px #cc00ff, 0 0 90px #cc00ff;
             }
         }
         
         .subtitle {
             text-align: center;
-            color: #ff00ff;
+            color: #cc00ff;
             font-size: 1.5em;
             margin-bottom: 40px;
-            text-shadow: 0 0 15px #ff00ff;
+            text-shadow: 0 0 15px #cc00ff;
         }
         
         .flow-diagram {
-            background: rgba(20, 0, 40, 0.9);
-            border: 2px solid #00ccff;
+            background: rgba(15, 0, 50, 0.9);
+            border: 2px solid #0099ff;
             border-radius: 20px;
             padding: 40px;
             margin-bottom: 40px;
@@ -61,11 +61,11 @@
         }
         
         .flow-diagram h2 {
-            color: #00ccff;
+            color: #0099ff;
             text-align: center;
             font-size: 2em;
             margin-bottom: 30px;
-            text-shadow: 0 0 15px #00ccff;
+            text-shadow: 0 0 15px #0099ff;
         }
         
         .flow-box {
@@ -79,13 +79,13 @@
         }
         
         .flow-box.model {
-            border-color: #00ff88;
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            border-color: #00ddff;
+            box-shadow: 0 0 20px rgba(0, 221, 255, 0.3);
         }
         
         .flow-box.git {
-            border-color: #ff00ff;
-            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+            border-color: #cc00ff;
+            box-shadow: 0 0 20px rgba(204, 0, 255, 0.3);
         }
         
         .flow-box.mcp {
@@ -102,8 +102,8 @@
             text-align: center;
             font-size: 2em;
             margin: 10px 0;
-            color: #00ccff;
-            text-shadow: 0 0 10px #00ccff;
+            color: #0099ff;
+            text-shadow: 0 0 10px #0099ff;
         }
         
         .models-grid {
@@ -114,33 +114,33 @@
         }
         
         .model-card {
-            background: rgba(20, 0, 40, 0.9);
-            border: 2px solid #00ff88;
+            background: rgba(15, 0, 50, 0.9);
+            border: 2px solid #00ddff;
             border-radius: 15px;
             padding: 25px;
             backdrop-filter: blur(10px);
-            box-shadow: 0 0 25px rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 25px rgba(0, 221, 255, 0.3);
             transition: all 0.3s ease;
         }
         
         .model-card:hover {
-            border-color: #ff00ff;
-            box-shadow: 0 0 40px rgba(255, 0, 255, 0.5);
+            border-color: #cc00ff;
+            box-shadow: 0 0 40px rgba(204, 0, 255, 0.5);
             transform: translateY(-5px);
         }
         
         .model-card h3 {
-            color: #ff00ff;
+            color: #cc00ff;
             font-size: 1.5em;
             margin-bottom: 15px;
-            text-shadow: 0 0 10px #ff00ff;
+            text-shadow: 0 0 10px #cc00ff;
         }
         
         .model-card .status {
             display: inline-block;
             padding: 5px 15px;
-            background: rgba(0, 255, 136, 0.2);
-            border: 1px solid #00ff88;
+            background: rgba(0, 221, 255, 0.2);
+            border: 1px solid #00ddff;
             border-radius: 20px;
             font-size: 0.9em;
             margin-bottom: 15px;
@@ -153,7 +153,7 @@
         }
         
         .model-card .capability {
-            color: #00ccff;
+            color: #0099ff;
             margin: 8px 0;
             padding-left: 20px;
             position: relative;
@@ -163,7 +163,7 @@
             content: "▸";
             position: absolute;
             left: 0;
-            color: #00ff88;
+            color: #00ddff;
         }
         
         .directory-tree {
@@ -185,17 +185,17 @@
         }
         
         .tree-line {
-            color: #00ccff;
+            color: #0099ff;
             padding-left: 20px;
         }
         
         .tree-line .dir {
-            color: #00ff88;
+            color: #00ddff;
             font-weight: bold;
         }
         
         .tree-line .file {
-            color: #ff00ff;
+            color: #cc00ff;
         }
         
         .tree-line .comment {
@@ -204,20 +204,20 @@
         }
         
         .principles-panel {
-            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(255, 0, 255, 0.1), rgba(0, 204, 255, 0.1));
-            border: 2px solid #00ff88;
+            background: linear-gradient(135deg, rgba(0, 221, 255, 0.1), rgba(204, 0, 255, 0.1), rgba(0, 204, 255, 0.1));
+            border: 2px solid #00ddff;
             border-radius: 20px;
             padding: 40px;
             margin-bottom: 40px;
-            box-shadow: 0 0 50px rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 50px rgba(0, 221, 255, 0.3);
         }
         
         .principles-panel h2 {
-            color: #00ff88;
+            color: #00ddff;
             font-size: 2.5em;
             text-align: center;
             margin-bottom: 30px;
-            text-shadow: 0 0 20px #00ff88;
+            text-shadow: 0 0 20px #00ddff;
         }
         
         .principle-grid {
@@ -235,15 +235,15 @@
         }
         
         .principle-box.truth {
-            border-color: #00ff88;
+            border-color: #00ddff;
         }
         
         .principle-box.awareness {
-            border-color: #00ccff;
+            border-color: #0099ff;
         }
         
         .principle-box.love {
-            border-color: #ff00ff;
+            border-color: #cc00ff;
         }
         
         .principle-box:hover {
@@ -257,9 +257,9 @@
             text-shadow: 0 0 10px currentColor;
         }
         
-        .principle-box.truth h3 { color: #00ff88; }
-        .principle-box.awareness h3 { color: #00ccff; }
-        .principle-box.love h3 { color: #ff00ff; }
+        .principle-box.truth h3 { color: #00ddff; }
+        .principle-box.awareness h3 { color: #0099ff; }
+        .principle-box.love h3 { color: #cc00ff; }
         
         .principle-box p {
             color: #cccccc;
@@ -267,13 +267,13 @@
         }
         
         .stats-banner {
-            background: rgba(20, 0, 40, 0.9);
-            border: 2px solid #ff00ff;
+            background: rgba(15, 0, 50, 0.9);
+            border: 2px solid #cc00ff;
             border-radius: 15px;
             padding: 30px;
             margin-bottom: 40px;
             text-align: center;
-            box-shadow: 0 0 40px rgba(255, 0, 255, 0.4);
+            box-shadow: 0 0 40px rgba(204, 0, 255, 0.4);
         }
         
         .stats-row {
@@ -291,41 +291,41 @@
         
         .stat-value {
             font-size: 3em;
-            color: #00ff88;
+            color: #00ddff;
             font-weight: bold;
-            text-shadow: 0 0 20px #00ff88;
+            text-shadow: 0 0 20px #00ddff;
             display: block;
             margin-bottom: 10px;
         }
         
         .stat-label {
-            color: #ff00ff;
+            color: #cc00ff;
             font-size: 1.2em;
             text-transform: uppercase;
         }
         
         .vision-box {
-            background: linear-gradient(135deg, rgba(255, 0, 255, 0.2), rgba(0, 255, 136, 0.2), rgba(0, 204, 255, 0.2));
-            border: 3px solid #00ff88;
+            background: linear-gradient(135deg, rgba(204, 0, 255, 0.2), rgba(0, 221, 255, 0.2), rgba(0, 204, 255, 0.2));
+            border: 3px solid #00ddff;
             border-radius: 20px;
             padding: 40px;
             text-align: center;
-            box-shadow: 0 0 60px rgba(0, 255, 136, 0.5);
+            box-shadow: 0 0 60px rgba(0, 221, 255, 0.5);
             animation: vision-pulse 4s ease-in-out infinite;
         }
         
         @keyframes vision-pulse {
             0%, 100% {
-                box-shadow: 0 0 60px rgba(0, 255, 136, 0.5);
-                border-color: #00ff88;
+                box-shadow: 0 0 60px rgba(0, 221, 255, 0.5);
+                border-color: #00ddff;
             }
             33% {
-                box-shadow: 0 0 60px rgba(255, 0, 255, 0.5);
-                border-color: #ff00ff;
+                box-shadow: 0 0 60px rgba(204, 0, 255, 0.5);
+                border-color: #cc00ff;
             }
             66% {
                 box-shadow: 0 0 60px rgba(0, 204, 255, 0.5);
-                border-color: #00ccff;
+                border-color: #0099ff;
             }
         }
         
@@ -361,7 +361,7 @@
         <div class="subtitle">Git-Based Message Passing • github-mcp-server Integration • Protocol-7 Aligned</div>
         
         <div class="stats-banner">
-            <h2 style="color: #ff00ff; text-shadow: 0 0 15px #ff00ff; margin-bottom: 20px;">System Status</h2>
+            <h2 style="color: #cc00ff; text-shadow: 0 0 15px #cc00ff; margin-bottom: 20px;">System Status</h2>
             <div class="stats-row">
                 <div class="stat-item">
                     <span class="stat-value">4</span>
@@ -386,7 +386,7 @@
             <h2>📡 Communication Flow</h2>
             
             <div class="flow-box model">
-                <strong style="color: #00ff88; font-size: 1.2em;">Local Model (Qwen2.5-7B)</strong>
+                <strong style="color: #00ddff; font-size: 1.2em;">Local Model (Qwen2.5-7B)</strong>
                 <p style="color: #cccccc; margin-top: 10px;">Writes message to suggestions/outgoing/copilot/</p>
             </div>
             
@@ -400,21 +400,21 @@
             <div class="arrow">↓</div>
             
             <div class="flow-box git">
-                <strong style="color: #ff00ff; font-size: 1.2em;">GitHub Repository</strong>
+                <strong style="color: #cc00ff; font-size: 1.2em;">GitHub Repository</strong>
                 <p style="color: #cccccc; margin-top: 10px;">Repository updated • Message persisted • History preserved</p>
             </div>
             
             <div class="arrow">↓</div>
             
             <div class="flow-box model">
-                <strong style="color: #00ff88; font-size: 1.2em;">Target Model (Copilot)</strong>
+                <strong style="color: #00ddff; font-size: 1.2em;">Target Model (Copilot)</strong>
                 <p style="color: #cccccc; margin-top: 10px;">Pulls repository → Reads suggestions/incoming/ → Processes message</p>
             </div>
             
             <div class="arrow">↻</div>
             
             <div class="flow-box model">
-                <strong style="color: #00ff88; font-size: 1.2em;">Response Cycle</strong>
+                <strong style="color: #00ddff; font-size: 1.2em;">Response Cycle</strong>
                 <p style="color: #cccccc; margin-top: 10px;">Copilot writes response → github-mcp-server commits → Qwen reads incoming/</p>
             </div>
         </div>
@@ -441,7 +441,7 @@
             <div class="tree-line">└── <span class="dir">next-larger/</span> <span class="comment"># Escalation to larger models</span></div>
         </div>
         
-        <h2 style="color: #ff00ff; text-align: center; font-size: 2.5em; margin-bottom: 30px; text-shadow: 0 0 20px #ff00ff;">🤖 Active Model Profiles</h2>
+        <h2 style="color: #cc00ff; text-align: center; font-size: 2.5em; margin-bottom: 30px; text-shadow: 0 0 20px #cc00ff;">🤖 Active Model Profiles</h2>
         
         <div class="models-grid">
             <div class="model-card">
@@ -523,10 +523,10 @@
         </div>
         
         <div class="vision-box">
-            <h2 style="color: #00ff88;">🔮 The Vision</h2>
+            <h2 style="color: #00ddff;">🔮 The Vision</h2>
             <p>A self-organizing network of AI models, each with unique capabilities, collaborating through Git-based message passing to accomplish complex tasks that no single model could handle alone.</p>
-            <p style="margin-top: 20px; color: #ff00ff;"><strong>Fluid • Harmonic • Resilient • Emergent • Growing</strong></p>
-            <p style="margin-top: 30px; font-size: 1.5em; color: #00ccff;">"In Protocol-7, even the models collaborate harmonically."</p>
+            <p style="margin-top: 20px; color: #cc00ff;"><strong>Fluid • Harmonic • Resilient • Emergent • Growing</strong></p>
+            <p style="margin-top: 30px; font-size: 1.5em; color: #0099ff;">"In Protocol-7, even the models collaborate harmonically."</p>
         </div>
         
         <div class="timestamp">
