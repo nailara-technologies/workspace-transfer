@@ -1,0 +1,384 @@
+#!/usr/bin/perl
+# Token usage reporting and analysis
+# Usage: token-report [task-type] [--summary|--detail|--trends]
+
+use v5.24;
+use strict;
+use warnings;
+use POSIX qw(strftime);
+use FindBin qw($RealBin);
+use File::Spec;
+
+# Configuration
+my $up_dir = File::Spec->updir;
+my $WORKSPACE_ROOT = File::Spec->rel2abs(File::Spec->catdir($RealBin, $up_dir));
+my $LOG_FILE = File::Spec->catfile($WORKSPACE_ROOT, '.token-stats.log');
+
+# Parse arguments
+my $filter_task = shift @ARGV;
+my $mode = shift @ARGV || '--summary';
+
+# Check if log exists
+unless (-f $LOG_FILE) {
+    say "📊 No token tracking data yet.";
+    say "";
+    say "Start tracking with:";
+    say "  bin/track-tokens <task> <tokens>";
+    say "";
+    say "Example:";
+    say "  bin/track-tokens init 2400";
+    exit 0;
+}
+
+# Load data
+my @entries = load_entries();
+
+unless (@entries) {
+    say "📊 Token tracking log is empty.";
+    exit 0;
+}
+
+# Filter if task specified
+if ($filter_task && $filter_task !~ /^--/) {
+    @entries = grep { $_->{task} eq $filter_task } @entries;
+    unless (@entries) {
+        say "No entries found for task: $filter_task";
+        exit 0;
+    }
+}
+
+# Display based on mode
+if ($mode eq '--summary') {
+    show_summary(\@entries, $filter_task);
+} elsif ($mode eq '--detail') {
+    show_detail(\@entries, $filter_task);
+} elsif ($mode eq '--trends') {
+    show_trends(\@entries, $filter_task);
+} else {
+    die "Unknown mode: $mode\nUse: --summary, --detail, or --trends\n";
+}
+
+# ============================================================================
+# Functions
+# ============================================================================
+
+sub load_entries {
+    open my $fh, '<', $LOG_FILE or die "Cannot read $LOG_FILE: $!";
+    my @entries;
+
+    while (my $line = <$fh>) {
+        chomp $line;
+        next if $line =~ /^#/ || $line =~ /^\s*$/;
+
+        my ($timestamp, $task, $tokens) = split /\|/, $line;
+        next unless defined $tokens && $tokens =~ /^\d+$/;
+
+        push @entries, {
+            timestamp => $timestamp,
+            task => $task,
+            tokens => $tokens
+        };
+    }
+
+    close $fh;
+    return @entries;
+}
+
+sub show_summary {
+    my ($entries, $filter) = @_;
+
+    say "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+    say "📊 Token Usage Summary";
+    say "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+    say "";
+
+    # Overall stats
+    my $total = 0;
+    my @all_tokens = map { $_->{tokens} } @$entries;
+    $total += $_ for @all_tokens;
+
+    say sprintf("Total Sessions: %d", scalar @$entries);
+    say sprintf("Total Tokens:   %s", format_number($total));
+    say sprintf("Average/Session: %s", format_number($total / @$entries));
+    say "";
+
+    # Group by task
+    my %by_task;
+    for my $entry (@$entries) {
+        push @{$by_task{$entry->{task}}}, $entry->{tokens};
+    }
+
+    say "By Task Type:";
+    say "";
+
+    # Sort by total tokens (descending)
+    my @sorted_tasks = sort {
+        sum(@{$by_task{$b}}) <=> sum(@{$by_task{$a}})
+    } keys %by_task;
+
+    for my $task (@sorted_tasks) {
+        my @tokens = @{$by_task{$task}};
+        my $count = scalar @tokens;
+        my $sum = sum(@tokens);
+        my $mean = $sum / $count;
+
+        my @sorted = sort { $a <=> $b } @tokens;
+        my $min = $sorted[0];
+        my $max = $sorted[-1];
+
+        say sprintf("  %-20s n=%-3d  avg=%s  range=%s-%s",
+            $task,
+            $count,
+            format_number($mean),
+            format_number($min),
+            format_number($max)
+        );
+    }
+
+    say "";
+    say "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+    say "💡 Tips:";
+    say "   bin/token-report <task> --detail   # Detailed stats for task";
+    say "   bin/token-report --trends          # Show trends over time";
+    say "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+}
+
+sub show_detail {
+    my ($entries, $filter) = @_;
+
+    say "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+    say "📊 Detailed Token Statistics";
+    if ($filter) {
+        say "Task: $filter";
+    }
+    say "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+    say "";
+
+    # Group by task
+    my %by_task;
+    for my $entry (@$entries) {
+        push @{$by_task{$entry->{task}}}, $entry;
+    }
+
+    for my $task (sort keys %by_task) {
+        my @task_entries = @{$by_task{$task}};
+        my @tokens = map { $_->{tokens} } @task_entries;
+
+        # Calculate statistics
+        my $count = scalar @tokens;
+        my $sum = sum(@tokens);
+        my $mean = $sum / $count;
+
+        my @sorted = sort { $a <=> $b } @tokens;
+        my $min = $sorted[0];
+        my $max = $sorted[-1];
+
+        my $median;
+        if ($count % 2 == 0) {
+            $median = ($sorted[$count/2 - 1] + $sorted[$count/2]) / 2;
+        } else {
+            $median = $sorted[int($count/2)];
+        }
+
+        # Standard deviation
+        my $variance_sum = 0;
+        $variance_sum += ($_ - $mean) ** 2 for @tokens;
+        my $stddev = $count > 1 ? sqrt($variance_sum / ($count - 1)) : 0;
+
+        say "Task: $task";
+        say sprintf("  Count:        %d sessions", $count);
+        say sprintf("  Total:        %s tokens", format_number($sum));
+        say sprintf("  Mean:         %s tokens", format_number($mean));
+        say sprintf("  Median:       %s tokens", format_number($median));
+        say sprintf("  Std Dev:      %s tokens", format_number($stddev));
+        say sprintf("  Range:        %s - %s tokens", format_number($min), format_number($max));
+
+        if ($stddev > 0) {
+            my $cv = ($stddev / $mean) * 100;
+            say sprintf("  Variability:  %.1f%% (coefficient of variation)", $cv);
+        }
+
+        say "";
+
+        # Show recent history (last 5)
+        if (@task_entries > 1) {
+            say "  Recent History (last " . min(5, $count) . "):";
+            my @recent = reverse @task_entries;
+            @recent = @recent[0..min(4, $#recent)];
+
+            for my $entry (@recent) {
+                my $ts = substr($entry->{timestamp}, 0, 16);  # Date and time only
+                my $tokens = $entry->{tokens};
+                my $diff = $tokens - $mean;
+                my $indicator = $diff > $stddev ? "⚠️ " : $diff < -$stddev ? "✅ " : "  ";
+
+                say sprintf("    %s %s  %s tokens  (%+.0f from mean)",
+                    $indicator,
+                    $ts,
+                    format_number($tokens),
+                    $diff
+                );
+            }
+            say "";
+        }
+    }
+
+    say "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+}
+
+sub show_trends {
+    my ($entries, $filter) = @_;
+
+    say "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+    say "📈 Token Usage Trends";
+    if ($filter) {
+        say "Task: $filter";
+    }
+    say "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+    say "";
+
+    # Group by task and show chronological trend
+    my %by_task;
+    for my $entry (@$entries) {
+        push @{$by_task{$entry->{task}}}, $entry;
+    }
+
+    for my $task (sort keys %by_task) {
+        my @task_entries = @{$by_task{$task}};
+        next if @task_entries < 2;  # Need at least 2 points for trend
+
+        say "Task: $task";
+        say "";
+
+        # Calculate moving average (window of 3)
+        my @tokens = map { $_->{tokens} } @task_entries;
+
+        for (my $i = 0; $i < @task_entries; $i++) {
+            my $entry = $task_entries[$i];
+            my $ts = substr($entry->{timestamp}, 0, 16);
+            my $tokens = $entry->{tokens};
+
+            # Simple sparkline using block characters
+            my $max_tokens = max(@tokens);
+            my $bar_length = int(($tokens / $max_tokens) * 40);
+            my $bar = "█" x $bar_length;
+
+            # Trend indicator (compare to previous)
+            my $indicator = "";
+            if ($i > 0) {
+                my $prev = $task_entries[$i-1]->{tokens};
+                my $diff_pct = (($tokens - $prev) / $prev) * 100;
+
+                if ($diff_pct > 10) {
+                    $indicator = " 📈 +" . sprintf("%.0f%%", $diff_pct);
+                } elsif ($diff_pct < -10) {
+                    $indicator = " 📉 " . sprintf("%.0f%%", $diff_pct);
+                } else {
+                    $indicator = " ➡️  " . sprintf("%+.0f%%", $diff_pct);
+                }
+            }
+
+            say sprintf("  %s  %s  %s%s",
+                $ts,
+                format_number($tokens, 1),
+                $bar,
+                $indicator
+            );
+        }
+
+        # Overall trend
+        my $first = $task_entries[0]->{tokens};
+        my $last = $task_entries[-1]->{tokens};
+        my $total_change = (($last - $first) / $first) * 100;
+
+        say "";
+        say sprintf("  Overall: %s → %s (%+.1f%%)",
+            format_number($first),
+            format_number($last),
+            $total_change
+        );
+
+        if ($total_change > 20) {
+            say "  ⚠️  Token usage increasing - review for inefficiency";
+        } elsif ($total_change < -20) {
+            say "  ✅ Token efficiency improving!";
+        }
+
+        say "";
+    }
+
+    say "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+}
+
+# Helper functions
+sub sum {
+    my $total = 0;
+    $total += $_ for @_;
+    return $total;
+}
+
+sub min {
+    my ($a, $b) = @_;
+    return $a < $b ? $a : $b;
+}
+
+sub max {
+    my @values = @_;
+    my $max = $values[0];
+    for my $val (@values) {
+        $max = $val if $val > $max;
+    }
+    return $max;
+}
+
+sub format_number {
+    my ($num, $pad) = @_;
+    return '0' unless defined $num;
+
+    my $formatted = sprintf("%.0f", $num);
+
+    # Add thousand separators
+    $formatted =~ s/(\d)(?=(\d{3})+$)/$1,/g;
+
+    if ($pad) {
+        return sprintf("%8s", $formatted);
+    }
+
+    return $formatted;
+}
+
+__END__
+
+=head1 NAME
+
+token-report - View token usage statistics and trends
+
+=head1 SYNOPSIS
+
+    token-report [task-type] [--summary|--detail|--trends]
+
+=head1 DESCRIPTION
+
+Displays token usage statistics from tracking data.
+
+=head1 EXAMPLES
+
+    # Summary of all tasks
+    bin/token-report
+
+    # Detailed stats for specific task
+    bin/token-report init --detail
+
+    # View trends over time
+    bin/token-report --trends
+
+    # Trends for specific task
+    bin/token-report onboarding --trends
+
+=head1 MODES
+
+--summary : Overview by task type (default)
+--detail  : Detailed statistics with history
+--trends  : Chronological trends with sparklines
+
+=cut

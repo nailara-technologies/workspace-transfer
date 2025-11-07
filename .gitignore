@@ -18,6 +18,9 @@ context-checkpoints/*.md
 # Session markers (local only)
 .initialized
 
+# Token tracking data (local analytics only)
+.token-stats.log
+
 # Build artifacts
 *.o
 *.so

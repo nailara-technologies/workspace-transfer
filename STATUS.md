@@ -20,6 +20,7 @@
 - Git persistence (2-3 sec sync)
 - Bootstrap & initialization system
 - **Protocol-7 staging area** with transfer workflow
+- **Token tracking & anomaly detection** (compound efficiency monitoring)
 
 ### Recently Completed ✅
 - Phase 0: Checkpoint encryption system (Oct 4, 2025)
@@ -28,6 +29,7 @@
 - 1-Bit Covert Channel Architecture (archived)
 - Instant Boot System (operational)
 - **Workspace restructuring for token efficiency** (Nov 7, 2025)
+- **Token tracking system with statistical anomaly detection** (Nov 7, 2025)
 
 ---
 
@@ -142,6 +144,8 @@ workspace-transfer/
 │   ├── checkpoint           # Creative excellence checkpoint
 │   ├── status               # Workspace status
 │   ├── transfer             # Transfer to protocol-7
+│   ├── track-tokens         # Token usage tracking
+│   ├── token-report         # Token analytics & trends
 │   └── lib/                 # Shared libraries
 ├── protocol7-staging/        # Stage Protocol-7 work here
 │   ├── modules/
@@ -174,6 +178,12 @@ bin/checkpoint
 
 # Transfer to protocol-7 (dry run)
 bin/transfer --dry-run
+
+# Token tracking (compound efficiency monitoring)
+bin/track-tokens <task> <tokens>     # Track token usage
+bin/token-report                     # View summary statistics
+bin/token-report init --detail       # Detailed stats for task
+bin/token-report --trends            # Visualize trends
 
 # View full documentation
 ls docs/

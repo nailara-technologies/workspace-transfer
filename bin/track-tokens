@@ -1,0 +1,261 @@
+#!/usr/bin/perl
+# Token usage tracking and anomaly detection
+# Usage: track-tokens <task> <tokens> [--silent]
+
+use v5.24;
+use strict;
+use warnings;
+use POSIX qw(strftime);
+use FindBin qw($RealBin);
+use File::Spec;
+
+# Configuration
+my $up_dir = File::Spec->updir;
+my $WORKSPACE_ROOT = File::Spec->rel2abs(File::Spec->catdir($RealBin, $up_dir));
+my $LOG_FILE = File::Spec->catfile($WORKSPACE_ROOT, '.token-stats.log');
+my $THRESHOLD_MULTIPLIER = 2.0;  # Alert if > 2x standard deviation from mean
+
+# Parse arguments
+die "Usage: track-tokens <task> <tokens> [--silent]\n" unless @ARGV >= 2;
+my ($task, $tokens, $silent) = @ARGV;
+$silent = ($silent && $silent eq '--silent') ? 1 : 0;
+
+# Validate tokens is numeric
+die "Error: tokens must be a number\n" unless $tokens =~ /^\d+$/;
+
+# Load historical data
+my @history = load_history();
+
+# Calculate statistics
+my %stats = calculate_stats(\@history, $task);
+
+# Check for anomalies
+my $anomaly = detect_anomaly($tokens, \%stats);
+
+# Log this entry
+log_entry($task, $tokens);
+
+# Report
+unless ($silent) {
+    print_report($task, $tokens, \%stats, $anomaly);
+}
+
+exit($anomaly ? 1 : 0);
+
+# ============================================================================
+# Functions
+# ============================================================================
+
+sub load_history {
+    return () unless -f $LOG_FILE;
+
+    open my $fh, '<', $LOG_FILE or die "Cannot read $LOG_FILE: $!";
+    my @entries;
+
+    while (my $line = <$fh>) {
+        chomp $line;
+        next if $line =~ /^#/ || $line =~ /^\s*$/;
+
+        # Format: timestamp|task|tokens
+        my ($timestamp, $task, $tokens) = split /\|/, $line;
+        next unless defined $tokens && $tokens =~ /^\d+$/;
+
+        push @entries, {
+            timestamp => $timestamp,
+            task => $task,
+            tokens => $tokens
+        };
+    }
+
+    close $fh;
+    return @entries;
+}
+
+sub calculate_stats {
+    my ($history, $task) = @_;
+
+    # Filter to same task type
+    my @task_entries = grep { $_->{task} eq $task } @$history;
+
+    return (
+        count => 0,
+        mean => 0,
+        median => 0,
+        stddev => 0,
+        min => 0,
+        max => 0
+    ) unless @task_entries;
+
+    # Extract token counts
+    my @values = sort { $a <=> $b } map { $_->{tokens} } @task_entries;
+    my $count = scalar @values;
+
+    # Calculate mean
+    my $sum = 0;
+    $sum += $_ for @values;
+    my $mean = $sum / $count;
+
+    # Calculate median
+    my $median;
+    if ($count % 2 == 0) {
+        $median = ($values[$count/2 - 1] + $values[$count/2]) / 2;
+    } else {
+        $median = $values[int($count/2)];
+    }
+
+    # Calculate standard deviation
+    my $variance_sum = 0;
+    $variance_sum += ($_ - $mean) ** 2 for @values;
+    my $stddev = $count > 1 ? sqrt($variance_sum / ($count - 1)) : 0;
+
+    return (
+        count => $count,
+        mean => $mean,
+        median => $median,
+        stddev => $stddev,
+        min => $values[0],
+        max => $values[-1]
+    );
+}
+
+sub detect_anomaly {
+    my ($tokens, $stats) = @_;
+
+    # Need at least 3 historical entries to detect anomalies
+    return 0 if $stats->{count} < 3;
+
+    # Check if tokens exceeds mean + (threshold * stddev)
+    my $threshold = $stats->{mean} + ($THRESHOLD_MULTIPLIER * $stats->{stddev});
+
+    return $tokens > $threshold;
+}
+
+sub log_entry {
+    my ($task, $tokens) = @_;
+
+    my $timestamp = strftime("%Y-%m-%d %H:%M:%S", localtime);
+
+    # Create log file if it doesn't exist
+    unless (-f $LOG_FILE) {
+        open my $fh, '>', $LOG_FILE or die "Cannot create $LOG_FILE: $!";
+        print $fh "# Token Usage Log\n";
+        print $fh "# Format: timestamp|task|tokens\n";
+        print $fh "# Task types: init, onboarding, development, transfer, etc.\n";
+        print $fh "#\n";
+        close $fh;
+    }
+
+    # Append entry
+    open my $fh, '>>', $LOG_FILE or die "Cannot append to $LOG_FILE: $!";
+    print $fh "$timestamp|$task|$tokens\n";
+    close $fh;
+}
+
+sub print_report {
+    my ($task, $tokens, $stats, $anomaly) = @_;
+
+    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print "📊 Token Usage Tracked\n";
+    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print "\n";
+    print "Task: $task\n";
+    print "Tokens: " . format_number($tokens) . "\n";
+    print "\n";
+
+    if ($stats->{count} > 0) {
+        print "Historical Stats (n=$stats->{count}):\n";
+        print "  Mean:   " . format_number($stats->{mean}) . " tokens\n";
+        print "  Median: " . format_number($stats->{median}) . " tokens\n";
+        print "  StdDev: " . format_number($stats->{stddev}) . " tokens\n";
+        print "  Range:  " . format_number($stats->{min}) . " - " . format_number($stats->{max}) . "\n";
+        print "\n";
+
+        # Comparison
+        my $diff = $tokens - $stats->{mean};
+        my $pct = $stats->{mean} > 0 ? ($diff / $stats->{mean}) * 100 : 0;
+
+        if ($anomaly) {
+            print "⚠️  ANOMALY DETECTED!\n";
+            print "   This usage is " . sprintf("%.1f%%", abs($pct)) . " ";
+            print(($diff > 0 ? "above" : "below") . " average\n");
+            print "   Threshold: " . format_number($stats->{mean} + ($THRESHOLD_MULTIPLIER * $stats->{stddev})) . " tokens\n";
+            print "\n";
+            print "   Review for inefficiency:\n";
+            print "   - Unnecessary file exploration?\n";
+            print "   - Verbose output?\n";
+            print "   - Repeated documentation reading?\n";
+            print "   - Missing optimization opportunities?\n";
+        } elsif (abs($pct) > 10) {
+            print "📈 Variance: " . sprintf("%+.1f%%", $pct) . " from average\n";
+            if ($diff < 0) {
+                print "   ✅ Good! Token efficiency improving.\n";
+            }
+        } else {
+            print "✅ Normal range\n";
+        }
+    } else {
+        print "📝 First measurement for this task\n";
+        print "   Future runs will compare against this baseline\n";
+    }
+
+    print "\n";
+    print "💾 Logged to: .token-stats.log\n";
+    print "📊 View stats: bin/token-report\n";
+    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+}
+
+sub format_number {
+    my $num = shift;
+    return '0' unless defined $num;
+    return sprintf("%.0f", $num) if $num == int($num);
+    return sprintf("%.1f", $num);
+}
+
+__END__
+
+=head1 NAME
+
+track-tokens - Token usage tracking and anomaly detection
+
+=head1 SYNOPSIS
+
+    track-tokens <task> <tokens> [--silent]
+
+=head1 DESCRIPTION
+
+Tracks token usage by task type and detects statistical anomalies.
+
+Helps catch efficiency regressions before they become expensive.
+
+=head1 EXAMPLES
+
+    # Log initialization tokens
+    track-tokens init 2400
+
+    # Log onboarding (silent mode)
+    track-tokens onboarding 15000 --silent
+
+    # Log development work
+    track-tokens development 8500
+
+=head1 TASK TYPES
+
+Common task types:
+- init: Workspace initialization
+- onboarding: Full onboarding process
+- development: Active development work
+- transfer: Protocol-7 file transfers
+- documentation: Documentation updates
+- refactoring: Code refactoring sessions
+
+=head1 ANOMALY DETECTION
+
+Alerts when usage exceeds: mean + (2.0 * stddev)
+
+Requires at least 3 historical measurements.
+
+=head1 FILES
+
+.token-stats.log - Historical token usage data (gitignored)
+
+=cut
