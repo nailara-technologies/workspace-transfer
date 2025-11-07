@@ -1,0 +1,170 @@
+# 🚀 Workspace-Transfer: Token-Efficient AI Collaboration
+
+**Quick-start guide for AI models and human developers**
+
+---
+
+## ⚡ For AI Models: Token-Efficient Entry
+
+### First Time / Fresh Clone
+
+```bash
+bin/init                         # Initialize workspace (~500 tokens)
+cat .user/local/STATUS          # Quick overview (~200 tokens)
+bin/checkpoint --brief           # Creative principles (~300 tokens)
+```
+
+**Total**: ~1k tokens (vs ~24k without optimization)
+
+### Resume Existing Work
+
+```bash
+cat .user/local/CURRENT          # Recent activity + todos + research
+bin/todo list                    # Pending tasks
+bin/research list                # Pending questions
+```
+
+**Total**: ~300-500 tokens (vs ~2k re-explaining context)
+
+### Before Starting Feature Work
+
+```bash
+# Check dependencies for your session type
+bin/deps check <profile>         # visualization|filesystem|network|learning
+
+# If missing
+bin/deps install <profile>       # One-command install
+
+# Session types:
+# - visualization: gnuplot, ImageMagick, graphics libs
+# - filesystem: FUSE development
+# - network: SSL, networking libs
+# - learning: SQLite, DBI
+# - base: Core dependencies
+```
+
+---
+
+## 📊 Current Workspace Status
+
+**Type**: Protocol-7 AI Collaboration & Staging Area
+**Purpose**: Develop features in isolation, then transfer to main repo
+
+**Active Systems**:
+- Token tracking with anomaly detection
+- Status automation (.user/local/ summaries)
+- Context management (persistent todos & research)
+- Dependency management (profile-based setup)
+- Git automation (PAT auth, branch cleanup)
+
+**Next Priority**: Token visualization + INDEX.md with psychedelic graphs
+
+**Branch**: `base`
+
+---
+
+## 🎯 Token-Efficient Workflows
+
+### During Work
+
+```bash
+# Track tasks (persists across sessions)
+bin/todo add "Implement feature X" high
+bin/todo list
+bin/todo done <id>
+
+# Defer research questions (avoid context bloat)
+bin/research ask "How does Y work?" medium
+bin/research list
+
+# Track token usage
+bin/track-tokens <task> <tokens>
+bin/session-tokens add <N>
+bin/suggest-handover              # Check if handover recommended
+```
+
+### Commit & Push
+
+```bash
+git add -A
+git commit -m "Description"
+bin/push-to-base                   # Automated PAT auth + push to base
+```
+
+### Session Handover
+
+```bash
+# At natural checkpoint
+git add -A && git commit -m "WIP: Current state"
+bin/push-to-base
+bin/session-tokens reset
+
+# Next session resumes with:
+cat .user/local/CURRENT
+# Shows pending todos, research, recent work
+```
+
+---
+
+## 📁 Key Files
+
+| File | Purpose | Tokens |
+|------|---------|--------|
+| `.user/local/STATUS` | Current workspace overview | ~200 |
+| `.user/local/QUICK_START` | Entry commands for scenarios | ~300 |
+| `.user/local/CURRENT` | Recent activity + todos + research | ~150 |
+| `.user/local/HEALTH` | Session health metrics | ~150 |
+| `STATUS.md` | Full detailed status | ~2000 |
+| `docs/reference/CONTEXT_MANAGEMENT.md` | Todos & research guide | Reference |
+| `docs/reference/DEPENDENCY_MANAGEMENT.md` | Dependency profiles | Reference |
+| `docs/reference/TOKEN_TRACKING_GUIDE.md` | Token efficiency system | Reference |
+
+---
+
+## 🛠️ Available Tools
+
+### Context Management
+- `bin/todo` - Persistent task tracking across sessions
+- `bin/research` - Question deferral system
+
+### Dependency Management
+- `bin/deps` - Profile-based pre-flight checks and installation
+
+### Token Tracking
+- `bin/track-tokens` - Track usage with positive reinforcement
+- `bin/suggest-handover` - Proactive handover recommendations
+- `bin/token-report` - Analytics and trends
+
+### Git Automation
+- `bin/push-to-base` - Automated push with PAT auth
+
+### Status Automation
+- `bin/update-status` - Regenerate .user/local/ summaries
+
+---
+
+## 💡 Philosophy
+
+**Token efficiency through automation**:
+- Scripts remember policies, models don't need to
+- Offload computation from context to code
+- Persistent state eliminates re-explanation
+- Self-optimizing feedback loops
+
+**Compound efficiency**:
+- Small savings (500 tokens) × many sessions (100) = huge impact (50k tokens)
+- Every optimization pays dividends across all future sessions
+
+---
+
+## 🔗 Quick Links
+
+- [STATUS.md](STATUS.md) - Full workspace status
+- [docs/onboarding/START_HERE.md](docs/onboarding/START_HERE.md) - Detailed onboarding
+- [docs/reference/](docs/reference/) - System documentation
+- [protocol7-staging/](protocol7-staging/) - Staging area for Protocol-7 work
+
+---
+
+**Updated**: 2025-11-07
+**Token Savings**: ~200k-400k over 100 sessions

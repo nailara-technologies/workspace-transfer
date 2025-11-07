@@ -23,7 +23,7 @@ context-checkpoints/*.md
 .current-session
 
 # Status automation (regenerated locally)
-.user/
+.user/local/
 
 # Context management (local only)
 .todos/

@@ -16,12 +16,14 @@ use POSIX qw(strftime);
 my $up_dir = File::Spec->updir;
 my $WORKSPACE_ROOT = File::Spec->rel2abs(File::Spec->catdir($RealBin, $up_dir));
 my $USER_DIR = File::Spec->catdir($WORKSPACE_ROOT, '.user');
+my $LOCAL_DIR = File::Spec->catdir($USER_DIR, 'local');
 my $STATUS_FILE = File::Spec->catfile($WORKSPACE_ROOT, 'STATUS.md');
 
 my $QUIET = grep { $_ eq '--quiet' } @ARGV;
 
 # Ensure .user directory exists
 mkdir $USER_DIR unless -d $USER_DIR;
+mkdir $LOCAL_DIR unless -d $USER_DIR;
 
 # Generate status files
 generate_status();
@@ -29,7 +31,7 @@ generate_quick_start();
 generate_current();
 generate_health();
 
-say "✅ Status files updated in .user/" unless $QUIET;
+say "✅ Status files updated in .user/local/" unless $QUIET;
 
 # ============================================================================
 # Generators
@@ -74,7 +76,7 @@ sub generate_status {
 
     print $out "\n";
     print $out "📄 Full details: cat STATUS.md\n";
-    print $out "📊 Quick start: cat .user/QUICK_START\n";
+    print $out "📊 Quick start: cat .user/local/QUICK_START\n";
     print $out "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
 
     close $out;
@@ -93,7 +95,7 @@ sub generate_quick_start {
     print $out "🆕 FIRST TIME / FRESH SESSION\n";
     print $out "────────────────────────────────────────────────────────────────────\n";
     print $out "bin/init                    # Initialize workspace (~500 tokens)\n";
-    print $out "cat .user/STATUS            # View current state (~200 tokens)\n";
+    print $out "cat .user/local/STATUS            # View current state (~200 tokens)\n";
     print $out "bin/checkpoint --brief      # Creative excellence (~300 tokens)\n";
     print $out "bin/session-tokens reset    # Start session tracking\n";
     print $out "\n";
@@ -102,8 +104,8 @@ sub generate_quick_start {
 
     print $out "🔄 RESUME EXISTING WORK\n";
     print $out "────────────────────────────────────────────────────────────────────\n";
-    print $out "cat .user/STATUS            # Current state\n";
-    print $out "cat .user/CURRENT           # Recent activity\n";
+    print $out "cat .user/local/STATUS            # Current state\n";
+    print $out "cat .user/local/CURRENT           # Recent activity\n";
     print $out "git log --oneline -5        # Recent commits\n";
     print $out "bin/session-tokens reset    # Start tracking\n";
     print $out "\n";
@@ -471,10 +473,10 @@ Offloads status parsing from model to script - instead of reading
 
 =head1 GENERATED FILES
 
-.user/STATUS       - Current workspace status (active systems, priorities)
-.user/QUICK_START  - Entry point commands for different scenarios
-.user/CURRENT      - Recent activity (git status, commits, session tokens)
-.user/HEALTH       - Session health metrics and suggestions
+.user/local/STATUS       - Current workspace status (active systems, priorities)
+.user/local/QUICK_START  - Entry point commands for different scenarios
+.user/local/CURRENT      - Recent activity (git status, commits, session tokens)
+.user/local/HEALTH       - Session health metrics and suggestions
 
 =head1 INTEGRATION
 
