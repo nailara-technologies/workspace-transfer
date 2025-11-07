@@ -31,6 +31,27 @@ cat STATUS.md
 
 ---
 
+## 🌀 Interactive Visualizations
+
+Experience the workspace through psychedelic Protocol-7 aesthetics:
+
+<div align="center">
+
+### 📊 [Token Usage Dashboard](visualizations/token-usage-dashboard.html)
+**Real-time token efficiency analytics** | Interactive charts with moving averages, task breakdowns, and trend analysis
+
+### 🧠 [Model Onboarding Optimization](visualizations/model-onboarding-optimization-visual.html)
+**Token efficiency improvements** | Visual comparison of before/after optimization (90% reduction)
+
+### 🌐 [Multi-Model Communication Architecture](visualizations/models-communication-visual.html)
+**Bidirectional AI coordination** | Quality-based cooperation patterns and handoff protocols
+
+</div>
+
+*Open these HTML files in your browser for the full interactive experience with glow effects, animations, and Protocol-7 color schemes.*
+
+---
+
 ## Repository Structure
 
 ```
