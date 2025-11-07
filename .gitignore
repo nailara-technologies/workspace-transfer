@@ -25,6 +25,10 @@ context-checkpoints/*.md
 # Status automation (regenerated locally)
 .user/
 
+# Context management (local only)
+.todos/
+.research/
+
 # Build artifacts
 *.o
 *.so

@@ -120,6 +120,9 @@ sub generate_quick_start {
     print $out "bin/session-tokens add <N>       # Update session total\n";
     print $out "bin/suggest-handover             # Check health (every ~30k tokens)\n";
     print $out "\n";
+    print $out "bin/todo add \"<task>\" [priority]  # Track tasks (critical|high|medium|low)\n";
+    print $out "bin/research ask \"<Q>\" [priority]  # Defer questions (blocking|high|medium|low)\n";
+    print $out "\n";
 
     print $out "✅ COMMIT & PUSH\n";
     print $out "────────────────────────────────────────────────────────────────────\n";
@@ -178,6 +181,44 @@ sub generate_current {
         for my $commit (@commits) {
             chomp $commit;
             print $out "   $commit\n";
+        }
+    }
+
+    # Pending todos (if any)
+    my $todos_file = File::Spec->catfile($WORKSPACE_ROOT, '.todos', 'active.yaml');
+    if (-f $todos_file) {
+        my @todos = parse_todos($todos_file);
+        my @pending = grep { $_->{status} ne 'completed' } @todos;
+
+        if (@pending) {
+            print $out "\n";
+            my $count = scalar @pending;
+            my $critical = scalar grep { $_->{priority} eq 'critical' } @pending;
+            my $high = scalar grep { $_->{priority} eq 'high' } @pending;
+
+            print $out "📋 Todos: $count pending";
+            print $out " ($critical critical, $high high)" if $critical || $high;
+            print $out "\n";
+            print $out "   💡 bin/todo list\n";
+        }
+    }
+
+    # Research questions (if any)
+    my $research_file = File::Spec->catfile($WORKSPACE_ROOT, '.research', 'questions.yaml');
+    if (-f $research_file) {
+        my @questions = parse_research($research_file);
+        my @pending = grep { $_->{status} eq 'pending' } @questions;
+
+        if (@pending) {
+            print $out "\n" unless -f $todos_file;
+            my $count = scalar @pending;
+            my $blocking = scalar grep { $_->{priority} eq 'blocking' } @pending;
+            my $high = scalar grep { $_->{priority} eq 'high' } @pending;
+
+            print $out "🔬 Research: $count pending";
+            print $out " ($blocking blocking, $high high)" if $blocking || $high;
+            print $out "\n";
+            print $out "   💡 bin/research list\n";
         }
     }
 
@@ -353,6 +394,60 @@ sub format_number {
     my $formatted = sprintf("%.0f", $num);
     $formatted =~ s/(\d)(?=(\d{3})+$)/$1,/g;
     return $formatted;
+}
+
+sub parse_todos {
+    my ($file) = @_;
+    return () unless -f $file;
+
+    open my $fh, '<', $file or return ();
+    my @todos;
+    my $current = undef;
+
+    while (my $line = <$fh>) {
+        chomp $line;
+        next if $line =~ /^#/ || $line =~ /^\s*$/;
+        next if $line =~ /^todos:/;
+
+        if ($line =~ /^\s*-\s+id:\s*(.+)/) {
+            $current = { id => $1 };
+            push @todos, $current;
+        } elsif ($current && $line =~ /^\s+(\w+):\s*(.+)/) {
+            my ($key, $val) = ($1, $2);
+            $val =~ s/^["'](.*)["']$/$1/;  # Remove quotes
+            $current->{$key} = $val;
+        }
+    }
+
+    close $fh;
+    return @todos;
+}
+
+sub parse_research {
+    my ($file) = @_;
+    return () unless -f $file;
+
+    open my $fh, '<', $file or return ();
+    my @questions;
+    my $current = undef;
+
+    while (my $line = <$fh>) {
+        chomp $line;
+        next if $line =~ /^#/ || $line =~ /^\s*$/;
+        next if $line =~ /^questions:/;
+
+        if ($line =~ /^\s*-\s+id:\s*(.+)/) {
+            $current = { id => $1 };
+            push @questions, $current;
+        } elsif ($current && $line =~ /^\s+(\w+):\s*(.+)/) {
+            my ($key, $val) = ($1, $2);
+            $val =~ s/^["'](.*)["']$/$1/;  # Remove quotes
+            $current->{$key} = $val;
+        }
+    }
+
+    close $fh;
+    return @questions;
 }
 
 __END__

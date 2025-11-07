@@ -22,6 +22,7 @@
 - **Protocol-7 staging area** with transfer workflow
 - **Token tracking & anomaly detection** (compound efficiency monitoring)
 - **Status automation** (.user/ directory with quick status summaries)
+- **Context management** (persistent todos and research tracking)
 
 ### Recently Completed ✅
 - Phase 0: Checkpoint encryption system (Oct 4, 2025)
@@ -32,6 +33,7 @@
 - **Workspace restructuring for token efficiency** (Nov 7, 2025)
 - **Token tracking system with statistical anomaly detection** (Nov 7, 2025)
 - **Status automation system** (Nov 7, 2025) - Offload STATUS.md parsing to .user/ files
+- **Context management system** (Nov 7, 2025) - Persistent todos and research tracking
 
 ---
 
@@ -157,6 +159,8 @@ workspace-transfer/
 │   ├── suggest-handover     # Proactive handover recommendations
 │   ├── session-tokens       # Session token counter
 │   ├── token-report         # Token analytics & trends
+│   ├── todo                 # Persistent task management
+│   ├── research             # Research question tracking
 │   └── lib/                 # Shared libraries
 ├── protocol7-staging/        # Stage Protocol-7 work here
 │   ├── modules/
@@ -184,7 +188,7 @@ bin/init
 # Status automation (token-efficient)
 cat .user/STATUS                     # Quick workspace overview
 cat .user/QUICK_START                # Entry point commands
-cat .user/CURRENT                    # Recent activity
+cat .user/CURRENT                    # Recent activity (includes todos & research)
 cat .user/HEALTH                     # Session health metrics
 bin/update-status                    # Regenerate .user/ files
 
@@ -193,6 +197,15 @@ cat STATUS.md
 
 # Creative checkpoint (brief)
 bin/checkpoint
+
+# Context management (persistent tasks & research)
+bin/todo add "<task>" [priority]     # Add task (critical|high|medium|low|deferred)
+bin/todo list [filter]               # List tasks
+bin/todo done <id>                   # Mark complete
+bin/research ask "<question>" [pri]  # Track question (blocking|high|medium|low)
+bin/research list [filter]           # List questions
+bin/research answer <id> ["answer"]  # Mark answered
+# See: docs/reference/CONTEXT_MANAGEMENT.md for full guide
 
 # Transfer to protocol-7 (dry run)
 bin/transfer --dry-run
