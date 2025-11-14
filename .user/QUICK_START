@@ -1,0 +1,53 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUICK START GUIDE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🆕 FIRST TIME / FRESH SESSION
+────────────────────────────────────────────────────────────────────
+bin/init                    # Initialize workspace (~500 tokens)
+cat .user/local/STATUS            # View current state (~200 tokens)
+bin/checkpoint --brief      # Creative excellence (~300 tokens)
+bin/session-tokens reset    # Start session tracking
+
+Total: ~1k tokens (vs ~24k without optimization)
+
+🔄 RESUME EXISTING WORK
+────────────────────────────────────────────────────────────────────
+cat .user/local/STATUS            # Current state
+cat .user/local/CURRENT           # Recent activity
+git log --oneline -5        # Recent commits
+bin/session-tokens reset    # Start tracking
+
+🔧 SETUP SESSION (if needed)
+────────────────────────────────────────────────────────────────────
+bin/deps list                   # List dependency profiles
+bin/deps check <profile>        # Check if deps installed
+bin/deps install <profile>      # Install missing deps
+# Profiles: base, filesystem, network, learning, visualization, archive
+
+📝 DURING WORK
+────────────────────────────────────────────────────────────────────
+bin/track-tokens <task> <N>     # Track usage
+bin/session-tokens add <N>       # Update session total
+bin/suggest-handover             # Check health (every ~30k tokens)
+
+bin/todo add "<task>" [priority]  # Track tasks (critical|high|medium|low)
+bin/research ask "<Q>" [priority]  # Defer questions (blocking|high|medium|low)
+
+✅ COMMIT & PUSH
+────────────────────────────────────────────────────────────────────
+git add -A
+git commit -m "Description"
+bin/push-to-base                 # Push to base branch
+
+🔀 HANDOVER SESSION
+────────────────────────────────────────────────────────────────────
+git add -A && git commit -m "WIP: Description"
+bin/push-to-base
+# Document state in STATUS.md or commit message
+bin/session-tokens reset
+# Start fresh session
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Updated: 2025-11-14 12:36:10
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
