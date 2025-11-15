@@ -1,0 +1,94 @@
+## [:< ##
+
+# name = httpd.process_template
+# descr = Process template file - offloads recursive parsing to web zenka
+
+my $session_id    = shift // '';
+my $template_path = shift // '';
+die "expected valid session id" if not defined $data{'session'}{$session_id};
+my $session = $data{'session'}{$session_id};
+die "expected template file path argument" if !length($template_path);
+die "template file not found"              if !-f $template_path;
+my $response_params = $session->{'response'}->{'params'};
+my $content_date    = time2str( int( $session->{'start_time'} ) );
+my $content_type    = 'text/plain';
+$content_type = 'text/html' if $template_path =~ /\.html/;
+
+# LLL: ;charset=...
+
+<[base.log]>->( 1, "[process_template] $template_path (offloading to web zenka)" );
+
+## Load template content ##
+my $template_content = <[file.slurp]>->( $template_path );
+
+unless ( defined $template_content ) {
+    <[base.log]>->( 0, "[$session_id] failed to read template: $template_path" );
+    return <[httpd.send_error_page]>->( $session_id, 500 );
+}
+
+## Store template processing state in session ##
+$session->{'content'} = {
+    'date'          => $content_date,
+    'type'          => $content_type,
+    'complete'      => 0,
+    'template_path' => $template_path,
+};
+
+## Generate unique template ID for tracking ##
+my $template_id = sprintf(
+    'httpd_%s_%d',
+    <[chk-sum.elf.vax-BASE32]>->($template_path),
+    time()
+);
+
+## Prepare meta variables from session ##
+my $meta_vars = $session->{'meta'} // {};
+
+## Serialize meta variables for IPC transmission ##
+## For now, pass meta vars and template directly without encoding
+my $meta_json = <[httpd.json.encode]>->($meta_vars) // '{}';
+
+## Template is already raw text, no encoding needed for now
+my $template_b32r = $template_content;
+
+<[base.log]>->(
+    2,
+    "[$session_id] offloading template to web zenka: $template_id ("
+        . length($template_content)
+        . " bytes)"
+);
+
+## Send template to web zenka for recursive processing ##
+<[base.protocol-7.command.send.local]>->(
+    {   'command'   => qw| cube.web.process-template-ipc |,
+        'call_args' => {
+            'args' => join(
+                ':',
+                $template_id,
+                $template_b32r,
+                $meta_json,
+                $session_id
+            )
+        },
+        'reply' => {
+            'handler' => 'httpd.handler.web_template_reply',
+            'params'  => {
+                'client_sid'  => $session_id,
+                'template_id' => $template_id,
+            }
+        }
+    }
+);
+
+<[base.log]>->(
+    3,
+    "[$session_id] template processing request sent to web zenka: $template_id"
+);
+
+return 1;    ## Keep connection alive, waiting for web zenka reply ##
+
+#,,.,,.,.,.,.,,..,,..,,,.,.,.,,,.,..,,...,.,.,..,,...,...,,.,,,,,,.,,,,,,,..,,
+#3UXNAXAZSWN7GBFR67I3RMWO5SMD6OSUJ5BJVI3DXSWYNWACZTW4KJO4CFL23HM7OMSR7TKN3UX4E
+#\\\|CV6IIHVFT2HHFYQ2ZWD5UUQ3M7J5CWUVTR4HP7MWVIHZ7YS52PI \ / AMOS7 \ YOURUM ::
+#\[7]5J2MNM7ZF4VTN7LZSYYXI72AGXF3OTGRSVCL6EIAT2IPEFYYQ2CY 7  DATA SIGNATURE ::
+#:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

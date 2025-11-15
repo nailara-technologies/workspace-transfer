@@ -1,0 +1,75 @@
+
+ .:[ cube auth set-up [ 'v7' zenka managed ] ]:.
+
+
+auth.setup.usr.fs              = :zenka:
+auth.setup.usr.data            = :zenka:
+auth.setup.usr.X-11            = :zenka:
+auth.setup.usr.dbus            = :zenka:
+auth.setup.usr.udev            = :zenka:
+auth.setup.usr.zulum           = :zenka:
+auth.setup.usr.index           = :zenka:
+auth.setup.usr.nodes           = :zenka:
+auth.setup.usr.power           = :zenka:
+auth.setup.usr.source          = :zenka:
+auth.setup.usr.system          = :zenka:
+auth.setup.usr.events          = :zenka:
+auth.setup.usr.notify          = :zenka:
+auth.setup.usr.povray          = :zenka:
+auth.setup.usr.os-pkg          = :zenka:
+auth.setup.usr.storage         = :zenka:
+auth.setup.usr.decoder         = :zenka:
+auth.setup.usr.cube-13         = :zenka:
+auth.setup.usr.c-trade         = :zenka:
+auth.setup.usr.acquire         = :zenka:
+auth.setup.usr.content         = :zenka:
+auth.setup.usr.p7-log          = :zenka:
+auth.setup.usr.discover        = :zenka:
+auth.setup.usr.channels        = :zenka:
+auth.setup.usr.ext-world       = :zenka:
+auth.setup.usr.amos-term       = :zenka:
+auth.setup.usr.universal       = :zenka:
+auth.setup.usr.auto-hide       = :zenka:
+auth.setup.usr.start-anim      = :zenka:
+auth.setup.usr.screenshot      = :zenka:
+auth.setup.usr.rss-ticker      = :zenka:
+auth.setup.usr.web-browser     = :zenka:
+auth.setup.usr.tile-groups     = :zenka:
+auth.setup.usr.protocol-7-menu = :zenka:,:unix:<unix-AMOS-user> ## TTY-mode ##
+auth.setup.usr.graphics-matrix = :zenka:
+auth.setup.usr.X-11-pointer    = :zenka:
+auth.setup.usr.letsencrypt     = :zenka:
+auth.setup.usr.storchencam     = :zenka:
+auth.setup.usr.image2html      = :zenka:
+auth.setup.usr.impressive      = :zenka:
+auth.setup.usr.notify-osd      = :zenka:
+auth.setup.usr.remote-cam      = :zenka:
+auth.setup.usr.reenc-msg       = :zenka:
+auth.setup.usr.mediainfo       = :zenka:
+auth.setup.usr.mod-test        = :zenka:
+auth.setup.usr.download        = :zenka:
+auth.setup.usr.osd-logo        = :zenka:
+auth.setup.usr.pdf2html        = :zenka:
+auth.setup.usr.openbox         = :zenka:
+auth.setup.usr.compton         = :zenka:
+auth.setup.usr.weather         = :zenka:
+auth.setup.usr.pcycle          = :zenka:
+auth.setup.usr.ticker          = :zenka:
+auth.setup.usr.ffmpeg          = :zenka:
+auth.setup.usr.geoloc          = :zenka:
+auth.setup.usr.set-up          = :zenka:
+auth.setup.usr.debian          = :zenka:
+auth.setup.usr.workflow        = :zenka:,:unix:<unix-root>,:unix:<unix-admin>
+auth.setup.usr.httpd           = :zenka:
+auth.setup.usr.httpsd          = :zenka:
+auth.setup.usr.calc            = :zenka:
+auth.setup.usr.melt            = :zenka:
+auth.setup.usr.plnx            = :zenka:
+auth.setup.usr.web             = :zenka:
+auth.setup.usr.mpv             = :zenka:
+
+#,,.,,.,.,,..,..,,,..,,..,,..,.,.,...,...,,.,,..,,...,...,,..,.,,,.,,,,,.,..,,
+#WSZO7QUULPM57VKSEDFUSUM4SIJTVGO72GX6WIN2BSYXD62PZPRBNVO6L5UOQJKADAMZYE46EG7JQ
+#\\\|RYGRXFVZO6JW7JHM7ZHRKE5N7JETQXULU5J6FBPA5YNQOQ6TMLE \ / AMOS7 \ YOURUM ::
+#\[7]CJARPXQNLKXVBEAGKUEUBL6IITNSIZRRPEZOOMSUWLF46N22OQCY 7  DATA SIGNATURE ::
+#:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
