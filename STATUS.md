@@ -1,8 +1,8 @@
 # Workspace Status
 
-**Last Updated**: 2025-11-14
-**Branch**: claude/reinitialize-workspace-01BE71ncAMyR7NYKASUBH3Kh
-**Status**: 🟢 Clean workspace | 🎯 Ready for development | ✅ Template auth complete
+**Last Updated**: 2025-11-15
+**Branch**: claude/refactor-code-013LYXsoCBqWeAuw245auxvF
+**Status**: 🟢 Clean workspace | 🎯 Ready for development | ✅ HTTP template processing complete
 
 ---
 
@@ -43,6 +43,13 @@
   - Implemented user-agnostic configuration files with <admin-user> and <unix-admin> templates
   - p7 client compilation and unix socket authentication
   - Verified authentication: unix-root, unix-kitten, unix-taeki all working
+- **HTTP/HTTPS template processing system** (Nov 15, 2025) - Complete IPC-based template processing pipeline
+  - Fixed IPC command return format (hash ref with mode/data)
+  - Implemented base32 encoding for template content and JSON metadata
+  - Fixed cross-zenka JSON decoding using JSON::XS directly
+  - Fixed scalar reference dereferencing from base.parser.pattern_split
+  - Fixed reply mode case sensitivity (lowercase 'size' for multi-line)
+  - Complete httpd → cube → web zenka → httpd pipeline working end-to-end
 
 ---
 

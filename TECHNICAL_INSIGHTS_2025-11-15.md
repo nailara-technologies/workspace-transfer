@@ -476,13 +476,215 @@ Other zenki use this pattern:
 
 ---
 
+---
+
+## 16. IPC Command Return Format and Template Processing
+
+### Command Registration Pattern
+Only modules in `*.cmd.*` namespace are registered as callable IPC commands:
+
+```perl
+# modules/web.cmd.process_template_ipc - Command wrapper
+my $hash_ref = shift;
+my $args_str = $hash_ref->{'args'} // '';  # NOT call_args->args
+
+# Call implementation
+my $result = <[web.process_template_ipc]>->($args_str);
+return $result;  # Return hash ref directly
+```
+
+**Key Points:**
+- Command wrappers receive: `{ 'args' => '...', 'command_id' => '...', 'session_id' => '...', 'reply_id' => '...' }`
+- Args are directly in `$hash_ref->{'args'}`, not `$hash_ref->{'call_args'}->{'args'}`
+
+### Command Return Format (CRITICAL)
+Commands MUST return hash reference with mode and data:
+
+```perl
+# SUCCESS - multi-line content
+return {
+    'mode' => qw| size |,    # Lowercase 'size' for multi-line support
+    'data' => $content
+};
+
+# ERROR
+return {
+    'mode' => qw| false |,
+    'data' => qq| error message |
+};
+
+# WRONG - tuple format doesn't work
+return ( 'size', $content );  # ❌ Will fail
+return ( 5, $content );       # ❌ Will fail
+```
+
+**Important:**
+- Reply mode must be lowercase in return hash: `'size'`, `'false'`, `'true'`
+- IPC protocol layer converts to uppercase during transmission
+- Handler must normalize mode back to lowercase for checking: `my $mode = lc($reply_data->{'cmd'} // '');`
+- Only `'size'` mode supports multi-line content (like HTML templates)
+
+### Base32 Encoding for IPC Arguments
+IPC arguments are colon-delimited, requiring base32 encoding for data containing colons:
+
+```perl
+# In httpd.process_template - encode before sending
+my $template_b32r = encode_b32r($template_content);
+my $meta_json = <[httpd.json.encode]>->($meta_vars) // '{}';
+my $meta_b32r = encode_b32r($meta_json);
+
+<[base.protocol-7.command.send.local]>->(
+    {   'command'   => qw| cube.web.process_template_ipc |,
+        'call_args' => {
+            'args' => join(':', $template_id, $template_b32r, $meta_b32r, $session_id)
+        },
+        ...
+    }
+);
+
+# In web.process_template_ipc - decode after receiving
+my $template_content = decode_b32r($template_b32r);
+my $meta_json = decode_b32r($meta_b32r);
+my $meta_vars = JSON::XS::decode_json($meta_json) // {};
+```
+
+**Why This Matters:**
+- Template content contains colons in HTML tags: `<head>:`, `<title>`
+- JSON metadata contains colons: `"client_addr" : "::1"`
+- Without base32 encoding, IPC split on `:` delimiter corrupts data
+
+### Module Loading for Encoding Functions
+Both sending and receiving zenka need encode/decode functions:
+
+```perl
+# In httpd.init_code
+<[base.perlmod.load]>->( 'Crypt::Misc', qw| encode_b64u decode_b64u encode_b32r decode_b32r | );
+
+# In web.init_code
+<[base.perlmod.load]>->( 'Crypt::Misc', qw| encode_b32r decode_b32r | );
+<[base.perlmod.autoload]>->('JSON::XS');
+```
+
+### Cross-Zenka Function Availability
+Functions like `httpd.json.decode` don't exist in web zenka context:
+
+```perl
+# WRONG - httpd functions not available in web zenka
+my $meta_vars = <[httpd.json.decode]>->($meta_json);  # ❌ Undefined
+
+# CORRECT - use Perl module directly
+<[base.perlmod.autoload]>->('JSON::XS');  # In web.init_code
+my $meta_vars = JSON::XS::decode_json($meta_json);  # ✅ Works
+```
+
+### Cube Command Prefix Semantics
+When sending IPC commands, `cube.` prefix IS required:
+
+```perl
+# In httpd.process_template - sending command
+<[base.protocol-7.command.send.local]>->(
+    {   'command' => qw| cube.web.process_template_ipc |,  # ✅ cube. prefix required
+        ...
+    }
+);
+
+# In configuration/zenki/cube/access.zenki - permission config
+access.cmd.usr.httpd = web.process_template_ipc web.*  # ✅ No cube. prefix (already from cube perspective)
+```
+
+**Why:**
+- When sending: Must specify `cube.` to route through cube IPC system
+- In access.zenki: Already written from cube's perspective, no prefix needed
+- Similar pattern in web-browser modules: `cube.pdf2html.get_url`, `cube.content.set_flags`
+
+### Reference Dereferencing Pattern
+`base.parser.pattern_split` returns array of scalar references:
+
+```perl
+# In web.process_template_recursive
+my $final_content = $parsed_content;
+if ( ref($final_content) eq 'ARRAY' ) {
+    ## Dereference ALL elements (they're all scalar refs from pattern_split)
+    my @deref = map { ref($_) ? $$_ : $_ } @{$final_content};
+    $final_content = join( '', @deref );
+}
+
+# In web.process_template_ipc - also handle array or scalar refs
+my $content = $result->{content};
+my $ref_type = ref($content);
+
+if ( $ref_type eq 'ARRAY' ) {
+    my @deref = map { ref($_) eq 'SCALAR' ? $$_ : $_ } @{$content};
+    $content = join( '', @deref );
+} elsif ( $ref_type eq 'SCALAR' ) {
+    $content = $$content;
+}
+```
+
+**Pattern:**
+- Use `ref($_) ? $$_ : $_` to dereference ANY reference type generically
+- Handle both ARRAY and SCALAR reference types
+- Always dereference at the source before returning to IPC
+
+### Complete Template Processing Flow
+
+```
+HTTP Client → httpd.http_get
+    ↓
+httpd.route_dispatcher → Determine handler
+    ↓
+httpd.process_template
+    ├─ Read template file (file.slurp)
+    ├─ Base32-encode template content
+    ├─ JSON-encode + base32-encode metadata
+    ├─ Send to cube: cube.web.process_template_ipc
+    └─ Register reply handler: httpd.handler.web_template_reply
+    ↓
+Cube IPC → Route to web zenka
+    ↓
+web.cmd.process_template_ipc (wrapper)
+    └─ Extract args from hash_ref->{'args'}
+    ↓
+web.process_template_ipc (implementation)
+    ├─ Base32-decode template and metadata
+    ├─ JSON-decode metadata
+    ├─ Call web.process_template_recursive
+    ├─ Dereference scalar/array refs
+    └─ Return { 'mode' => 'size', 'data' => $content }
+    ↓
+Cube IPC → Convert mode to uppercase, send to httpd
+    ↓
+httpd.handler.web_template_reply
+    ├─ Normalize mode to lowercase
+    ├─ If mode eq 'size': Build HTTP response with content
+    ├─ If mode eq 'false': Send 500 error page
+    └─ Trigger flush to client
+    ↓
+HTTP Client receives HTML
+```
+
+### Permission Configuration
+Two-layer permission system:
+
+```perl
+# 1. Sender permissions in cube/access.zenki
+access.cmd.usr.httpd = web.process_template_ipc web.*
+
+# 2. Receiver permissions in web/start
+access.cmd.usr.cube = process_template_ipc  # (if needed)
+```
+
+---
+
 ## Next Session Focus Areas
 
-### 1. Web Zenka Template Processing (HIGH PRIORITY)
-- Debug why web zenka returns error on template processing
-- Check IPC message format is correct
-- Verify handler reply mechanism works
-- May need to inspect web module code
+### 1. ✅ COMPLETED: Web Zenka Template Processing
+- ✅ Fixed IPC command return format (hash ref instead of tuple)
+- ✅ Fixed base32 encoding for template content and metadata
+- ✅ Fixed JSON decoding using JSON::XS directly
+- ✅ Fixed reference dereferencing for scalar refs
+- ✅ Fixed reply mode case sensitivity
+- ✅ Template processing now works end-to-end
 
 ### 2. HTTPS/TLS Verification (HIGH PRIORITY)
 - Verify httpsd works on port 443
@@ -495,6 +697,10 @@ Other zenki use this pattern:
 - Load test with concurrent requests
 - Certificate renewal testing
 - Multi-vhost testing
+
+### 4. Fix Locale Warnings
+- Address locale warnings during zenki startup
+- May need to set LC_ALL or LANG environment variables
 
 ---
 
@@ -510,6 +716,12 @@ Other zenki use this pattern:
 | Mime type function doesn't exist | Template type detection broken | Use regex on file extension |
 | Template processing IPC format | Web zenka receives wrong data | Follow: template_id:content:meta:sid |
 | Route caching improves performance | Slow repeated lookups | Implement cache with TTL |
+| **IPC commands must return hash ref** | Template replies fail | Return `{'mode' => 'size', 'data' => $content}` |
+| **Colon delimiter conflicts in IPC** | Template content truncated | Base32-encode all data containing colons |
+| **Reply mode case sensitivity** | Handler doesn't recognize mode | Lowercase in hash, normalize with `lc()` in handler |
+| **Cross-zenka function unavailability** | JSON decode fails in web zenka | Use `JSON::XS::decode_json()` directly |
+| **cube. prefix semantics** | Command routing confusion | Required in send, not in access.zenki |
+| **Scalar reference stringification** | Content becomes "SCALAR(0x...)" | Dereference with `ref($_) ? $$_ : $_` pattern |
 
 ---
 
