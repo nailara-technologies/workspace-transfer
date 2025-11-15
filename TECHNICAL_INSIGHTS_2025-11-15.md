@@ -326,7 +326,7 @@ auth.setup.usr.web = :zenka:
 - httpsd was missing from auth.zenki initially
 - This caused authentication failures when httpsd tried to connect to cube
 - Adding this single line fixed httpsd startup
-- Always verify all zenkas that need auth are registered
+- Always verify all zenki that need auth are registered
 
 ---
 
@@ -362,6 +362,120 @@ For quick code changes, use `p7 httpd.reload source` instead of full restart
 
 ---
 
+## 14. Flow Control in Zenka Startup Scripts
+
+### New Feature: base.exit_when_false and base.exit_when_empty
+
+Protocol-7 now supports elegant flow control for startup scripts:
+
+```perl
+# base.exit_when_false - exit if parameter is FALSE (0) or numeric < 1
+result = [base.exit_when_false:<parameter>,exit_code,'error message']
+
+# base.exit_when_empty - exit if parameter is undef or empty string
+result = [base.exit_when_empty:<parameter>,exit_code,'error message']
+```
+
+### Example: HTTPSD Certificate Validation
+
+```
+## Validate certificates before attempting socket creation
+httpsd.cert_status = [httpsd.startup.validate_certificates]
+[exit_when_false:<httpsd.cert_status>,0,'certificate load error, shutdown.,.']
+
+## Only reaches this point if validation succeeded
+httpsd.sock = [httpsd.create_ssl_socket:<net.https.addr>,<net.https.port>]
+[base.protocol.bind:<httpsd.sock>,'https','server']
+```
+
+### Why This Pattern is Elegant
+
+1. **Encapsulation**: Validation logic in modules, not config
+2. **Reusability**: Any zenka can use the same flow control helpers
+3. **Clear Intent**: Reading config file shows exactly what happens
+4. **Graceful Shutdown**: Zenka exits cleanly when conditions fail
+5. **Restart Handling**: 'v7' automatically restarts zenka with increasing delays
+
+### How to Write Startup Validation Modules
+
+```perl
+# modules/httpsd.startup.validate_certificates
+
+my $cert_file = <httpsd.cfg.certificate_path>;
+my $key_file  = <httpsd.cfg.key_path>;
+
+unless ( -f $cert_file ) {
+    <[base.log]>->(0, "FATAL: Certificate not found: $cert_file");
+    return FALSE;  # Triggers [exit_when_false:...]
+}
+
+unless ( -f $key_file ) {
+    <[base.log]>->(0, "FATAL: Key not found: $key_file");
+    return FALSE;  # Triggers [exit_when_false:...]
+}
+
+return TRUE;  # Validation passed, continue startup
+```
+
+### Key Points
+
+- Modules should return TRUE/FALSE (5/0)
+- Modules should log error details (users won't see zenka config)
+- Use consistent error message format
+- Always check file existence BEFORE attempting use
+- Prevents confusing error messages from failed I/O operations
+
+### Known Minor Issue
+
+- exit_when_false exits silently even with error message parameter
+- Zenka shutdown happens before log messages can be flushed?
+- Is be working as designed (prevent hanging during shutdown)
+- Worth investigating in future sessions for better debugging
+
+---
+
+## 15. Module-Based Startup Organization Pattern
+
+### Why Not Use Config File Conditionals?
+
+Previous attempts tried to implement `[if: ... ]` conditionals in startup scripts.
+This doesn't work because Protocol-7 doesn't have conditional syntax in config files yet.
+
+**Better approach**: Move startup logic into modules
+
+### Pattern
+
+```
+configuration/zenki/httpsd/start:
+    [load_modules:<modules.load>]
+    [init_modules]
+    httpsd.status = [httpsd.startup.validate_certificates]
+    [exit_when_false:<httpsd.status>,...]
+    httpsd.sock = [httpsd.create_ssl_socket:...]
+
+modules/httpsd.startup.validate_certificates:
+    - Do validation
+    - Log errors
+    - Return TRUE/FALSE
+```
+
+### Benefits
+
+1. **Separates concerns**: Config files describe what happens, modules do validation
+2. **Reusable**: Other zenki can use similar patterns
+3. **Testable**: Can call validation module directly to test
+4. **Maintainable**: Logic is in Perl, not config language
+5. **Follows conventions**: Similar to letsencrypt.base.fork_letsencrypt_child pattern
+
+### This is the Modern Protocol-7 Way
+
+Other zenki use this pattern:
+- `letsencrypt.base.fork_letsencrypt_child` - Forks ACME child process
+- `X-11.chk.early-priv-drop` - Checks and drops privileges early
+- Pattern extends to any startup validation or setup
+
+---
+
 ## Next Session Focus Areas
 
 ### 1. Web Zenka Template Processing (HIGH PRIORITY)
@@ -392,7 +506,7 @@ For quick code changes, use `p7 httpd.reload source` instead of full restart
 | Namespace aliasing via swap_subs | Function names confusing | Check pre-init for aliases |
 | Empty string after path normalization | Root path handling broken | Add `$path = 'index.html' if !length` |
 | Local git proxy authentication fails | Can't push changes | Use GitHub directly + GITHUB_PAT |
-| httpsd missing from auth.zenki | HTTPS zenka won't start | Register all zenkas in auth |
+| httpsd missing from auth.zenki | HTTPS zenka won't start | Register all zenki in auth |
 | Mime type function doesn't exist | Template type detection broken | Use regex on file extension |
 | Template processing IPC format | Web zenka receives wrong data | Follow: template_id:content:meta:sid |
 | Route caching improves performance | Slow repeated lookups | Implement cache with TTL |

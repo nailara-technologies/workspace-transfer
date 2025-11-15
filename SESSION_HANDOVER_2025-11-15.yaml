@@ -1,0 +1,168 @@
+---
+title: HTTP/HTTPS Implementation Session Handover
+session_date: 2025-11-15
+session_status: In Progress - Context Reset Point
+next_steps_priority: High
+
+## SESSION SUMMARY
+
+This session focused on fixing critical HTTP/HTTPS server functionality in Protocol-7.
+The system can now:
+- ✅ Handle HTTP requests on port 80
+- ✅ Route requests correctly to appropriate handlers
+- ✅ Validate certificates before HTTPS startup
+- ✅ Exit gracefully when certificates missing
+- ❌ Process templates through web zenka (still failing)
+
+## COMPLETED WORK
+
+### 1. HTTP Server Core Fixes
+- **Handler Dispatch Bug** - Fixed variable function invocation using `$code{...}` hash
+- **Path Normalization** - Added root path handling for "/" requests
+- **File Reading** - Corrected `file.slurp` function usage
+- **IPC Message Format** - Updated template transmission format (plain text + JSON)
+- Files: `httpd.http_get`, `httpd.vhost_template_resolver`, `httpd.process_template`
+
+### 2. HTTPS Certificate Validation
+- **New Feature**: `base.exit_when_false` and `base.exit_when_empty` flow control
+- **Elegant Pattern**: Certificate validation in `httpsd.startup.validate_certificates`
+- **Graceful Shutdown**: Zenka exits cleanly with increasing restart delays when certs missing
+- **Clear Logging**: Error messages indicate exactly what's missing
+- Files: `configuration/zenki/httpsd/start`, `modules/httpsd.startup.validate_certificates`
+
+### 3. Code Cleanup
+- Removed call to non-existent `base.list.formatted.show` from `httpd.cmd.vhosts`
+- Fixed module return format expectations
+
+## CURRENT BLOCKERS
+
+### High Priority: Web Zenka Template Processing
+**Status**: Not working - returns error on every request
+**Symptoms**:
+- HTTP returns 500 error immediately
+- httpd logs: "template processing failed: httpd_... - unknown error"
+- web zenka logs: No handler invocation logged
+
+**Root Cause NOT YET IDENTIFIED**:
+- Handler code is present: `web.process_template_ipc`
+- IPC message is being sent to cube
+- But handler is never invoked on web zenka side
+- Possible issue: Command routing between cube and web zenka not working for this handler
+
+**What was tried**:
+- Fixed undefined functions (file.get → file.slurp, base.json.decode → httpd.json.decode)
+- Changed handler return format from numeric (0, 5) to string ('FALSE', 'SIZE')
+- Created underscore version of handler name for compatibility
+- Verified handler code syntax is correct
+
+**Debug Approach for Next Session**:
+1. Check cube's command routing logs for web.process_template_ipc messages
+2. Verify handler registration in web zenka
+3. Test direct command invocation to web zenka from p7 CLI
+4. Check if handler name format (hyphens vs underscores) affects routing
+
+## INFRASTRUCTURE STATUS
+
+### Running Zenkas
+All zenkas operational:
+- ✅ cube (authentication/routing)
+- ✅ httpd (HTTP server, port 80)
+- ✅ httpsd (HTTPS server, port 443 - waiting for templates to work)
+- ✅ web (template processing - not responding to requests)
+- ✅ letsencrypt (ACME certificate management)
+- ✅ p7-log (logging)
+
+### Certificate Status
+- Directory exists: `/etc/protocol-7/certs/` (currently empty)
+- Validation working: httpsd gracefully exits when certs missing
+- Ready for: Let's Encrypt integration or self-signed certificate testing
+
+### HTTP Request Pipeline
+Fully functional:
+- TCP connection → HTTP parsing → Route dispatch → Handler → Response
+- ACME challenges route correctly
+- Static files serve correctly
+- Template requests sent to web zenka (but fail there)
+
+## KEY LEARNINGS DOCUMENTED
+
+See: `TECHNICAL_INSIGHTS_2025-11-15.md` (updated with):
+1. **Flow Control Pattern**: `base.exit_when_false` / `base.exit_when_empty` for elegant startup validation
+2. **Startup Validation Pattern**: Module-based validation (httpsd.startup.validate_certificates)
+3. **Module-based Organization**: Startup logic in modules, not config files
+4. **Return Value Conventions**: TRUE/FALSE vs numeric codes in flow control
+
+## GIT STATUS
+
+**Protocol-7 Repository**:
+- All changes committed and pushed to GitHub
+- Branch: `base`
+- Recent commits:
+  - da78943be: created base.exit_when_{false|empty} for zenka description [flow control]
+  - b40721058: fix: Add elegant certificate validation module for httpsd startup
+  - 77d2c286e: fix: Add robust certificate handling in httpsd startup and remove missing module reference
+
+**Workspace-Transfer Repository**:
+- All changes committed and pushed to GitHub
+- Documentation updated with technical insights
+
+## CERTIFICATES FOR TESTING
+
+To test HTTPS functionality, need to:
+
+**Option A: Generate Self-Signed Certificate**
+```bash
+openssl req -x509 -newkey rsa:2048 -keyout /etc/protocol-7/certs/current.key \
+  -out /etc/protocol-7/certs/current.pem -days 365 -nodes
+```
+
+**Option B: Use Let's Encrypt**
+- letsencrypt zenka already configured
+- Requires public domain and DNS setup
+- Automatic renewal configured
+
+## NEXT SESSION CHECKLIST
+
+### Priority 1: Web Zenka Debug
+- [ ] Investigate cube's command routing for web zenka handlers
+- [ ] Check web zenka handler registration/loading
+- [ ] Test web.process_template_ipc invocation directly
+- [ ] Identify why handler code never executes
+
+### Priority 2: Testing
+- [ ] Generate self-signed certificate to test HTTPS
+- [ ] Test HTTP → template processing → HTTPS pipeline end-to-end
+- [ ] Verify port 443 is listening and accepting TLS connections
+
+### Priority 3: Production Readiness
+- [ ] Let's Encrypt integration testing
+- [ ] Load testing with concurrent requests
+- [ ] Systemd service configuration
+- [ ] Production deployment guide
+
+## KNOWN MINOR ISSUES
+
+1. **exit_when_false Silent Exit**: Passes remaining parameters but zenka exits silently
+   - May be working as designed (shutdown happens before logging can occur)
+   - Worth investigating to improve logging/debugging
+
+2. **base.list.formatted.show Missing**: Module doesn't exist
+   - Fallback code in httpd.cmd.vhosts works fine
+   - Could be implemented later if list formatting needed elsewhere
+
+## TECHNICAL DEBT
+
+- [ ] Implement conditional control flow in startup scripts for future use
+- [ ] Create base.list.formatted.show if list display becomes important
+- [ ] Improve logging during zenka shutdown for debugging
+- [ ] Document flow control pattern in Protocol-7 wiki
+
+## CONTEXT RESET REASONING
+
+Token count getting high (100k+), making new attempts inefficient.
+This handover document provides:
+- Complete status of current implementation
+- Clear blockers and next steps
+- Debugging approach for web zenka issue
+- Technical learnings preserved in TECHNICAL_INSIGHTS
+- All code changes in git with clear commit messages
