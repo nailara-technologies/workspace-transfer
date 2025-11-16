@@ -8,7 +8,21 @@ Stateless workspace handoff for multi-AI development on the Protocol-7 harmonic 
 
 ## Quick Start
 
-### 🆕 First Time Cloning?
+### 🆕 Complete First-Time Setup (Recommended)
+
+**Everything automated in one command:**
+```bash
+./START-HERE
+```
+
+This single entry point handles:
+- ✓ GitHub PAT authentication setup
+- ✓ Cloning both workspace-transfer and protocol-7
+- ✓ Configuring git remotes with PAT
+- ✓ Checking dependencies
+- ✓ Printing next steps
+
+### 🆕 First Time Cloning? (Manual Alternative)
 
 **Just cloning workspace-transfer?**
 → See **[docs/onboarding/GETTING_STARTED.md](docs/onboarding/GETTING_STARTED.md)**
