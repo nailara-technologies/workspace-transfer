@@ -62,47 +62,52 @@
 - Certificate loading and validation working
 - TLS negotiation verified via curl `-v` output
 
-### 🟡 CRITICAL BLOCKER: Event Loop Handler Routing
+### 🟢 EVENT LOOP HANDLER ROUTING: FIXED ✅
 
-**Issue**: After SSL connection accepted and session created, HTTP request handler NOT invoked. Client session immediately shuts down.
+**Issue (RESOLVED)**: After SSL connection accepted and session created, HTTP request handler was NOT invoked due to raw FD reads getting encrypted data instead of plaintext.
 
-**Root Cause**: Protocol-7's event loop dispatch mechanism does not invoke socket-type-specific handlers (`io.ip.ssl.input.read`) for SSL sockets. The handler system has two levels:
-1. **Socket-Type Handler** - Entry point when FD becomes readable (defined in `$data{'io'}{'type'}`)
-2. **Protocol Handler** - Processes protocol data (e.g., `httpsd.request_handler`)
+**Root Cause (IDENTIFIED & FIXED)**:
+- `base.s_read()` used `IO::AIO::aio_read()` on raw file descriptors
+- For SSL sockets, `fileno()` returns underlying TCP FD
+- Reading from raw FD gave encrypted TLS data, not plaintext HTTP
+- Protocol parser received garbage and closed connection
 
-For SSL, Level 1 never calls Level 2.
+**Solution (IMPLEMENTED)**:
+- Modified `base.s_read()` to detect `IO::Socket::SSL` objects
+- Use socket's `sysread()` method for SSL sockets (automatic TLS decryption)
+- Fall back to `IO::AIO::aio_read()` for TCP sockets (preserves async performance)
+- No changes to handler registration or event loop needed
 
-**Technical Details**: See `HTTPS_FIX_STATUS.md` for comprehensive diagnostic report
+**Commit**: protocol-7 base branch, commit `0e5970296`
+- File: `modules/base.s_read`
+- Added SSL socket type detection with appropriate read path
 
-**Files Created This Session**:
-- `io.ip.ssl.input.read` - Simplified SSL handler (not being invoked)
-- `io.ip.ssl.s_read` - SSL socket read with sysread() for TLS decryption
-- `io.ip.ssl.handler.read` - Complex handler variant
-- `io.ip.ssl.read_linewise` - Linewise HTTP request reading
+**Result**: Complete HTTPS handler chain now works
+- SSL connections accepted ✅
+- TLS handshake successful ✅
+- Client sessions created ✅
+- HTTP requests received as plaintext ✅
+- Protocol handlers invoked ✅
+- Responses sent back through encrypted connection ✅
 
-**Solution Path**: Need to understand how Protocol-7's event loop decides which handler to call, then ensure SSL socket's readable FD events trigger the correct handler chain.
+**Technical Details**: See `HTTPS_SSL_FIX_COMPLETE_2025-11-16.md` for comprehensive analysis
 
 ---
 
 ## Current Development Priorities
 
-### 1. Event Loop Handler Routing (BLOCKING) 🚨
-**Priority**: CRITICAL | **Status**: Root cause identified, solution strategy drafted
+### 1. HTTPS/SSL Support: COMPLETE ✅
+**Priority**: CRITICAL (WAS) | **Status**: FIXED - Event loop handler routing resolved
 
-Investigate and fix event loop dispatch mechanism for SSL socket handlers:
+The socket read layer (`base.s_read`) now automatically handles both TCP and SSL sockets by detecting socket type and using the appropriate read method. Complete HTTPS server support is now functional.
 
-**Investigation Tasks**:
-1. Trace `base.handler.connect` to understand how HTTP socket handlers are registered
-2. Verify if TCP/HTTP socket handlers have special registration mechanism
-3. Determine if SSL sockets need special event notification (IO::Poll vs select vs other)
-4. Check if socket-type system is actually used for handler dispatch vs direct registration
+**See**: `HTTPS_SSL_FIX_COMPLETE_2025-11-16.md` for detailed technical analysis
 
-**Implementation Options** (to be evaluated):
-1. Copy TCP handler pattern - Replicate `base.handler.read` for SSL but with sysread()
-2. Direct handler registration - Register SSL handlers same way as TCP handlers
-3. Bypass event loop - Force handler invocation in `io.ip.ssl.input.connect`
-
-**See**: `HTTPS_FIX_STATUS.md` for next steps and investigation paths
+**Next for HTTPS:**
+- Run comprehensive testing with different HTTP methods
+- Performance benchmarking (HTTP vs HTTPS throughput)
+- Load testing with concurrent connections
+- Documentation and runbook for HTTPS deployment
 
 ### 2. Filesystem Integration 🗂️
 **Priority**: HIGH | **Status**: Not started
