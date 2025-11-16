@@ -9,8 +9,37 @@
 # 4. Installs dependencies
 # 5. Provides next steps
 #
+# Usage:
+#   ./START-HERE           # Interactive setup
+#   ./START-HERE --install # Auto-install dependencies
+#   ./START-HERE --help    # Show help
+#
 
 set -e
+
+# Parse arguments
+AUTO_INSTALL=false
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --install)
+            AUTO_INSTALL=true
+            shift
+            ;;
+        --help|-h)
+            echo "Usage: START-HERE [OPTIONS]"
+            echo ""
+            echo "Options:"
+            echo "  --install   Automatically install missing dependencies"
+            echo "  --help      Show this help message"
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Use --help for usage information"
+            exit 1
+            ;;
+    esac
+done
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -165,9 +194,27 @@ done
 if [ ${#missing_modules[@]} -gt 0 ]; then
     print_warning "Missing Perl modules: ${missing_modules[*]}"
     echo ""
-    read -p "Would you like to install them now? (y/n) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+
+    INSTALL_DEPS="n"
+
+    if [ "$AUTO_INSTALL" = true ]; then
+        # Auto-install mode: just install
+        INSTALL_DEPS="y"
+    elif [ -t 0 ]; then
+        # Interactive: ask the user
+        read -p "Would you like to install them now? (y/n) " -n 1 -r
+        echo
+        INSTALL_DEPS=$REPLY
+    else
+        # Non-interactive without --install flag: show instructions
+        print_warning "Running in non-interactive mode. To auto-install dependencies, use:"
+        echo "  $SCRIPT_DIR/START-HERE --install"
+        echo ""
+        echo "Or install manually:"
+        echo "  cpan ${missing_modules[*]}"
+    fi
+
+    if [[ $INSTALL_DEPS =~ ^[Yy]$ ]]; then
         echo "Installing Perl modules: ${missing_modules[*]}"
         cpan "${missing_modules[@]}" && {
             print_success "Dependencies installed successfully"
@@ -176,7 +223,9 @@ if [ ${#missing_modules[@]} -gt 0 ]; then
             echo "  cpan ${missing_modules[*]}"
         }
     else
-        print_warning "Skipping dependency installation"
+        if [ "$AUTO_INSTALL" != true ] && [ -t 0 ]; then
+            print_warning "Skipping dependency installation"
+        fi
         echo "You can install them later with:"
         echo "  cpan ${missing_modules[*]}"
         echo ""
