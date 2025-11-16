@@ -45,9 +45,9 @@ The fix elegantly avoids the "raw FD problem" where reading from a file descript
 **Problem Identified**: Remote URLs frequently reset from GitHub HTTPS to `http://local_proxy@127.0.0.1:PORT/` format
 
 **Solution Deployed**:
-- `bin/dev/configure-remote` - Automatic remote URL detection and repair
-- `bin/dev/push-to-github` - Wrapper with retry logic and exponential backoff
-- Both scripts deployed to `workspace-transfer` and `protocol-7` repositories
+- `bin/configure-remote` - Automatic remote URL detection and repair (workspace-transfer)
+- `bin/push-to-github` - Wrapper with retry logic and exponential backoff (workspace-transfer)
+- Scripts in `protocol-7` remain in `bin/dev/` to separate development tools from production use
 
 **Features Implemented**:
 - Automatic repository detection from current URL
@@ -59,7 +59,7 @@ The fix elegantly avoids the "raw FD problem" where reading from a file descript
 
 **Real-World Testing**: Scripts were immediately useful during this session
 - Encountered `HTTP 403` error on push attempt
-- Used `bin/dev/push-to-github base`
+- Used `bin/push-to-github base`
 - Remote was automatically reconfigured
 - Push succeeded on first retry
 - This validates the automation's practical value
@@ -70,7 +70,8 @@ The fix elegantly avoids the "raw FD problem" where reading from a file descript
 
 ### REMOTE_URL_CONFIGURATION.md
 Completely updated with:
-- Script locations changed from `bin/` to `bin/dev/`
+- Script locations for workspace-transfer: `bin/configure-remote` and `bin/push-to-github`
+- Script locations for protocol-7: `bin/dev/configure-remote` and `bin/dev/push-to-github`
 - Usage examples for manual and integrated approaches
 - Troubleshooting section with error patterns and solutions
 - Quick reference table
@@ -128,11 +129,12 @@ Comprehensive update with:
 5. **Documentation**: Provided error recovery guidance for future use
 
 ### Documentation Philosophy
-- Keep documentation close to code (bin/dev/configure-remote has help text)
+- Keep documentation close to code (scripts have help text)
 - Cross-reference between documentation files
 - Include practical examples from real usage patterns
 - Document error patterns and recovery steps
-- Organize scripts in subdirectories to reduce clutter for end users
+- For workspace-transfer: scripts in bin/ since repo is development-only
+- For protocol-7: keep development scripts in bin/dev/ to separate from production use
 
 ---
 
@@ -166,15 +168,16 @@ Comprehensive update with:
 The remote URL automation makes this easier:
 ```bash
 # If git push fails with HTTP 403:
-bin/dev/push-to-github base
+bin/push-to-github base
 
 # Or manually:
-bin/dev/configure-remote
+bin/configure-remote
 git push origin base
 ```
 
 ### For Developers
-- Scripts are in `bin/dev/` to avoid cluttering the main `bin/` directory
+- workspace-transfer: Scripts in `bin/` since entire repo is development-focused
+- protocol-7: Scripts in `bin/dev/` to separate development tools from production
 - Documentation references are prominent in setup guide
 - Real error patterns documented for quick troubleshooting
 
@@ -200,7 +203,7 @@ git push origin base
 - [ ] Consider environment variable fallback if PAT not available
 
 ### General Improvements
-- [ ] Extract common patterns from bin/dev/ scripts into lib/
+- [ ] Extract common patterns from automation scripts into lib/
 - [ ] Create test suite for socket reading behavior
 - [ ] Add metrics collection for HTTPS performance
 - [ ] Create user-facing documentation for troubleshooting

@@ -167,13 +167,14 @@ Both will use your GITHUB_PAT automatically for operations (token is embedded in
 ⚠️ **Note**: Remote URLs sometimes reset to local proxy addresses. If you encounter this:
 
 ```bash
-# Navigate to the repository (workspace-transfer or protocol-7)
-cd workspace-transfer  # or cd ../protocol-7
-
-# Use the automatic reconfiguration script
-bin/dev/configure-remote
+# In workspace-transfer repository
+bin/configure-remote
 
 # Or push with automatic reconfiguration (recommended)
+bin/push-to-github base
+
+# In protocol-7 repository (if needed)
+bin/dev/configure-remote
 bin/dev/push-to-github base
 ```
 
@@ -308,7 +309,11 @@ git remote -v
 # If it's SSH, change to HTTPS:
 git remote set-url origin https://github.com/nailara-technologies/protocol-7.git
 
-# Or use the automatic reconfiguration script:
+# Or use the automatic reconfiguration script (workspace-transfer):
+bin/configure-remote
+bin/push-to-github base
+
+# Or in protocol-7:
 bin/dev/configure-remote
 bin/dev/push-to-github base
 ```

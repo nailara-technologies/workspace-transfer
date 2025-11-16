@@ -116,7 +116,7 @@ fi
 print_section "Step 3: Configuring workspace-transfer remote"
 cd "$SCRIPT_DIR"
 if [ -n "$GITHUB_PAT" ]; then
-    bin/dev/configure-remote
+    bin/configure-remote
 else
     print_warning "Skipping remote configuration (no GITHUB_PAT)"
 fi
@@ -262,7 +262,7 @@ echo "   cd ../protocol-7"
 echo "   cat STATUS.md"
 echo ""
 echo "5. For git operations with auto-remote configuration:"
-echo "   bin/dev/push-to-github base"
+echo "   bin/push-to-github base"
 echo ""
 
 # Show what can be started now

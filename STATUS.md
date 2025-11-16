@@ -55,9 +55,9 @@
   - Live tested: verified plaintext HTTP received from encrypted connections
   - Elegant 34-line fix with no changes to handler registration
 - **Git remote URL automation** (Nov 16, 2025) - Automated repair for persistent local_proxy resets
-  - Created `bin/dev/configure-remote` for automatic GitHub PAT reconfiguration
-  - Created `bin/dev/push-to-github` wrapper with exponential backoff retry logic
-  - Deployed to both workspace-transfer and protocol-7
+  - Created `bin/configure-remote` for automatic GitHub PAT reconfiguration
+  - Created `bin/push-to-github` wrapper with exponential backoff retry logic
+  - Deployed to workspace-transfer repository
   - Added documentation with error recovery guidance
 
 ---
@@ -136,8 +136,8 @@ The socket read layer (`base.s_read`) now automatically handles both TCP and SSL
 Remote URLs frequently reset to local proxy addresses, breaking GitHub access. Created automation scripts to detect and repair this issue automatically.
 
 **Implementation**:
-- `bin/dev/configure-remote` - Detects repository from URL, reconfigures to GitHub HTTPS with PAT
-- `bin/dev/push-to-github` - Wrapper around git push with auto-configuration and exponential backoff retry logic
+- `bin/configure-remote` - Detects repository from URL, reconfigures to GitHub HTTPS with PAT
+- `bin/push-to-github` - Wrapper around git push with auto-configuration and exponential backoff retry logic
 - Scripts deployed to both `workspace-transfer` and `protocol-7` repositories
 - Documentation: `docs/reference/REMOTE_URL_CONFIGURATION.md` with error recovery guidance
 - Integration: References added to `docs/onboarding/PROTOCOL7_SETUP.md`
@@ -152,16 +152,16 @@ Remote URLs frequently reset to local proxy addresses, breaking GitHub access. C
 **Commits**:
 - workspace-transfer base: `4255986` (documentation + script reorganization)
 - workspace-transfer base: `b054d88` (PROTOCOL7_SETUP.md integration references)
-- protocol-7 base: `13dc0e369` (script reorganization to bin/dev/)
+- protocol-7 base: `13dc0e369` (script organization in bin/dev/)
 
 **Usage**:
 ```bash
 # Option 1: Manual fix then push
-bin/dev/configure-remote
+bin/configure-remote
 git push origin base
 
 # Option 2: Integrated (recommended)
-bin/dev/push-to-github base
+bin/push-to-github base
 ```
 
 ### 3. Filesystem Integration 🗂️

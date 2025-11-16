@@ -19,7 +19,7 @@ git pull origin base
 git remote -v
 
 # If you see "local_proxy" in any URL, fix it immediately:
-bin/dev/configure-remote
+bin/configure-remote
 
 # 3. Check status
 git status
@@ -35,10 +35,10 @@ git status
 - Commits: `0e5970296`, `36995b73c`, `38fbe93e4` in protocol-7
 
 **Git Remote URL Automation** ✅ DEPLOYED
-- Scripts: `bin/dev/configure-remote` and `bin/dev/push-to-github`
+- Scripts: `bin/configure-remote` and `bin/push-to-github`
 - What: Automatically fixes local_proxy resets and retries with exponential backoff
-- Where: Both workspace-transfer and protocol-7 repositories
-- Usage: `bin/dev/push-to-github base` if push fails
+- Where: workspace-transfer repository
+- Usage: `bin/push-to-github base` if push fails
 
 **START-HERE Onboarding** ✅ DEPLOYED
 - Script: `./START-HERE` at repository root
@@ -85,15 +85,15 @@ Do push after completing work:
 ```bash
 git add .
 git commit -m "your message here"
-bin/dev/push-to-github base
+bin/push-to-github base
 ```
 
 ### Quick Reference
 
 **If git push fails:**
 ```bash
-bin/dev/configure-remote
-bin/dev/push-to-github base
+bin/configure-remote
+bin/push-to-github base
 ```
 
 **Check current priorities:**
