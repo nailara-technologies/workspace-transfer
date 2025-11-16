@@ -21,12 +21,12 @@ cd "$REPO_PATH"
 
 echo "Configuring git remote for: $REPO_PATH"
 echo "Current remotes:"
-git remote -v
+git remote -v | sed "s/${GITHUB_PAT}/***PAT***/g"
 
 # Get the current origin URL
 CURRENT_URL=$(git remote get-url origin)
 echo ""
-echo "Current origin URL: $CURRENT_URL"
+echo "Current origin URL: $(echo "$CURRENT_URL" | sed "s/${GITHUB_PAT}/***PAT***/g")"
 
 # Determine repo owner and name
 if [[ $CURRENT_URL =~ github.com/([^/]+)/([^/]+)(\.git)?$ ]]; then
