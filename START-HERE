@@ -166,75 +166,54 @@ else
     bin/dev/configure-remote
 fi
 
-# Step 6: Check dependencies
+# Step 6: Check dependencies using bin/deps
 print_section "Step 6: Checking dependencies"
 
 cd "$SCRIPT_DIR"
 
-# Check if Perl modules are available
-echo "Checking Perl dependencies..."
+echo "Checking dependencies using bin/deps system..."
 
-perl_modules=(
-    "IO::AIO"
-    "IO::Socket::SSL"
-    "JSON::XS"
-    "Fuse"
-    "DBD::SQLite"
-)
-
-missing_modules=()
-for module in "${perl_modules[@]}"; do
-    if ! perl -M"$module" -e '' 2>/dev/null; then
-        missing_modules+=("$module")
-    else
-        print_success "Found: $module"
-    fi
-done
-
-if [ ${#missing_modules[@]} -gt 0 ]; then
-    print_warning "Missing Perl modules: ${missing_modules[*]}"
-    echo ""
-
-    INSTALL_DEPS="n"
+# Check base profile first (minimal requirements)
+if bin/deps check base --no-cache; then
+    print_success "Base dependencies satisfied"
+else
+    print_warning "Some base dependencies missing"
 
     if [ "$AUTO_INSTALL" = true ]; then
-        # Auto-install mode: just install
-        INSTALL_DEPS="y"
+        print_section "Installing base dependencies"
+        bin/deps install base
     elif [ -t 0 ]; then
-        # Interactive: ask the user
-        read -p "Would you like to install them now? (y/n) " -n 1 -r
+        echo ""
+        read -p "Would you like to install missing base dependencies now? (y/n) " -n 1 -r
         echo
-        INSTALL_DEPS=$REPLY
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            bin/deps install base
+        else
+            print_warning "Skipping base dependency installation"
+            echo "You can install them later with:"
+            echo "  bin/deps install base"
+        fi
     else
-        # Non-interactive without --install flag: show instructions
         print_warning "Running in non-interactive mode. To auto-install dependencies, use:"
         echo "  $SCRIPT_DIR/START-HERE --install"
         echo ""
         echo "Or install manually:"
-        echo "  cpan ${missing_modules[*]}"
+        echo "  bin/deps install base"
     fi
+fi
 
-    if [[ $INSTALL_DEPS =~ ^[Yy]$ ]]; then
-        echo "Installing Perl modules: ${missing_modules[*]}"
-        cpan "${missing_modules[@]}" && {
-            print_success "Dependencies installed successfully"
-        } || {
-            print_warning "Some dependencies failed to install. You can retry with:"
-            echo "  cpan ${missing_modules[*]}"
-        }
-    else
-        if [ "$AUTO_INSTALL" != true ] && [ -t 0 ]; then
-            print_warning "Skipping dependency installation"
-        fi
-        echo "You can install them later with:"
-        echo "  cpan ${missing_modules[*]}"
-        echo ""
-        echo "Or use the dependency management system:"
-        echo "  bin/deps check protocol7-full"
-        echo "  bin/deps install protocol7-full"
-    fi
+# Offer to install protocol7_full if in auto-install mode
+if [ "$AUTO_INSTALL" = true ]; then
+    echo ""
+    print_section "Installing full Protocol-7 development environment"
+    bin/deps install protocol7_full
 else
-    print_success "All Perl dependencies installed!"
+    echo ""
+    echo "Optional: For full Protocol-7 development environment, install with:"
+    echo "  bin/deps install protocol7_full"
+    echo ""
+    echo "Or check available profiles:"
+    echo "  bin/deps list"
 fi
 
 # Step 7: Print summary and next steps
