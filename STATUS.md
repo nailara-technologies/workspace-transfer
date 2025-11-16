@@ -1,8 +1,8 @@
 # Workspace Status
 
-**Last Updated**: 2025-11-16 01:55 UTC
-**Branch**: claude/resume-workspace-session-01EE76DgSmXiPoFpUxvLsg9d
-**Status**: 🟡 HTTPS operational but infinite loop in handler | 🔴 BLOCKER: Handler registration missing | 🔧 Next: Register https protocol handlers
+**Last Updated**: 2025-11-16 04:50 UTC
+**Branch**: base (merged from claude/resume-workspace-session-01EE76DgSmXiPoFpUxvLsg9d)
+**Status**: 🟢 TLS/SSL fully operational | 🟡 HTTPS request handling blocked: Event loop handler routing issue identified | 🔧 Next: Fix event loop socket handler dispatch mechanism
 
 ---
 
@@ -55,29 +55,54 @@
 
 ## Current Session Status (2025-11-16)
 
-### 🔴 CRITICAL BLOCKER: HTTPSD Handler Registration
+### 🟢 TLS/SSL Infrastructure: FULLY OPERATIONAL ✅
 
-**Issue**: HTTPS requests cause infinite loop of undefined variable errors in handler lookup
+**Achievement**: TLS 1.2 handshake working perfectly with ECDHE-RSA-AES256-GCM-SHA384 cipher suite
+- SSL socket creation successful
+- Certificate loading and validation working
+- TLS negotiation verified via curl `-v` output
 
-**Root Cause**: Configuration defines `https.handler.get = httpsd.request_handler` but these handlers are NOT registered in the `$data{'io'}{'type'}` global data structure that `base.handler.connect` expects at runtime.
+### 🟡 CRITICAL BLOCKER: Event Loop Handler Routing
 
-**When Fixed**: Will enable full HTTPS/TLS support with template processing
+**Issue**: After SSL connection accepted and session created, HTTP request handler NOT invoked. Client session immediately shuts down.
 
-**See**: `SESSION_SUMMARY_2025-11-16_PART3_HTTPSD_DEBUG.md` for detailed technical analysis and solution
+**Root Cause**: Protocol-7's event loop dispatch mechanism does not invoke socket-type-specific handlers (`io.ip.ssl.input.read`) for SSL sockets. The handler system has two levels:
+1. **Socket-Type Handler** - Entry point when FD becomes readable (defined in `$data{'io'}{'type'}`)
+2. **Protocol Handler** - Processes protocol data (e.g., `httpsd.request_handler`)
 
-**Solution Ready**: Register 'https' protocol handlers in httpsd.init_code (10-15 min to implement)
+For SSL, Level 1 never calls Level 2.
+
+**Technical Details**: See `HTTPS_FIX_STATUS.md` for comprehensive diagnostic report
+
+**Files Created This Session**:
+- `io.ip.ssl.input.read` - Simplified SSL handler (not being invoked)
+- `io.ip.ssl.s_read` - SSL socket read with sysread() for TLS decryption
+- `io.ip.ssl.handler.read` - Complex handler variant
+- `io.ip.ssl.read_linewise` - Linewise HTTP request reading
+
+**Solution Path**: Need to understand how Protocol-7's event loop decides which handler to call, then ensure SSL socket's readable FD events trigger the correct handler chain.
 
 ---
 
 ## Current Development Priorities
 
-### 1. HTTPSD Handler Registration (BLOCKING) 🚨
-**Priority**: CRITICAL | **Status**: Solution identified, awaiting implementation
+### 1. Event Loop Handler Routing (BLOCKING) 🚨
+**Priority**: CRITICAL | **Status**: Root cause identified, solution strategy drafted
 
-Fix the HTTPS handler registration issue:
-1. Register protocol.https with proper handler structure
-2. Ensure `$data{'io'}{'type'}` includes https handlers
-3. Test HTTPS GET/POST requests work without timeout
+Investigate and fix event loop dispatch mechanism for SSL socket handlers:
+
+**Investigation Tasks**:
+1. Trace `base.handler.connect` to understand how HTTP socket handlers are registered
+2. Verify if TCP/HTTP socket handlers have special registration mechanism
+3. Determine if SSL sockets need special event notification (IO::Poll vs select vs other)
+4. Check if socket-type system is actually used for handler dispatch vs direct registration
+
+**Implementation Options** (to be evaluated):
+1. Copy TCP handler pattern - Replicate `base.handler.read` for SSL but with sysread()
+2. Direct handler registration - Register SSL handlers same way as TCP handlers
+3. Bypass event loop - Force handler invocation in `io.ip.ssl.input.connect`
+
+**See**: `HTTPS_FIX_STATUS.md` for next steps and investigation paths
 
 ### 2. Filesystem Integration 🗂️
 **Priority**: HIGH | **Status**: Not started
@@ -308,6 +333,9 @@ Work should embody Protocol-7 principles:
 
 ---
 
-**Updated by**: Protocol-7 initialization and HTTPS/TLS setup (2025-11-16)
+**Updated by**: Final HTTPS/TLS investigation and event loop diagnostic (2025-11-16, 04:50 UTC)
+**Session Branch**: claude/resume-workspace-session-01EE76DgSmXiPoFpUxvLsg9d (merged to base)
 **Previous versions**: See docs/archive/
-**Initialization Complete**: ✅ protocol-7 cloned, dependencies installed, GitHub HTTPS configured
+**Key Findings**: TLS/SSL fully operational; event loop handler routing identified as root blocker
+**Commits**: 7 diagnostic documents and analysis pushed to origin/base
+**Token Budget Remaining**: ~$1.00

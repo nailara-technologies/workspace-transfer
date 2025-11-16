@@ -1,8 +1,8 @@
-# Active Session Checkpoint - Protocol-7 Template Authentication
+# Active Session Checkpoint - Protocol-7 HTTPS/TLS Implementation
 
-**Generated**: 2025-11-14
-**Session ID**: 01BE71ncAMyR7NYKASUBH3Kh
-**Status**: ✅ ACTIVE - All systems operational
+**Generated**: 2025-11-16 (04:50 UTC)
+**Session ID**: claude/resume-workspace-session-01EE76DgSmXiPoFpUxvLsg9d
+**Status**: 🟢 TLS/SSL fully operational | 🟡 Request handler routing blocked | ✅ Systems stable
 
 ---
 
@@ -10,43 +10,66 @@
 
 ### 1. **First File to Read**
 ```
-/home/user/protocol-7/docs/SESSION_STATUS_2025-11-14_template-auth-completion.md
+/home/user/workspace-transfer/HTTPS_FIX_STATUS.md
 ```
-This contains everything about what was completed, current state, and testing checklist.
+Comprehensive diagnostic of TLS/SSL success and event loop handler routing blocker.
 
-### 2. **Source Bootstrap Script**
-```bash
-source ~/.session-bootstrap.sh
-verify_session_state        # Check if cube zenka is running
-test_authentication         # Test p7 whoami with all users
+Also see: `/home/user/workspace-transfer/STATUS.md` (master status file)
+
+### 2. **Current Technical State**
+```
+✅ TLS 1.2 handshakes working perfectly
+✅ SSL sockets created and listening on port 443
+✅ Certificates load, validate, and negotiate correctly
+❌ HTTP request handler not invoked for HTTPS (event loop routing issue)
 ```
 
-### 3. **Verify Cube Zenka**
+### 3. **Verify System State**
 ```bash
-# Check if socket exists
-ls -la /var/run/.7/UNIX/NIW7OAQ
+# Check if Protocol-7 is running
+ps aux | grep runsc | grep -v grep
+
+# Test TLS handshake (will timeout on request, but shows TLS works)
+timeout 3 curl -k -v https://localhost/ 2>&1 | grep "SSL connection"
+
+# Check httpsd logs
+cd /home/user/protocol-7 && p7 httpsd.show-buffer zenka 2>/dev/null | tail -30
+```
+
+### 4. **Protocol-7 System Check**
+```bash
+# Verify cube zenka is running
+lsof -i :443 2>/dev/null | grep LISTEN
 
 # If missing, restart:
 cd /home/user/protocol-7
-./bin/Protocol-7 cube -BK -v
+killall -9 runsc.* 2>/dev/null
+./bin/Protocol-7 v7 -B -v
 ```
 
 ---
 
 ## 📋 CRITICAL ENVIRONMENT SETUP
 
-### Environment Variables (in ~/.session-bootstrap.sh)
+### Key Paths
 ```bash
-PROTOCOL_7_ROOT="/home/user/protocol-7"
-WORKSPACE_TRANSFER_ROOT="/home/user/workspace-transfer"
-PROTOCOL_7_SOCKET_PATH="/var/run/.7/UNIX/NIW7OAQ"
-PROTOCOL_7_P7_CLIENT="/home/user/protocol-7/bin/p7"
-SESSION_ID="01BE71ncAMyR7NYKASUBH3Kh"
+PROTOCOL_7_ROOT="/home/user/protocol-7"           # Main Protocol-7 repo
+WORKSPACE_TRANSFER="/home/user/workspace-transfer" # Documentation & status
+PROTOCOL_7_SOCKET="/var/run/.7/UNIX/NIW7OAQ"     # Protocol-7 IPC socket
+GITHUB_PAT="<stored in environment>"              # GitHub auth token (from env var)
 ```
 
-### Set on Session Start
+### Git Configuration (HTTPS with PAT)
 ```bash
-export PROTOCOL_7_UNIX_PATH="/var/run/.7/UNIX/NIW7OAQ"
+cd /home/user/workspace-transfer
+git remote set-url origin "https://${GITHUB_PAT}@github.com/nailara-technologies/workspace-transfer.git"
+git remote -v  # Should show GitHub HTTPS URL
+```
+
+### Session Startup (Next Session)
+```bash
+export PROTOCOL_7_ROOT="/home/user/protocol-7"
+export GITHUB_PAT="<your-github-pat>"  # Set from environment or secure storage
 cd /home/user/protocol-7
 ```
 
