@@ -241,6 +241,12 @@ sub install_profile {
         print "✅ All dependencies already installed\n\n";
     }
 
+    # Run setup operations (copy files, create symlinks, execute commands)
+    copy_files($profile_name, $profile, $dry_run);
+    create_symlinks($profile_name, $profile, $dry_run);
+    setup_paths($profile_name, $profile, $dry_run);
+    execute_commands($profile_name, $profile, $dry_run);
+
     # Clear cache to force recheck
     clear_cache_for($profile_name);
 
@@ -358,11 +364,39 @@ FILES:
   .deps/profiles.yaml    Dependency definitions
   .deps/cache/           Verification cache (gitignored)
 
+PROFILE SECTIONS:
+  description  Short description of the profile
+  apt          APT packages to install
+  cpan         Perl CPAN modules to install
+  system       System commands to verify
+  copy         Files to copy (src, dest, sudo)
+  symlinks     Symlinks to create (target, link, sudo)
+  paths        Directories to add to PATH
+  exec         Commands to execute post-install (cmd, sudo)
+
+SETUP OPERATIONS:
+  All profiles support setup operations that run after dependency installation:
+  - Copy files (with automatic sudo when needed)
+  - Create symlinks (with automatic sudo when needed)
+  - Print PATH instructions
+  - Execute post-install commands (systemd reload, etc.)
+
+ROOT DETECTION:
+  Sudo is automatically skipped when running as root user.
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 HELP
 }
 
 # Helper functions
+
+sub is_root {
+    return $> == 0;
+}
+
+sub get_sudo {
+    return is_root() ? '' : 'sudo ';
+}
 
 sub load_profiles {
     my %profiles;
@@ -371,6 +405,7 @@ sub load_profiles {
 
     my $current_profile = undef;
     my $current_section = undef;
+    my $current_obj = undef;
 
     while (my $line = <$fh>) {
         chomp $line;
@@ -381,18 +416,47 @@ sub load_profiles {
             # New profile
             $current_profile = $1;
             $profiles{$current_profile} = {};
+            $current_obj = undef;
         } elsif ($current_profile && $line =~ /^    (\w+):\s*(.*)$/) {
             my ($key, $val) = ($1, $2);
 
             if ($key eq 'description') {
                 $val =~ s/^"(.*)"$/$1/;
                 $profiles{$current_profile}{description} = $val;
-            } elsif ($key eq 'includes' || $key eq 'apt' || $key eq 'cpan' || $key eq 'system') {
+            } elsif ($key =~ /^(includes|apt|cpan|system|copy|symlinks|paths|exec)$/) {
                 $current_section = $key;
                 $profiles{$current_profile}{$key} = [];
+                $current_obj = undef;
             }
-        } elsif ($current_profile && $current_section && $line =~ /^      - (.+)$/) {
-            push @{$profiles{$current_profile}{$current_section}}, $1;
+        } elsif ($current_profile && $current_section && $line =~ /^      - (.*)$/) {
+            # New list item
+            my $item = $1;
+
+            if ($current_section =~ /^(copy|symlinks|exec)$/) {
+                # These are complex objects, start a new hash
+                $current_obj = {};
+                push @{$profiles{$current_profile}{$current_section}}, $current_obj;
+
+                # Parse inline key:value if present (e.g., "- src: ...")
+                if ($item =~ /^(\w+):\s*(.*)$/) {
+                    my ($obj_key, $obj_val) = ($1, $2);
+                    $obj_val =~ s/^"(.*)"$/$1/;
+                    $current_obj->{$obj_key} = $obj_val;
+                }
+            } else {
+                # Simple list items (apt, cpan, system, paths, includes)
+                $item =~ s/^"(.*)"$/$1/;  # Remove quotes if present
+                push @{$profiles{$current_profile}{$current_section}}, $item;
+                $current_obj = undef;
+            }
+        } elsif ($current_profile && $current_section && $line =~ /^        (\w+):\s*(.*)$/) {
+            # Handle nested properties in complex objects
+            if ($current_obj && ref($current_obj) eq 'HASH') {
+                my ($obj_key, $obj_val) = ($1, $2);
+                $obj_val =~ s/^"(.*)"$/$1/;
+                $obj_val =~ s/^([a-z]+)$/$1/;  # Handle boolean-like values
+                $current_obj->{$obj_key} = $obj_val;
+            }
         }
     }
 
@@ -444,4 +508,130 @@ sub update_cache {
     open my $fh, '>', $cache_file or return;
     print $fh $ok ? 'OK' : 'MISSING';
     close $fh;
+}
+
+sub copy_files {
+    my ($profile_name, $profile, $dry_run) = @_;
+
+    return unless $profile->{copy};
+
+    print "📋 Copying system files...\n";
+
+    for my $copy_item (@{$profile->{copy}}) {
+        my $src = $copy_item->{src};
+        my $dest = $copy_item->{dest};
+        my $needs_sudo = $copy_item->{sudo};
+
+        # Resolve relative paths from workspace root
+        my $full_src = File::Spec->file_name_is_absolute($src) ? $src
+                     : File::Spec->catfile($WORKSPACE_ROOT, $src);
+
+        unless (-f $full_src) {
+            print "   ❌ Source not found: $full_src\n";
+            next;
+        }
+
+        my $sudo_prefix = ($needs_sudo && !is_root()) ? 'sudo ' : '';
+
+        if ($dry_run) {
+            print "   [DRY RUN] Would copy: $full_src -> $dest\n";
+        } else {
+            my $cmd = "${sudo_prefix}cp $full_src $dest";
+            print "   Copying: $full_src -> $dest\n";
+            my $result = system($cmd);
+            if ($result == 0) {
+                print "   ✅ Copied: $dest\n";
+            } else {
+                print "   ❌ Failed to copy: $dest\n";
+            }
+        }
+    }
+    print "\n";
+}
+
+sub create_symlinks {
+    my ($profile_name, $profile, $dry_run) = @_;
+
+    return unless $profile->{symlinks};
+
+    print "🔗 Creating symlinks...\n";
+
+    for my $link_item (@{$profile->{symlinks}}) {
+        my $target = $link_item->{target};
+        my $link = $link_item->{link};
+        my $needs_sudo = $link_item->{sudo};
+
+        # Resolve relative paths
+        my $full_target = File::Spec->file_name_is_absolute($target) ? $target
+                        : File::Spec->catfile($WORKSPACE_ROOT, $target);
+
+        my $sudo_prefix = ($needs_sudo && !is_root()) ? 'sudo ' : '';
+
+        if ($dry_run) {
+            print "   [DRY RUN] Would link: $link -> $full_target\n";
+        } else {
+            my $cmd = "${sudo_prefix}ln -f -s $full_target $link";
+            print "   Creating: $link -> $full_target\n";
+            my $result = system($cmd);
+            if ($result == 0) {
+                print "   ✅ Symlink created: $link\n";
+            } else {
+                print "   ❌ Failed to create symlink: $link\n";
+            }
+        }
+    }
+    print "\n";
+}
+
+sub setup_paths {
+    my ($profile_name, $profile, $dry_run) = @_;
+
+    return unless $profile->{paths};
+
+    print "🛣️  Adding to PATH...\n";
+
+    my @paths = @{$profile->{paths}};
+    for my $path (@paths) {
+        my $full_path = File::Spec->file_name_is_absolute($path) ? $path
+                      : File::Spec->catfile($WORKSPACE_ROOT, $path);
+
+        print "   Path: $full_path\n";
+    }
+
+    print "   💡 To add these permanently, add to your shell profile:\n";
+    for my $path (@paths) {
+        my $full_path = File::Spec->file_name_is_absolute($path) ? $path
+                      : File::Spec->catfile($WORKSPACE_ROOT, $path);
+        print "      export PATH=\"$full_path:\$PATH\"\n";
+    }
+    print "\n";
+}
+
+sub execute_commands {
+    my ($profile_name, $profile, $dry_run) = @_;
+
+    return unless $profile->{exec};
+
+    print "⚙️  Executing post-install commands...\n";
+
+    for my $exec_item (@{$profile->{exec}}) {
+        my $cmd = $exec_item->{cmd};
+        my $needs_sudo = $exec_item->{sudo};
+
+        my $sudo_prefix = ($needs_sudo && !is_root()) ? 'sudo ' : '';
+        my $full_cmd = $sudo_prefix . $cmd;
+
+        if ($dry_run) {
+            print "   [DRY RUN] Would run: $full_cmd\n";
+        } else {
+            print "   Running: $full_cmd\n";
+            my $result = system($full_cmd);
+            if ($result == 0) {
+                print "   ✅ Command executed\n";
+            } else {
+                print "   ⚠️  Command exit code: $result\n";
+            }
+        }
+    }
+    print "\n";
 }
