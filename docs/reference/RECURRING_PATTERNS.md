@@ -13,9 +13,27 @@ These patterns happen frequently across sessions. Documenting them here saves to
 
 ### Pushing to Base Branch
 
-**Pattern**: Push completed work directly to base branch
+**Pattern**: Push completed work directly to base branch with full write access
 
-**Manual process** (what you had to do):
+**Direct Approach** (recommended - as of 2025-11-16):
+```bash
+# Checkout and push directly to base
+git checkout base
+git push origin base
+
+# Or cherry-pick specific commits from feature branches:
+git checkout base
+git cherry-pick <commit-hash>
+git push origin base
+```
+
+**Automated approach** (still available):
+```bash
+# From your feature branch, use the helper script
+bin/push-to-base --cleanup-branch <feature-branch-name>
+```
+
+**Manual process** (legacy - for reference):
 ```bash
 # 1. Configure remote with PAT
 git remote set-url origin https://${GITHUB_PAT}@github.com/nailara-technologies/workspace-transfer.git
@@ -34,38 +52,41 @@ git branch -d <feature-branch>
 git push origin --delete <feature-branch>
 ```
 
-**Automated** (what you do now):
-```bash
-# From your feature branch
-bin/push-to-base --cleanup-branch <feature-branch-name>
-```
-
-**Why this matters**:
-- Saves ~200 tokens per session explaining git operations
-- Prevents authentication errors (PAT automatically configured)
-- Consistent workflow every time
-- One command instead of 6
+**Why this approach**:
+- **Full write access to base branch** - no need for feature branches
+- Cleaner git history with direct base commits
+- Faster workflow - eliminates merge/delete steps
+- PAT is already configured in the remote URL
 
 **💡 Pro Tip - Direct GitHub Operations**:
-When you need to connect to GitHub directly (gh CLI, API calls, or manual git operations), remember that **GITHUB_PAT is available** in the environment or can be read from `.credentials`. The PAT works for:
-- Pushing to base branch: `git remote set-url origin https://${GITHUB_PAT}@github.com/owner/repo.git`
+With reconfigured remotes and full base branch access, you can:
+- Push directly to base: `git checkout base && git push origin base`
+- Cherry-pick commits: `git cherry-pick <commit> && git push origin base`
+- Use GITHUB_PAT in environment: `https://${GITHUB_PAT}@github.com/...`
 - GitHub CLI: `gh auth login --with-token <<< "$GITHUB_PAT"`
 - API calls: `curl -H "Authorization: token $GITHUB_PAT"`
-- Any git operation requiring authentication
 
-No need to ask the user for credentials - use the PAT that's already configured!
+No feature branches required - GITHUB_PAT provides full write access to the default branch!
 
 ---
 
 ### Branch Naming Convention
 
-**Pattern**: Feature branches must start with `claude/` and end with session ID
+**Pattern**: No longer required for feature branches (direct base branch access available)
 
-**Why**: Server-side enforcement prevents 403 errors on push
+**Historical Context**: Feature branches previously required `claude/` prefix with session ID
+- **Old example**: `claude/init-workspace-transfer-011CUsZbZ39Enbpofu88zCwS`
+- **Previous reason**: Server-side enforcement prevented 403 errors
 
-**Automation**: `bootstrap.pl` creates correctly-named branches automatically
+**Current Approach** (as of 2025-11-16):
+- Work directly on `base` branch with full write access
+- Feature branches optional - use only for experimentation or branch protection
+- No naming convention required for direct base branch commits
 
-**Example**: `claude/init-workspace-transfer-011CUsZbZ39Enbpofu88zCwS`
+**💡 If you need feature branches**:
+- Still supported: `bin/push-to-base --cleanup-branch <name>`
+- Still available: automated naming via `bootstrap.pl`
+- But not required: GITHUB_PAT provides direct base write access
 
 ---
 
