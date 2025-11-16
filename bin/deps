@@ -220,12 +220,20 @@ sub install_profile {
     if (@cpan_modules) {
         print "📥 Installing CPAN modules: " . join(', ', @cpan_modules) . "\n";
 
+        # Prefer cpanm (from cpanminus package), fall back to cpan
+        my $cpan_cmd = `which cpanm 2>/dev/null` ? 'cpanm' : 'cpan';
+
         if ($dry_run) {
-            print "   [DRY RUN] Would run: cpan " . join(' ', @cpan_modules) . "\n\n";
+            print "   [DRY RUN] Would run: $cpan_cmd " . join(' ', @cpan_modules) . "\n\n";
         } else {
             for my $module (@cpan_modules) {
                 print "   Installing $module...\n";
-                my $result = system("cpan -T $module 2>&1 | grep -v 'Loading internal'");
+
+                my $cmd = ($cpan_cmd eq 'cpanm')
+                    ? "$cpan_cmd -n $module"
+                    : "cpan -T $module 2>&1 | grep -v 'Loading internal'";
+
+                my $result = system($cmd);
 
                 if ($result == 0) {
                     print "   ✅ $module installed\n";
@@ -383,6 +391,11 @@ SETUP OPERATIONS:
 
 ROOT DETECTION:
   Sudo is automatically skipped when running as root user.
+
+CPAN TOOL:
+  Prefers cpanm (from cpanminus package) for reliable module installation.
+  Falls back to cpan if cpanm is not available.
+  For best results, ensure cpanminus is installed.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 HELP
