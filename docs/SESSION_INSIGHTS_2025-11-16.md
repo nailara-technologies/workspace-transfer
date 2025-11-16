@@ -29,9 +29,10 @@ Both areas are now complete and operational.
 - Complete end-to-end flow verified: TLS → HTTP → handlers → response
 
 **Evidence**:
-- Certificate: TLSv1.2 with ECDHE-RSA-AES256-GCM-SHA384 cipher suite
+- Certificate: TLSv1.3/1.2 with modern Curve25519-based cipher suites (ECDHE-ECDSA-CHACHA20-POLY1305)
 - Live test command: `curl -k -s https://localhost/`
 - Result: httpsd successfully receives and parses plaintext HTTP from encrypted socket
+- Note: Cipher suite modernization (RSA → Curve25519) completed in parallel this session
 
 **Technical Insight**:
 The fix elegantly avoids the "raw FD problem" where reading from a file descriptor on an SSL socket returns encrypted data. The solution:
