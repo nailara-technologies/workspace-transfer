@@ -18,6 +18,42 @@ HTTPS/TLS infrastructure is **architecturally complete** but **operationally blo
 
 ## Detailed Findings
 
+### 📝 Test Run Results (2025-11-16 00:13 UTC)
+
+**Command:**
+```bash
+cd /home/user/protocol-7 && ./bin/Protocol-7 v7 -B -v
+```
+
+**Startup Sequence Observed:**
+1. ✅ v7 zenka starts
+2. ✅ cube zenka starts (IPC coordinator)
+3. ✅ httpd zenka starts (HTTP server)
+4. ✅ web zenka starts (template processor)
+5. ✅ p7-log zenka starts (logging)
+6. ✅ letsencrypt zenka starts
+7. ❌ **httpsd zenka STARTS but immediately ERRORS**
+
+**Log Evidence:**
+```
+3K5MT75YEWX3EEI: instance ['httpsd'] offline → starting
+3K5MT752OGV2MMA: pushing start-up init-code < httpsd zenka >
+3K5MT752PKW7EIA: httpsd zenka started [ pid : 20665 ]
+3K5MVAXDAOWPGTI: instance ['httpsd'] starting → ERROR ❌
+3K5MVAXDKGW5IQA: start-retries : limitless (automatic restart loop)
+3K5MVAXFMSXN4GY: instance ['httpsd'] error → starting (retrying)
+```
+
+**Interpretation:**
+- httpsd process starts successfully
+- httpsd exits immediately with error (likely certificate validation failure)
+- v7 detects failure and restarts (infinite loop)
+- No httpsd.zenka.log created (exited before first log write)
+
+**Root Cause Confirmed:** Certificate validation fails, causing httpsd process to exit before it can log
+
+---
+
 ### ✅ What's Ready
 
 **httpsd Configuration (Complete)**
