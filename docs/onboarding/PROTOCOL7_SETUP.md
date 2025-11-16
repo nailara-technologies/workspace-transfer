@@ -103,6 +103,17 @@ cat STATUS.md           # Should show current priorities
 bin/init                # Initialize workspace
 ```
 
+### Install Dependencies (First Time Only)
+```bash
+cd protocol-7
+
+# Install minimal dependencies required by Protocol-7
+bash bin/dependencies/install_minimal_dependencies.debian.sh
+
+# This installs Perl modules and system packages
+# Takes 2-5 minutes depending on internet connection
+```
+
 ### Test protocol-7
 ```bash
 cd protocol-7
@@ -115,26 +126,41 @@ cd protocol-7
 
 ## Git Credentials (HTTPS)
 
-Both repos use HTTPS with GitHub PAT (Personal Access Token).
+⚠️ **IMPORTANT**: Both repos require HTTPS authentication with GitHub Personal Access Token (PAT).
+
+### Why HTTPS with PAT?
+- **Direct access to GitHub.com**: These repositories are on github.com, not locally hosted
+- **Full feature access**: With GITHUB_PAT, you get full push/pull/fetch permissions
+- **Seamless cloning**: Larger codebases (protocol-7 has 5,000+ files) clone smoothly with PAT authentication
+- **No SSH key needed**: PAT-based HTTPS works in all environments
 
 ### Setup Once
 ```bash
-# Store your GitHub PAT in environment
+# Set GitHub PAT in environment (REQUIRED for cloning/pushing)
 export GITHUB_PAT="ghp_your_actual_token_here"
 
-# Or configure git credential helper
-git config --global credential.helper store
-# Then git will prompt once and remember
+# Verify it's set
+echo $GITHUB_PAT  # Should show your token (starts with ghp_)
 ```
 
-### For Each Repo
+**Creating a PAT if you don't have one:**
+1. Go to https://github.com/settings/tokens
+2. Click "Generate new token (classic)"
+3. Give it `repo` scope (full control of private/public repos)
+4. Copy the token and store it: `export GITHUB_PAT="ghp_..."`
+
+### Automatic Remote Configuration
+When you clone with `$GITHUB_PAT` in your environment, remotes are automatically set to HTTPS:
+
 ```bash
 cd workspace-transfer
-git remote -v  # Should show: https://github.com/nailara-technologies/workspace-transfer.git
+git remote -v  # Shows: https://github.com/nailara-technologies/workspace-transfer.git
 
 cd ../protocol-7
-git remote -v  # Should show: https://github.com/nailara-technologies/protocol-7.git
+git remote -v  # Shows: https://github.com/nailara-technologies/protocol-7.git
 ```
+
+Both will use your GITHUB_PAT automatically for operations (token is embedded in URL during this session).
 
 ---
 
