@@ -24,20 +24,20 @@ This happens automatically in the environment and requires manual reconfiguratio
 
 Two helper scripts automatically manage remote URL configuration:
 
-### 1. `bin/configure-remote` - Fix Remote URLs
+### 1. `bin/dev/configure-remote` - Fix Remote URLs
 
 **Purpose:** Detect and fix git remote URLs to use GitHub direct access with PAT
 
 **Usage:**
 ```bash
 # In workspace-transfer repo
-bin/configure-remote
+bin/dev/configure-remote
 
 # Or specify a repo path
-bin/configure-remote /path/to/repo
+bin/dev/configure-remote /path/to/repo
 
 # In protocol-7 repo
-bin/configure-remote
+bin/dev/configure-remote
 ```
 
 **What it does:**
@@ -49,6 +49,7 @@ bin/configure-remote
 
 **Example output:**
 ```
+$ bin/dev/configure-remote
 Configuring git remote for: /home/user/workspace-transfer
 Current origin URL: http://local_proxy@127.0.0.1:54501/git/nailara-technologies/workspace-transfer
 
@@ -64,20 +65,20 @@ origin	https://***PAT***@github.com/nailara-technologies/workspace-transfer.git 
 
 ---
 
-### 2. `bin/push-to-github` - Push with Automatic Configuration
+### 2. `bin/dev/push-to-github` - Push with Automatic Configuration
 
 **Purpose:** Ensure remote is configured, then push with retry logic
 
 **Usage:**
 ```bash
 # Push current branch to origin
-bin/push-to-github
+bin/dev/push-to-github
 
 # Push specific branch
-bin/push-to-github main
+bin/dev/push-to-github main
 
 # Push to specific remote
-bin/push-to-github base origin
+bin/dev/push-to-github base origin
 ```
 
 **What it does:**
@@ -88,7 +89,7 @@ bin/push-to-github base origin
 
 **Example:**
 ```bash
-$ bin/push-to-github base
+$ bin/dev/push-to-github base
 
 Pushing to GitHub: origin/base
 
@@ -120,8 +121,8 @@ fatal: the remote end hung up unexpectedly
 
 **Solution:**
 ```bash
-bin/configure-remote
-git push origin base  # or use: bin/push-to-github
+bin/dev/configure-remote
+git push origin base  # or use: bin/dev/push-to-github
 ```
 
 ---
@@ -131,7 +132,7 @@ git push origin base  # or use: bin/push-to-github
 ### Option 1: Manual Use
 ```bash
 # Before any push, ensure remote is configured
-bin/configure-remote
+bin/dev/configure-remote
 
 # Then push normally
 git push origin base
@@ -140,17 +141,17 @@ git push origin base
 ### Option 2: Integrated Push (Recommended)
 ```bash
 # This handles everything automatically
-bin/push-to-github base
+bin/dev/push-to-github base
 ```
 
 ### Option 3: In a Script
 ```bash
 #!/bin/bash
-bin/configure-remote
+bin/dev/configure-remote
 git push origin base || {
     echo "Push failed, reconfiguring..."
-    bin/configure-remote
-    bin/push-to-github base
+    bin/dev/configure-remote
+    bin/dev/push-to-github base
 }
 ```
 
@@ -197,15 +198,17 @@ export GITHUB_PAT="ghp_your_actual_token"
 ```bash
 # Make sure you're in the repo directory or specify path
 cd /path/to/repo
-bin/configure-remote
+bin/dev/configure-remote
 
 # Or
-bin/configure-remote /path/to/repo
+bin/dev/configure-remote /path/to/repo
 ```
 
 **Problem:** Script can't parse the repository name
 ```bash
-# This should rarely happen. If it does, manually set the remote:
+# This should rarely happen. If it does, run configure-remote with verbose output:
+bin/dev/configure-remote
+# Or manually set the remote:
 git remote set-url origin "https://${GITHUB_PAT}@github.com/nailara-technologies/workspace-transfer.git"
 ```
 
@@ -215,21 +218,21 @@ git remote set-url origin "https://${GITHUB_PAT}@github.com/nailara-technologies
 
 | Command | Purpose | When to Use |
 |---------|---------|------------|
-| `bin/configure-remote` | Fix remote URL | Before `git push` fails |
-| `bin/push-to-github` | Auto-configure + push | Recommended for all pushes |
-| `bin/push-to-github base` | Push specific branch | When on different branch |
+| `bin/dev/configure-remote` | Fix remote URL | Before `git push` fails |
+| `bin/dev/push-to-github` | Auto-configure + push | Recommended for all pushes |
+| `bin/dev/push-to-github base` | Push specific branch | When on different branch |
 
 ---
 
 ## Files
 
 - **workspace-transfer:**
-  - `bin/configure-remote` - Configure remote script
-  - `bin/push-to-github` - Push with auto-config script
+  - `bin/dev/configure-remote` - Configure remote script
+  - `bin/dev/push-to-github` - Push with auto-config script
 
 - **protocol-7:**
-  - `bin/configure-remote` - Configure remote script
-  - `bin/push-to-github` - Push with auto-config script
+  - `bin/dev/configure-remote` - Configure remote script
+  - `bin/dev/push-to-github` - Push with auto-config script
 
 ---
 
