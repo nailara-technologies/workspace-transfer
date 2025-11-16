@@ -8,17 +8,25 @@ Stateless workspace handoff for multi-AI development on the Protocol-7 harmonic 
 
 ## Quick Start
 
-### First Time? (AI or Human)
+### 🆕 First Time Cloning?
+
+See **[docs/onboarding/GETTING_STARTED.md](docs/onboarding/GETTING_STARTED.md)**
+- How to clone the repository
+- First-time setup (~5 minutes)
+- Environment configuration
+- Basic commands
+
+### Already in the Workspace?
 
 ```bash
-# Single command initialization
-bin/init
-
-# View current status and priorities
+# View current priorities
 cat STATUS.md
+
+# Quick 1-page summary
+cat .user/STATUS
 ```
 
-**That's it.** Everything else follows from there.
+Follow the priorities section in STATUS.md and you're set.
 
 ---
 
@@ -169,11 +177,12 @@ All workspace-transfer work is released to public knowledge.
 
 ## Questions?
 
-- **New session?** → Run `bin/init`, read `STATUS.md`
-- **Need help?** → Check `docs/onboarding/`
+- **Cloning for first time?** → See `docs/onboarding/GETTING_STARTED.md`
+- **Already cloned?** → Read `STATUS.md` for priorities
+- **Need help?** → Check `docs/onboarding/` or `docs/reference/`
 - **Protocol-7 specific?** → Check `docs/protocol7/`
 - **Still stuck?** → Open a GitHub issue
 
 ---
 
-**Token-optimized for AI collaboration** | **Updated: 2025-11-07**
+**Token-optimized for AI collaboration** | **Updated: 2025-11-16**
