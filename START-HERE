@@ -165,12 +165,27 @@ done
 if [ ${#missing_modules[@]} -gt 0 ]; then
     print_warning "Missing Perl modules: ${missing_modules[*]}"
     echo ""
-    echo "To install them:"
-    echo "  cpan ${missing_modules[*]}"
-    echo ""
-    echo "Or use the dependency management system:"
-    echo "  bin/deps check protocol7-full"
-    echo "  bin/deps install protocol7-full"
+    read -p "Would you like to install them now? (y/n) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo "Installing Perl modules: ${missing_modules[*]}"
+        cpan "${missing_modules[@]}" && {
+            print_success "Dependencies installed successfully"
+        } || {
+            print_warning "Some dependencies failed to install. You can retry with:"
+            echo "  cpan ${missing_modules[*]}"
+        }
+    else
+        print_warning "Skipping dependency installation"
+        echo "You can install them later with:"
+        echo "  cpan ${missing_modules[*]}"
+        echo ""
+        echo "Or use the dependency management system:"
+        echo "  bin/deps check protocol7-full"
+        echo "  bin/deps install protocol7-full"
+    fi
+else
+    print_success "All Perl dependencies installed!"
 fi
 
 # Step 7: Print summary and next steps
