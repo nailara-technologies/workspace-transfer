@@ -7,13 +7,17 @@
 ## Clone the Repository
 
 ```bash
-# Clone (uses HTTPS GitHub)
+# Clone workspace-transfer
 git clone https://github.com/nailara-technologies/workspace-transfer.git
 cd workspace-transfer
 
 # You're automatically on the 'base' branch (default for nailara-technologies repos)
 git branch --show-current  # Should show: base
 ```
+
+### Need to work on Protocol-7 framework itself?
+
+See **[PROTOCOL7_SETUP.md](PROTOCOL7_SETUP.md)** for cloning both workspace-transfer AND protocol-7, and understanding their relationship.
 
 ---
 

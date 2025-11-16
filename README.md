@@ -10,11 +10,11 @@ Stateless workspace handoff for multi-AI development on the Protocol-7 harmonic 
 
 ### 🆕 First Time Cloning?
 
-See **[docs/onboarding/GETTING_STARTED.md](docs/onboarding/GETTING_STARTED.md)**
-- How to clone the repository
-- First-time setup (~5 minutes)
-- Environment configuration
-- Basic commands
+**Just cloning workspace-transfer?**
+→ See **[docs/onboarding/GETTING_STARTED.md](docs/onboarding/GETTING_STARTED.md)**
+
+**Need to work on Protocol-7 framework itself?**
+→ See **[docs/onboarding/PROTOCOL7_SETUP.md](docs/onboarding/PROTOCOL7_SETUP.md)** (covers cloning both repos)
 
 ### Already in the Workspace?
 
@@ -178,6 +178,7 @@ All workspace-transfer work is released to public knowledge.
 ## Questions?
 
 - **Cloning for first time?** → See `docs/onboarding/GETTING_STARTED.md`
+- **Need to work on Protocol-7 itself?** → See `docs/onboarding/PROTOCOL7_SETUP.md`
 - **Already cloned?** → Read `STATUS.md` for priorities
 - **Need help?** → Check `docs/onboarding/` or `docs/reference/`
 - **Protocol-7 specific?** → Check `docs/protocol7/`
