@@ -162,6 +162,23 @@ git remote -v  # Shows: https://github.com/nailara-technologies/protocol-7.git
 
 Both will use your GITHUB_PAT automatically for operations (token is embedded in URL during this session).
 
+### Managing Remote URLs
+
+⚠️ **Note**: Remote URLs sometimes reset to local proxy addresses. If you encounter this:
+
+```bash
+# Navigate to the repository (workspace-transfer or protocol-7)
+cd workspace-transfer  # or cd ../protocol-7
+
+# Use the automatic reconfiguration script
+bin/dev/configure-remote
+
+# Or push with automatic reconfiguration (recommended)
+bin/dev/push-to-github base
+```
+
+See `workspace-transfer/docs/reference/REMOTE_URL_CONFIGURATION.md` for detailed instructions and troubleshooting.
+
 ---
 
 ## Understanding the Workflow
@@ -290,7 +307,13 @@ git remote -v
 
 # If it's SSH, change to HTTPS:
 git remote set-url origin https://github.com/nailara-technologies/protocol-7.git
+
+# Or use the automatic reconfiguration script:
+bin/dev/configure-remote
+bin/dev/push-to-github base
 ```
+
+See `docs/reference/REMOTE_URL_CONFIGURATION.md` for more details on handling persistent remote URL issues.
 
 ### "Not on base branch"
 ```bash
