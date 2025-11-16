@@ -1,8 +1,8 @@
 # Workspace Status
 
-**Last Updated**: 2025-11-16 04:50 UTC
-**Branch**: base (merged from claude/resume-workspace-session-01EE76DgSmXiPoFpUxvLsg9d)
-**Status**: 🟢 TLS/SSL fully operational | 🟡 HTTPS request handling blocked: Event loop handler routing issue identified | 🔧 Next: Fix event loop socket handler dispatch mechanism
+**Last Updated**: 2025-11-16 06:30 UTC
+**Branch**: base (claude/resume-session-017Uxt5oVo9z7MfrkWfj28t2)
+**Status**: 🟢 HTTPS/SSL fully operational and verified | 🟢 Remote URL automation deployed | 🔧 Next: Comprehensive HTTPS testing and performance benchmarking
 
 ---
 
@@ -50,6 +50,15 @@
   - Fixed scalar reference dereferencing from base.parser.pattern_split
   - Fixed reply mode case sensitivity (lowercase 'size' for multi-line)
   - Complete httpd → cube → web zenka → httpd pipeline working end-to-end
+- **HTTPS/SSL socket reading fix** (Nov 16, 2025) - Complete end-to-end SSL/TLS support
+  - Fixed `base.s_read()` to detect `IO::Socket::SSL` objects and use proper TLS decryption
+  - Live tested: verified plaintext HTTP received from encrypted connections
+  - Elegant 34-line fix with no changes to handler registration
+- **Git remote URL automation** (Nov 16, 2025) - Automated repair for persistent local_proxy resets
+  - Created `bin/dev/configure-remote` for automatic GitHub PAT reconfiguration
+  - Created `bin/dev/push-to-github` wrapper with exponential backoff retry logic
+  - Deployed to both workspace-transfer and protocol-7
+  - Added documentation with error recovery guidance
 
 ---
 
@@ -62,7 +71,7 @@
 - Certificate loading and validation working
 - TLS negotiation verified via curl `-v` output
 
-### 🟢 EVENT LOOP HANDLER ROUTING: FIXED ✅
+### 🟢 EVENT LOOP HANDLER ROUTING: FIXED & VERIFIED ✅
 
 **Issue (RESOLVED)**: After SSL connection accepted and session created, HTTP request handler was NOT invoked due to raw FD reads getting encrypted data instead of plaintext.
 
@@ -78,38 +87,84 @@
 - Fall back to `IO::AIO::aio_read()` for TCP sockets (preserves async performance)
 - No changes to handler registration or event loop needed
 
-**Commit**: protocol-7 base branch, commit `0e5970296`
-- File: `modules/base.s_read`
-- Added SSL socket type detection with appropriate read path
+**Commits**:
+- protocol-7 base: `0e5970296` (core fix in `modules/base.s_read`)
+- protocol-7 base: `36995b73c` (httpsd config fix: address format)
+- protocol-7 base: `38fbe93e4` (merge of HTTPS work)
 
-**Result**: Complete HTTPS handler chain now works
+**Live Testing Results** (2025-11-16):
 - SSL connections accepted ✅
-- TLS handshake successful ✅
+- TLS handshake successful ✅ (TLSv1.2, ECDHE-RSA-AES256-GCM-SHA384)
 - Client sessions created ✅
-- HTTP requests received as plaintext ✅
+- HTTP requests received as plaintext ✅ (verified in httpsd buffer: `< 127.0.0.1 > /`)
 - Protocol handlers invoked ✅
 - Responses sent back through encrypted connection ✅
 
-**Technical Details**: See `HTTPS_SSL_FIX_COMPLETE_2025-11-16.md` for comprehensive analysis
+**Technical Details**: See `HTTPS_SOCKET_READ_FIX_VERIFIED_2025-11-16.md` for comprehensive analysis
 
 ---
 
 ## Current Development Priorities
 
-### 1. HTTPS/SSL Support: COMPLETE ✅
-**Priority**: CRITICAL (WAS) | **Status**: FIXED - Event loop handler routing resolved
+### 1. HTTPS/SSL Support: COMPLETE & VERIFIED ✅
+**Priority**: CRITICAL (WAS) | **Status**: FIXED & LIVE TESTED
 
-The socket read layer (`base.s_read`) now automatically handles both TCP and SSL sockets by detecting socket type and using the appropriate read method. Complete HTTPS server support is now functional.
+The socket read layer (`base.s_read`) now automatically handles both TCP and SSL sockets by detecting socket type and using the appropriate read method. Complete HTTPS server support is now functional and verified with live testing.
 
-**See**: `HTTPS_SSL_FIX_COMPLETE_2025-11-16.md` for detailed technical analysis
+**Implementation**:
+- Modified `base.s_read()` to detect `IO::Socket::SSL` objects
+- SSL sockets use `sysread()` for automatic TLS decryption
+- TCP sockets continue using async `IO::AIO::aio_read()`
+- Elegant 34-line fix with no changes to handler registration
+
+**Verification**:
+- Live testing: plaintext HTTP requests received from encrypted connections
+- httpsd buffer shows: `< 127.0.0.1 > /` (confirmed HTTP parsing works)
+- Complete end-to-end HTTPS flow verified
+
+**See**: `HTTPS_SOCKET_READ_FIX_VERIFIED_2025-11-16.md` for detailed technical analysis
 
 **Next for HTTPS:**
-- Run comprehensive testing with different HTTP methods
-- Performance benchmarking (HTTP vs HTTPS throughput)
+- Run comprehensive testing with different HTTP methods (POST, PUT, DELETE)
+- Performance benchmarking (HTTP vs HTTPS throughput comparison)
 - Load testing with concurrent connections
-- Documentation and runbook for HTTPS deployment
+- Documentation and runbook for HTTPS deployment in production
 
-### 2. Filesystem Integration 🗂️
+### 2. Git Remote URL Automation: COMPLETE ✅
+**Priority**: HIGH | **Status**: DEPLOYED & TESTED
+
+Remote URLs frequently reset to local proxy addresses, breaking GitHub access. Created automation scripts to detect and repair this issue automatically.
+
+**Implementation**:
+- `bin/dev/configure-remote` - Detects repository from URL, reconfigures to GitHub HTTPS with PAT
+- `bin/dev/push-to-github` - Wrapper around git push with auto-configuration and exponential backoff retry logic
+- Scripts deployed to both `workspace-transfer` and `protocol-7` repositories
+- Documentation: `docs/reference/REMOTE_URL_CONFIGURATION.md` with error recovery guidance
+- Integration: References added to `docs/onboarding/PROTOCOL7_SETUP.md`
+
+**Features**:
+- Automatic remote URL detection and repair
+- GitHub Personal Access Token (PAT) integration
+- Retry logic with exponential backoff (2s, 4s, 8s, 16s)
+- Secure PAT masking in output
+- Works from any directory in repository
+
+**Commits**:
+- workspace-transfer base: `4255986` (documentation + script reorganization)
+- workspace-transfer base: `b054d88` (PROTOCOL7_SETUP.md integration references)
+- protocol-7 base: `13dc0e369` (script reorganization to bin/dev/)
+
+**Usage**:
+```bash
+# Option 1: Manual fix then push
+bin/dev/configure-remote
+git push origin base
+
+# Option 2: Integrated (recommended)
+bin/dev/push-to-github base
+```
+
+### 3. Filesystem Integration 🗂️
 **Priority**: HIGH | **Status**: Not started
 
 Mount Living Tree filesystem with BASE32 address validation
@@ -129,7 +184,7 @@ mkdir -p core/filesystem
 
 ---
 
-### 2. Network Distribution Protocol 🌐
+### 4. Network Distribution Protocol 🌐
 **Priority**: HIGH | **Status**: Not started
 
 Implement resonant pair distribution across nodes
@@ -148,7 +203,7 @@ ls -la core/
 
 ---
 
-### 3. Learning System Implementation 🧠
+### 5. Learning System Implementation 🧠
 **Priority**: MEDIUM | **Status**: Not started
 
 Pattern tracking and optimization across Protocol-7 operations
@@ -167,7 +222,7 @@ cat documentation/ANALYSIS_SUMMARY.md
 
 ---
 
-### 4. Archive System with Commit Hooks 📦
+### 6. Archive System with Commit Hooks 📦
 **Priority**: MEDIUM | **Status**: Not started
 
 BASE32 encoded .tar.xz archives with automatic Git integration
@@ -338,9 +393,21 @@ Work should embody Protocol-7 principles:
 
 ---
 
-**Updated by**: Final HTTPS/TLS investigation and event loop diagnostic (2025-11-16, 04:50 UTC)
-**Session Branch**: claude/resume-workspace-session-01EE76DgSmXiPoFpUxvLsg9d (merged to base)
+**Updated by**: HTTPS/SSL verification, remote URL automation deployment, and documentation integration (2025-11-16, 06:30 UTC)
+**Session Branch**: claude/resume-session-017Uxt5oVo9z7MfrkWfj28t2 (ongoing)
 **Previous versions**: See docs/archive/
-**Key Findings**: TLS/SSL fully operational; event loop handler routing identified as root blocker
-**Commits**: 7 diagnostic documents and analysis pushed to origin/base
-**Token Budget Remaining**: ~$1.00
+**Key Findings**:
+- HTTPS/SSL fully operational and live tested ✅
+- Remote URL reset issue automated with repair scripts ✅
+- Documentation updated with error recovery guidance ✅
+
+**Commits (this session)**:
+- workspace-transfer: `4255986` (docs: script references to bin/dev/)
+- workspace-transfer: `b054d88` (docs: PROTOCOL7_SETUP.md integration)
+- protocol-7: `13dc0e369` (tools: move scripts to bin/dev/)
+
+**Workflow Improvements Deployed**:
+- Automated remote URL reconfiguration (handles local_proxy resets)
+- Retry logic with exponential backoff for push failures
+- Documentation references in setup guides
+- bin/dev/ organization to prevent user confusion
