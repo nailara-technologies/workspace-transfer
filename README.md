@@ -42,6 +42,18 @@ cat .user/STATUS
 
 Follow the priorities section in STATUS.md and you're set.
 
+### 🔄 Resuming an Existing Session?
+
+**Using Claude Code to resume previous work:**
+→ See **[docs/RESUME_SESSION_PROMPT.md](docs/RESUME_SESSION_PROMPT.md)** (copy-paste into your new session)
+
+This prompt will:
+- Verify you're on the correct `base` branch
+- Fix any git remote issues (local_proxy resets)
+- Update from GitHub
+- Confirm everything is ready
+- Then ask what to work on
+
 ---
 
 ## What This Repository Does
