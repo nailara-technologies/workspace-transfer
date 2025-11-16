@@ -7,12 +7,33 @@ use warnings;
 use FindBin qw($RealBin);
 use File::Spec;
 use File::Path qw(make_path);
-use File::Basename;
+use Cwd qw(abs_path);
+use English;
 
-my $WORKSPACE_ROOT = dirname($RealBin);
-my $DEPS_DIR = File::Spec->catdir($WORKSPACE_ROOT, '.deps');
+$OUTPUT_AUTOFLUSH = 1;
+
+# Color palette inspired by Nailara branding
+my $reset             = "\e[0m";
+my $blacklight        = "\e[38;2;68;39;172m";    # Dark purple
+my $nailara_fg        = "\e[38;2;38;46;153m";    # Dark blue
+my $TRUE_color        = "\e[38;2;6;71;195m";     # Bright blue
+my $NEON_orange       = "\e[38;2;197;141;7m";    # Bright orange
+my $NEON_green_yellow = "\e[38;2;71;195;6m";     # Green-yellow
+
+##[ PROJECT PATH DISCOVERY ]######################################################
+
+# Helper functions for path operations (inspired by amos-chksum)
+sub catdir  { File::Spec->catdir(@_) }
+sub rel2abs { File::Spec->rel2abs(@_) }
+
+# Discover workspace-transfer root path using FindBin
+my $up_dir = File::Spec->updir;
+my $WORKSPACE_ROOT = abs_path(rel2abs(catdir($RealBin, $up_dir)));
+
+# Build all necessary paths
+my $DEPS_DIR = catdir($WORKSPACE_ROOT, '.deps');
 my $PROFILES_FILE = File::Spec->catfile($DEPS_DIR, 'profiles.yaml');
-my $CACHE_DIR = File::Spec->catdir($DEPS_DIR, 'cache');
+my $CACHE_DIR = catdir($DEPS_DIR, 'cache');
 
 # Ensure cache directory exists
 make_path($CACHE_DIR) unless -d $CACHE_DIR;
@@ -266,51 +287,51 @@ sub install_profile {
 sub list_profiles {
     my $profiles = load_profiles();
 
-    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    print "AVAILABLE DEPENDENCY PROFILES\n";
-    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+    print "${blacklight}:$reset\n";
+    print "${blacklight}::[$TRUE_color AVAILABLE DEPENDENCY PROFILES $blacklight]$reset\n";
+    print "${blacklight}:$reset\n\n";
 
     for my $name (sort keys %$profiles) {
         my $profile = $profiles->{$name};
-        print "📦 $name\n";
-        print "   $profile->{description}\n";
+        print "${blacklight}::$reset ${NEON_green_yellow}$name$reset\n";
+        print "${blacklight}::$reset   $profile->{description}\n";
 
         if ($profile->{includes}) {
-            print "   Includes: " . join(', ', @{$profile->{includes}}) . "\n";
+            print "${blacklight}::$reset   Includes: ${NEON_orange}" . join(', ', @{$profile->{includes}}) . "$reset\n";
         } else {
             my @types;
             push @types, scalar(@{$profile->{apt}}) . " apt" if $profile->{apt};
             push @types, scalar(@{$profile->{cpan}}) . " cpan" if $profile->{cpan};
             push @types, scalar(@{$profile->{system}}) . " system" if $profile->{system};
-            print "   Packages: " . join(', ', @types) . "\n" if @types;
+            print "${blacklight}::$reset   Packages: ${NEON_orange}" . join(', ', @types) . "$reset\n" if @types;
         }
         print "\n";
     }
 
-    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    print "Usage:\n";
-    print "  bin/deps check <profile>       # Check if dependencies are installed\n";
-    print "  bin/deps install <profile>     # Install missing dependencies\n";
-    print "  bin/deps status                # Check all profiles\n";
-    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print "${blacklight}:$reset\n";
+    print "${blacklight}::[$TRUE_color USAGE$blacklight]$reset\n";
+    print "${blacklight}::$reset   bin/deps check <profile>       # Check if dependencies are installed\n";
+    print "${blacklight}::$reset   bin/deps install <profile>     # Install missing dependencies\n";
+    print "${blacklight}::$reset   bin/deps status                # Check all profiles\n";
+    print "${blacklight}:$reset\n";
 }
 
 sub status_all {
     my $profiles = load_profiles();
 
-    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    print "DEPENDENCY STATUS\n";
-    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+    print "${blacklight}:$reset\n";
+    print "${blacklight}::[$TRUE_color DEPENDENCY STATUS $blacklight]$reset\n";
+    print "${blacklight}:$reset\n\n";
 
     for my $name (sort keys %$profiles) {
         next if $name eq 'development';  # Skip meta-profile
 
-        print "Checking $name...\n";
+        print "Checking ${NEON_green_yellow}$name$reset...\n";
         check_profile($name);
         print "\n";
     }
 
-    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    print "${blacklight}:$reset\n";
 }
 
 sub clear_cache {
@@ -327,78 +348,75 @@ sub clear_cache_for {
 }
 
 sub show_help {
-    print <<'HELP';
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DEPS - Dependency Management System
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    print "${blacklight}:$reset\n";
+    print "${blacklight}::[$TRUE_color DEPS - Dependency Management System$blacklight]$reset\n";
+    print "${blacklight}:$reset\n\n";
 
-USAGE:
-  bin/deps <command> [args]
+    print "${blacklight}::[$NEON_orange USAGE$blacklight]$reset\n";
+    print "${blacklight}::$reset   bin/deps <command> [args]\n\n";
 
-COMMANDS:
-  check <profile> [--no-cache]    Check if dependencies are installed
-  install <profile> [--dry-run]   Install missing dependencies
-  list                            List available profiles
-  status                          Check all profiles
-  clear-cache                     Clear verification cache
-  help                            Show this help
+    print "${blacklight}::[$NEON_orange COMMANDS$blacklight]$reset\n";
+    print "${blacklight}::$reset   check <profile> [--no-cache]    Check if dependencies are installed\n";
+    print "${blacklight}::$reset   install <profile> [--dry-run]   Install missing dependencies\n";
+    print "${blacklight}::$reset   list                            List available profiles\n";
+    print "${blacklight}::$reset   status                          Check all profiles\n";
+    print "${blacklight}::$reset   clear-cache                     Clear verification cache\n";
+    print "${blacklight}::$reset   help                            Show this help\n\n";
 
-PROFILES:
-  base           Basic workspace dependencies
-  filesystem     FUSE filesystem development
-  network        Network distribution protocol
-  learning       Learning system with SQLite
-  visualization  Token visualization and graphing
-  archive        Archive system with compression
-  development    Full development environment (all profiles)
+    print "${blacklight}::[$NEON_orange PROFILES$blacklight]$reset\n";
+    print "${blacklight}::$reset   base           Basic workspace dependencies\n";
+    print "${blacklight}::$reset   filesystem     FUSE filesystem development\n";
+    print "${blacklight}::$reset   network        Network distribution protocol\n";
+    print "${blacklight}::$reset   learning       Learning system with SQLite\n";
+    print "${blacklight}::$reset   visualization  Token visualization and graphing\n";
+    print "${blacklight}::$reset   archive        Archive system with compression\n";
+    print "${blacklight}::$reset   development    Full development environment (all profiles)\n\n";
 
-EXAMPLES:
-  bin/deps list                    # List all profiles
-  bin/deps check visualization     # Check visualization deps
-  bin/deps install filesystem      # Install filesystem deps
-  bin/deps install base --dry-run  # Preview installation
-  bin/deps status                  # Check all profiles
+    print "${blacklight}::[$NEON_orange EXAMPLES$blacklight]$reset\n";
+    print "${blacklight}::$reset   bin/deps list                    # List all profiles\n";
+    print "${blacklight}::$reset   bin/deps check visualization     # Check visualization deps\n";
+    print "${blacklight}::$reset   bin/deps install filesystem      # Install filesystem deps\n";
+    print "${blacklight}::$reset   bin/deps install base --dry-run  # Preview installation\n";
+    print "${blacklight}::$reset   bin/deps status                  # Check all profiles\n\n";
 
-CACHING:
-  Dependency checks are cached for performance. Use --no-cache to force recheck.
-  Clear cache with: bin/deps clear-cache
+    print "${blacklight}::[$NEON_orange CACHING$blacklight]$reset\n";
+    print "${blacklight}::$reset   Dependency checks are cached for performance. Use --no-cache to force recheck.\n";
+    print "${blacklight}::$reset   Clear cache with: bin/deps clear-cache\n\n";
 
-TOKEN SAVINGS:
-  - Per session with deps: ~500-2000 tokens (automated checking/installing)
-  - Applies to ~20-30% of sessions
-  - Compound over 100 sessions: ~20k-60k tokens
+    print "${blacklight}::[$NEON_orange FILES$blacklight]$reset\n";
+    print "${blacklight}::$reset   .deps/profiles.yaml    Dependency definitions\n";
+    print "${blacklight}::$reset   .deps/cache/           Verification cache (gitignored)\n\n";
 
-FILES:
-  .deps/profiles.yaml    Dependency definitions
-  .deps/cache/           Verification cache (gitignored)
+    print "${blacklight}::[$NEON_orange PROFILE SECTIONS$blacklight]$reset\n";
+    print "${blacklight}::$reset   description  Short description of the profile\n";
+    print "${blacklight}::$reset   apt          APT packages to install\n";
+    print "${blacklight}::$reset   cpan         Perl CPAN modules to install\n";
+    print "${blacklight}::$reset   system       System commands to verify\n";
+    print "${blacklight}::$reset   copy         Files to copy (src, dest, sudo)\n";
+    print "${blacklight}::$reset   symlinks     Symlinks to create (target, link, sudo)\n";
+    print "${blacklight}::$reset   paths        Directories to add to PATH\n";
+    print "${blacklight}::$reset   exec         Commands to execute post-install (cmd, sudo)\n\n";
 
-PROFILE SECTIONS:
-  description  Short description of the profile
-  apt          APT packages to install
-  cpan         Perl CPAN modules to install
-  system       System commands to verify
-  copy         Files to copy (src, dest, sudo)
-  symlinks     Symlinks to create (target, link, sudo)
-  paths        Directories to add to PATH
-  exec         Commands to execute post-install (cmd, sudo)
+    print "${blacklight}::[$NEON_orange SETUP OPERATIONS$blacklight]$reset\n";
+    print "${blacklight}::$reset   All profiles support setup operations that run after dependency installation:\n";
+    print "${blacklight}::$reset   - Copy files (with automatic sudo when needed)\n";
+    print "${blacklight}::$reset   - Create symlinks (with automatic sudo when needed)\n";
+    print "${blacklight}::$reset   - Print PATH instructions\n";
+    print "${blacklight}::$reset   - Execute post-install commands (systemd reload, etc.)\n\n";
 
-SETUP OPERATIONS:
-  All profiles support setup operations that run after dependency installation:
-  - Copy files (with automatic sudo when needed)
-  - Create symlinks (with automatic sudo when needed)
-  - Print PATH instructions
-  - Execute post-install commands (systemd reload, etc.)
+    print "${blacklight}::[$NEON_orange ROOT DETECTION$blacklight]$reset\n";
+    print "${blacklight}::$reset   Sudo is automatically skipped when running as root user.\n\n";
 
-ROOT DETECTION:
-  Sudo is automatically skipped when running as root user.
+    print "${blacklight}::[$NEON_orange CPAN TOOL$blacklight]$reset\n";
+    print "${blacklight}::$reset   Prefers cpanm (from cpanminus package) for reliable module installation.\n";
+    print "${blacklight}::$reset   Falls back to cpan if cpanm is not available.\n";
+    print "${blacklight}::$reset   For best results, ensure cpanminus is installed.\n\n";
 
-CPAN TOOL:
-  Prefers cpanm (from cpanminus package) for reliable module installation.
-  Falls back to cpan if cpanm is not available.
-  For best results, ensure cpanminus is installed.
+    print "${blacklight}::[$NEON_orange PATH DISCOVERY$blacklight]$reset\n";
+    print "${blacklight}::$reset   Uses FindBin-based absolute path discovery for reliable operation\n";
+    print "${blacklight}::$reset   from any working directory. Workspace root detected automatically.\n\n";
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-HELP
+    print "${blacklight}:$reset\n";
 }
 
 # Helper functions
