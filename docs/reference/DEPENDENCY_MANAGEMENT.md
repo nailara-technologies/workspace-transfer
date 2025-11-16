@@ -40,6 +40,7 @@ bin/deps <command> [args]
 | `learning` | Learning system with SQLite | Pattern tracking and metrics |
 | `visualization` | Token visualization and graphing | Generating token graphs and heatmaps |
 | `archive` | Archive system with compression | BASE32 archive implementation |
+| `protocol7_full` | Protocol-7 complete development environment | Full Protocol-7 setup with system files, symlinks, and PATH |
 | `development` | Full development environment | All of the above (meta-profile) |
 
 ---
@@ -201,10 +202,35 @@ profiles:
       - Module::Name
     system:           # System commands to verify
       - command_name
+    copy:             # Files to copy (with optional sudo)
+      - src: "relative/path/or/absolute"
+        dest: "/destination/path"
+        sudo: true
+    symlinks:         # Symlinks to create (with optional sudo)
+      - target: "relative/path/or/absolute"
+        link: "/usr/local/bin/shortcut"
+        sudo: true
+    paths:            # Directories to add to PATH
+      - "bin"
+      - "bin/dev"
+    exec:             # Post-install commands (with optional sudo)
+      - cmd: "systemctl daemon-reload"
+        sudo: true
     includes:         # Other profiles to include (meta-profiles)
       - profile1
       - profile2
 ```
+
+### Setup Operations
+
+The following operations run **after** dependency installation:
+
+1. **Copy**: Files are copied from source to destination (with automatic sudo if needed)
+2. **Symlinks**: Symlinks are created for command shortcuts
+3. **Paths**: Display instructions for adding directories to PATH
+4. **Exec**: Post-install commands are executed (e.g., systemctl daemon-reload)
+
+**Root Detection**: Sudo is automatically skipped when running as root user.
 
 ### Example: Visualization Profile
 
@@ -224,6 +250,50 @@ visualization:
     - convert  # ImageMagick
 ```
 
+### Example: Protocol-7 Full Profile
+
+```yaml
+protocol7_full:
+  description: "Protocol-7 complete development environment"
+  copy:
+    - src: "data/lib-path/systemd/system/Protocol-7.service"
+      dest: "/lib/systemd/system/Protocol-7.service"
+      sudo: true
+  symlinks:
+    - target: "bin/Protocol-7"
+      link: "/usr/local/bin/p7.v7"
+      sudo: true
+    - target: "bin/Protocol-7"
+      link: "/usr/local/bin/p7.cube"
+      sudo: true
+    - target: "bin/nshell"
+      link: "/usr/local/bin/nshell"
+      sudo: true
+  paths:
+    - "bin"
+    - "bin/dev"
+  exec:
+    - cmd: "systemctl daemon-reload"
+      sudo: true
+  apt:
+    - gcc
+    - git
+    - cpanminus
+    # ... additional packages ...
+  cpan:
+    - Crypt::Ed25519
+    - Digest::Skein
+    # ... additional modules ...
+```
+
+This profile demonstrates **complete setup automation**:
+- Installs 70+ APT packages
+- Installs 11+ CPAN modules
+- Copies systemd service file
+- Creates command shortcuts (p7.v7, p7.cube, nshell)
+- Configures PATH environment
+- Reloads systemd daemon
+
 ### Example: Development Meta-Profile
 
 ```yaml
@@ -236,6 +306,7 @@ development:
     - learning
     - visualization
     - archive
+    - protocol7_full
 ```
 
 ---
@@ -345,15 +416,27 @@ sudo apt-get install -y <packages>
 
 ### CPAN (Perl Modules)
 
-Perl modules installed via `cpan`:
+Perl modules installed via `cpanm` (preferred) or `cpan` (fallback):
+
+**cpanm** (from `cpanminus` package) - **Preferred**:
+- Non-interactive, reliable module installation
+- Uses `-n` flag to skip prompts
+- Modern standard for CPAN installation
+- **Only used if cpanminus is installed**
+
+**cpan** - **Fallback**:
+- Used when cpanm is not available
 - Uses `-T` flag (test-less install for speed)
 - Filters verbose output for cleaner display
-- May require additional system libraries
+- Legacy fallback for compatibility
 
 **Commands run**:
 ```bash
-cpan -T Module::Name
+cpanm -n Module::Name          # If cpanminus is installed
+cpan -T Module::Name            # If cpanminus is not available
 ```
+
+**Best Practice**: Install `cpanminus` package for reliable, non-interactive module installation.
 
 ### System Commands
 
@@ -473,6 +556,17 @@ bin/deps status
 
 ---
 
-**Version**: 1.0
-**Last Updated**: 2025-11-07
+**Version**: 2.0
+**Last Updated**: 2025-11-16
+**Features**:
+- ✅ Dependency checking with 24-hour caching
+- ✅ Multi-package manager support (APT, CPAN, system commands)
+- ✅ File copying with smart sudo detection
+- ✅ Symlink creation for command shortcuts
+- ✅ PATH configuration instructions
+- ✅ Post-install command execution
+- ✅ cpanm preference with cpan fallback
+- ✅ Dry-run mode for all operations
+- ✅ Protocol-7 complete setup profile
+
 **Estimated Token Savings**: ~20k-60k over 100 sessions (400-1900 tokens per session needing deps)
