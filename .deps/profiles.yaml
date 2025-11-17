@@ -69,19 +69,19 @@ profiles:
         dest: "/lib/systemd/system/Protocol-7.service"
         sudo: true
     symlinks:
-      - target: "bin/Protocol-7"
+      - target: "/home/user/protocol-7/bin/Protocol-7"
         link: "/usr/local/bin/p7.v7"
         sudo: true
-      - target: "bin/Protocol-7"
+      - target: "/home/user/protocol-7/bin/Protocol-7"
         link: "/usr/local/bin/p7.cube"
         sudo: true
-      - target: "bin/Protocol-7"
+      - target: "/home/user/protocol-7/bin/Protocol-7"
         link: "/usr/local/bin/p7.keys"
         sudo: true
-      - target: "bin/Protocol-7"
+      - target: "/home/user/protocol-7/bin/Protocol-7"
         link: "/usr/local/bin/p7.sourcecode"
         sudo: true
-      - target: "bin/nshell"
+      - target: "/home/user/protocol-7/bin/nshell"
         link: "/usr/local/bin/nshell"
         sudo: true
     paths:
