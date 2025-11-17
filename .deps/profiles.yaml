@@ -144,6 +144,7 @@ profiles:
       - libterm-readkey-perl
       - libterm-clui-perl
       - libtext-unidecode-perl
+      - libcompress-raw-lzma-perl
       - liblwp-protocol-https-perl
       - libclass-accessor-lite-perl
       - libio-socket-multicast-perl
