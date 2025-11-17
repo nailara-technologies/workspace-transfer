@@ -30,6 +30,10 @@ sub rel2abs { File::Spec->rel2abs(@_) }
 my $up_dir = File::Spec->updir;
 my $WORKSPACE_ROOT = abs_path(rel2abs(catdir($RealBin, $up_dir)));
 
+# Discover sibling directories (workspace-transfer and protocol-7 are siblings)
+my $PARENT_DIR = abs_path(catdir($WORKSPACE_ROOT, $up_dir));
+my $PROTOCOL7_ROOT = catdir($PARENT_DIR, 'protocol-7');
+
 # Build all necessary paths
 my $DEPS_DIR = catdir($WORKSPACE_ROOT, '.deps');
 my $PROFILES_FILE = File::Spec->catfile($DEPS_DIR, 'profiles.yaml');
@@ -594,9 +598,25 @@ sub create_symlinks {
         my $link = $link_item->{link};
         my $needs_sudo = $link_item->{sudo};
 
-        # Resolve relative paths
-        my $full_target = File::Spec->file_name_is_absolute($target) ? $target
-                        : File::Spec->catfile($WORKSPACE_ROOT, $target);
+        # Resolve symlink target path
+        # Try workspace-transfer first, then protocol-7 (sibling directory)
+        my $full_target;
+        if (File::Spec->file_name_is_absolute($target)) {
+            $full_target = $target;
+        } else {
+            my $ws_target = catdir($WORKSPACE_ROOT, $target);
+            my $p7_target = catdir($PROTOCOL7_ROOT, $target);
+
+            # Prefer workspace-transfer location, fall back to protocol-7
+            if (-e $ws_target) {
+                $full_target = $ws_target;
+            } elsif (-e $p7_target) {
+                $full_target = $p7_target;
+            } else {
+                # Default to workspace path (may be created later)
+                $full_target = $ws_target;
+            }
+        }
 
         my $sudo_prefix = ($needs_sudo && !is_root()) ? 'sudo ' : '';
 
