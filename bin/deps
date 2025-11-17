@@ -223,9 +223,11 @@ sub install_profile {
         print "📥 Installing APT packages: " . join(', ', @apt_packages) . "\n";
 
         if ($dry_run) {
-            print "   [DRY RUN] Would run: sudo apt-get install -y " . join(' ', @apt_packages) . "\n\n";
+            my $sudo = get_sudo();
+            print "   [DRY RUN] Would run: ${sudo}apt-get install -y " . join(' ', @apt_packages) . "\n\n";
         } else {
-            my $cmd = "sudo apt-get update -qq && sudo apt-get install -y " . join(' ', @apt_packages);
+            my $sudo = get_sudo();
+            my $cmd = "${sudo}apt-get update -qq && ${sudo}apt-get install -y " . join(' ', @apt_packages);
             print "   Running: $cmd\n";
 
             my $result = system($cmd);
