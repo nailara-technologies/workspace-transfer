@@ -94,8 +94,10 @@ profiles:
       - gcc
       - git
       - make
+      - perl
       - cpanminus
       - libc6-dev
+      # Core libraries and development tools
       - libmce-perl
       - liburi-perl
       - libclone-perl
@@ -111,23 +113,27 @@ profiles:
       - liburi-query-perl
       - libdigest-crc-perl
       - libdigest-elf-perl
+      - libdigest-perl
       - libfile-which-perl
       - libfile-finder-perl
+      - libfile-mimeinfo-perl
+      - libfile-rsync-perl
+      - libfile-extattr-perl
+      - libfile-slurper-perl
       - libperl-critic-perl
       - libsub-uplevel-perl
       - libbsd-resource-perl
       - libdigest-jhash-perl
-      - libfile-extattr-perl
-      - libfile-slurper-perl
       - libhash-flatten-perl
       - libhttp-message-perl
+      - libhttp-Headers-perl
+      - libhttp-Status-perl
       - libyaml-libyaml-perl
       - libyaml-tiny-perl
       - libconfig-simple-perl
       - libio-socket-ssl-perl
       - libtest-requires-perl
       - libppix-utilities-perl
-      - shared-mime-info
       - libtest-exception-perl
       - libtest-sharedfork-perl
       - libcurses-perl
@@ -136,34 +142,199 @@ profiles:
       - libterm-readline-gnu-perl
       - libterm-readpassword-perl
       - libterm-readkey-perl
+      - libterm-clui-perl
+      - libtext-unidecode-perl
       - liblwp-protocol-https-perl
       - libclass-accessor-lite-perl
       - libio-socket-multicast-perl
+      - libio-interface-perl
       - libinline-c-perl
       - libconst-fast-perl
       - liblwpx-paranoidagent-perl
+      - liblwpx-paranoidzenka-perl
       - liblinux-inotify2-perl
       - libio-compress-perl
+      - libio-compress-lzma-perl
       - libcapture-tiny-perl
       - libfreezethaw-perl
-      - libio-compress-lzma-perl
       - libgit-wrapper-perl
       - libcrypt-openssl-x509-perl
       - libcrypt-openssl-rsa-perl
       - libterm-size-perl
       - libunicode-string-perl
       - libunicode-maputf8-perl
+      - libipc-system-simple-perl
+      - libmodule-refresh-perl
+      - libmath-symbolic-perl
+      - libnet-libdnet-perl
+      - libnet-oping-perl
+      - libconvert-color-perl
+      # Graphics and GUI libraries
+      - libanyevent-perl
+      - libcairo-perl
+      - libcairo-gobject-perl
+      - libglib-perl
+      - libglib2.0-dev
+      - libgtk3-perl
+      - libgtk3-webkit2-perl
+      - gir1.2-webkit2-4.0
+      - libgraphics-magick-perl
+      - libimage-exif-perl
+      - libimager-perl
+      - libsdl-perl
+      - libpoppler-glib-dev
+      - libx11-keyboard-perl
+      - libx11-protocol-perl
+      - libx11-protocol-other-perl
+      - libxml-feed-perl
+      - libxml-rsslite-perl
+      # System utilities
+      - intel-gpu-tools
+      - pciutils
+      - notify-osd
+      - xserver-xorg-core
+      - shared-mime-info
+      # Special CPAN installation via cpanm
+      - cpanm:Glib::Event
     cpan:
+      # AMOS7 Framework modules
+      - AMOS7::13
+      - AMOS7::Assert::Truth
+      - AMOS7::CHKSUM
+      - AMOS7::CHKSUM::ELF
+      - AMOS7::FILE
+      - AMOS7::Protocol::P7
+      - AMOS7::TERM
+      - AMOS7::Twofish
+      # Core cryptography and security
       - Crypt::Ed25519
-      - Digest::Skein
-      - Digest::BMW
-      - Net::IP::Lite
-      - URI::QueryParam
-      - File::MimeInfo::Magic
-      - Sys::Statistics::Linux::CpuStats
-      - SigAction::SetCallBack
-      - Config::Hosts
       - Crypt::Curve25519
+      - Crypt::Digest::BLAKE2b_384
+      - Crypt::Digest::MD5
+      - Crypt::Digest::SHA1
+      - Crypt::Misc
+      - Crypt::OpenSSL::RSA
+      - Crypt::OpenSSL::X509
+      - Crypt::PRNG::Fortuna
+      - Crypt::Random
+      - CryptX
+      # Digest algorithms
+      - Digest
+      - Digest::BMW
+      - Digest::CRC
+      - Digest::Elf
+      - Digest::JHash
+      - Digest::SHA
+      - Digest::Skein
+      # File operations
+      - File::Basename
+      - File::Copy
+      - File::ExtAttr
+      - File::Find
+      - File::MimeInfo::Magic
+      - File::Path
+      - File::Rsync
+      - File::Spec
+      - File::Which
+      - Font::FreeType
+      - FreezeThaw
+      # Networking
+      - AnyEvent
+      - AnyEvent::Curl::Multi
+      - HTTP::Date
+      - HTTP::Headers
+      - HTTP::Message
+      - HTTP::Request
+      - HTTP::Response
+      - HTTP::Soup
+      - HTTP::Status
+      - IO::AIO
+      - IO::Interface
+      - IO::Interface::Simple
+      - IO::Scalar
+      - IO::Socket::Multicast
+      - IO::Socket::SSL
+      - IPC::System::Simple
+      - LWP::UserAgent
+      - LWPx::ParanoidAgent
+      - Net::DNS
+      - Net::IP::Lite
+      - Net::Ifconfig::Wrapper
+      - Net::Libdnet::Arp
+      - Net::Oping
+      # Event handling
+      - Event
+      # Graphics and visualization
+      - Cairo
+      - Cairo::GObject
+      - Curses::UI
+      - Glib
+      - Glib::Event
+      - Glib::Object::Introspection
+      - Graphics::Magick
+      - Gtk3
+      - Gtk3::WebKit2
+      - Image::EXIF
+      - Imager::Screenshot
+      - Inline::Lua
+      - Poppler
+      - SDL
+      - SDL::Color
+      - SDL::Event
+      - SDL::Events
+      - SDL::GFX::Rotozoom
+      - SDL::Image
+      - SDL::Mouse
+      - SDL::RWOps
+      - SDL::Rect
+      - SDL::Surface
+      - SDL::TTF
+      - SDL::Video
+      - X11::Keyboard
+      - X11::Protocol
+      - X11::Protocol::WM
+      - X11::Protocol::XSetRoot
+      - X11::WM
+      # Data processing
+      - JSON::PP
+      - JSON::XS
+      - MIME::Base64
+      - XML::Feed
+      - XML::RSS::TimingBot
+      - XML::RSSLite
+      - YAML::XS
+      # System and process utilities
+      - BSD::Resource
+      - Clone
+      - Capture::Tiny
+      - Cwd
+      - Date::Parse
+      - Device::Gembird
+      - Getopt::Long
+      - Git::Wrapper
+      - Hash::Flatten
+      - Hash::Merge::Simple
+      - Linux::Inotify2
+      - List::MoreUtils
+      - Math::Symbolic
+      - Math::Symbolic::Parser::Precompiled
+      - Mediainfo
+      - Module::Refresh
+      - POSIX
+      - Proc::ProcessTable
+      - SigAction::SetCallBack
+      - Sys::Filesystem
+      - Sys::Statistics::Linux
+      - Term::Clui
+      - Term::Clui::FileSelect
+      - Term::ReadLine
+      - Text::Unidecode
+      - Time::HiRes
+      - URI
+      - URI::QueryParam
+      - Const::Fast
+      - Config::Hosts
+      - Convert::Color
       - Poloniex::API
 
   development:
