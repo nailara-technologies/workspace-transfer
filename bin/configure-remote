@@ -53,6 +53,12 @@ else
     echo "✓ Remote already configured correctly"
 fi
 
+# Disable GPG signing (signing server can cause issues with commit automation)
+echo ""
+echo "Disabling GPG signing for commits..."
+git config commit.gpgsign false
+echo "✓ GPG signing disabled"
+
 echo ""
 echo "Updated remotes:"
 git remote -v | sed "s/${GITHUB_PAT}/***PAT***/g"
