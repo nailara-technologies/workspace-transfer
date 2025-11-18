@@ -140,6 +140,45 @@ sub check_profile {
         print "\n";
     }
 
+    # Check CPAN fallback modules (preferred via APT)
+    if ($profile->{cpan_fallback}) {
+        my %fallback_map = (
+            'AnyEvent' => 'libanyevent-perl',
+            'BSD::Resource' => 'libbsd-resource-perl',
+            'Cairo' => 'libcairo-perl',
+            'Cairo::GObject' => 'libcairo-gobject-perl',
+            'Capture::Tiny' => 'libcapture-tiny-perl',
+            'Clone' => 'libclone-perl',
+            'Const::Fast' => 'libconst-fast-perl',
+            'Convert::Color' => 'libconvert-color-perl',
+            'Crypt::Digest::MD5' => 'libcryptx-perl',
+            'Crypt::Digest::SHA1' => 'libcryptx-perl',
+            'Crypt::Misc' => 'libcryptx-perl',
+            'Crypt::PRNG::Fortuna' => 'libcryptx-perl',
+            'CryptX' => 'libcryptx-perl',
+            'Digest::CRC' => 'libdigest-crc-perl',
+            'Digest::Elf' => 'libdigest-elf-perl',
+        );
+        print "Checking CPAN fallback modules (via APT or CPAN)...\n";
+        for my $module (@{$profile->{cpan_fallback}}) {
+            $total++;
+            my $apt_pkg = $fallback_map{$module};
+            my $via_apt = $apt_pkg && check_apt($apt_pkg);
+
+            if (check_cpan($module)) {
+                if ($via_apt) {
+                    print "  ✅ $module (via APT: $apt_pkg)\n";
+                } else {
+                    print "  ✅ $module (via CPAN)\n";
+                }
+            } else {
+                print "  ❌ $module (missing)\n";
+                push @missing, "cpan_fallback:$module";
+            }
+        }
+        print "\n";
+    }
+
     # Check system commands
     if ($profile->{system}) {
         print "Checking system commands...\n";
@@ -216,6 +255,45 @@ sub install_profile {
 
     if ($profile->{cpan}) {
         for my $module (@{$profile->{cpan}}) {
+            unless (check_cpan($module)) {
+                push @cpan_modules, $module;
+            }
+        }
+    }
+
+    # Handle cpan_fallback - only install if APT equivalent isn't available
+    if ($profile->{cpan_fallback}) {
+        # Map fallback modules to APT packages
+        my %fallback_map = (
+            'AnyEvent' => 'libanyevent-perl',
+            'BSD::Resource' => 'libbsd-resource-perl',
+            'Cairo' => 'libcairo-perl',
+            'Cairo::GObject' => 'libcairo-gobject-perl',
+            'Capture::Tiny' => 'libcapture-tiny-perl',
+            'Clone' => 'libclone-perl',
+            'Const::Fast' => 'libconst-fast-perl',
+            'Convert::Color' => 'libconvert-color-perl',
+            'Crypt::Digest::MD5' => 'libcryptx-perl',
+            'Crypt::Digest::SHA1' => 'libcryptx-perl',
+            'Crypt::Misc' => 'libcryptx-perl',
+            'Crypt::PRNG::Fortuna' => 'libcryptx-perl',
+            'CryptX' => 'libcryptx-perl',
+            'Digest::CRC' => 'libdigest-crc-perl',
+            'Digest::Elf' => 'libdigest-elf-perl',
+        );
+
+        for my $module (@{$profile->{cpan_fallback}}) {
+            my $apt_pkg = $fallback_map{$module};
+
+            if ($apt_pkg) {
+                # Check if APT package is installed and module is loadable
+                if (check_apt($apt_pkg) && check_cpan($module)) {
+                    # APT package provides this, no need for CPAN
+                    next;
+                }
+            }
+
+            # Either no APT package or module not available from APT, try CPAN
             unless (check_cpan($module)) {
                 push @cpan_modules, $module;
             }
