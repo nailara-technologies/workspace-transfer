@@ -538,7 +538,7 @@ sub load_profiles {
             if ($key eq 'description') {
                 $val =~ s/^"(.*)"$/$1/;
                 $profiles{$current_profile}{description} = $val;
-            } elsif ($key =~ /^(includes|apt|cpan|system|copy|symlinks|paths|exec)$/) {
+            } elsif ($key =~ /^(includes|apt|cpan|cpan_fallback|system|copy|symlinks|paths|exec)$/) {
                 $current_section = $key;
                 $profiles{$current_profile}{$key} = [];
                 $current_obj = undef;
@@ -559,7 +559,7 @@ sub load_profiles {
                     $current_obj->{$obj_key} = $obj_val;
                 }
             } else {
-                # Simple list items (apt, cpan, system, paths, includes)
+                # Simple list items (apt, cpan, cpan_fallback, system, paths, includes)
                 $item =~ s/^"(.*)"$/$1/;  # Remove quotes if present
                 push @{$profiles{$current_profile}{$current_section}}, $item;
                 $current_obj = undef;
