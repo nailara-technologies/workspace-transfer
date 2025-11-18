@@ -295,6 +295,23 @@ profiles:
       - XML::RSS::TimingBot
       - XML::RSSLite
       - YAML::XS
+    cpan_fallback:
+      # These modules have Debian packages available; CPAN is fallback only
+      - AnyEvent
+      - BSD::Resource
+      - Cairo
+      - Cairo::GObject
+      - Capture::Tiny
+      - Clone
+      - Const::Fast
+      - Convert::Color
+      - Crypt::Digest::MD5
+      - Crypt::Digest::SHA1
+      - Crypt::Misc
+      - Crypt::PRNG::Fortuna
+      - CryptX
+      - Digest::CRC
+      - Digest::Elf
 
   development:
     description: "Full development environment (all profiles)"
