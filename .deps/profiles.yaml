@@ -193,7 +193,6 @@ profiles:
       - Crypt::OpenSSL::X509
       - Crypt::PRNG::Fortuna
       - Crypt::Random
-      - CryptX
       - Curses::UI
       - Cwd
       - Date::Parse
