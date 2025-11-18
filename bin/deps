@@ -306,18 +306,43 @@ sub install_profile {
 
         if ($dry_run) {
             my $sudo = get_sudo();
-            print "   [DRY RUN] Would run: ${sudo}apt-get install -y " . join(' ', @apt_packages) . "\n\n";
+            for my $pkg (@apt_packages) {
+                print "   [DRY RUN] Would run: ${sudo}apt-get install -y $pkg\n";
+            }
+            print "\n";
         } else {
             my $sudo = get_sudo();
-            my $cmd = "${sudo}apt-get update -qq && ${sudo}apt-get install -y " . join(' ', @apt_packages);
-            print "   Running: $cmd\n";
 
-            my $result = system($cmd);
-            if ($result == 0) {
-                print "   ✅ APT packages installed\n\n";
-            } else {
-                print "   ❌ APT installation failed (exit code: $result)\n\n";
+            # Set environment variables to suppress prompts during APT operations
+            my $apt_env = "DEBIAN_FRONTEND=noninteractive APT_LISTCHANGES_FRONTEND=none " .
+                         "UCF_FORCE_CONFMISS=true UCF_FORCE_CONFOLD=true PAGER=/bin/true";
+
+            # First, run apt-get update once
+            system("${apt_env} ${sudo}apt-get update -qq");
+
+            # Install each package individually to prevent one failure from blocking others
+            my $installed = 0;
+            my $failed = 0;
+
+            for my $pkg (@apt_packages) {
+                # Use dpkg options to force-confold and other non-interactive flags
+                my $cmd = "${apt_env} ${sudo}apt-get install -y " .
+                         "-o Dpkg::Options::=\"--force-confold\" " .
+                         "-o Dpkg::Options::=\"--force-confdef\" " .
+                         "-o Dpkg::Options::=\"--force-confmiss\" " .
+                         "-o Dpkg::Options::=\"--force-overwrite\" $pkg";
+                my $result = system("$cmd 2>/dev/null >/dev/null");
+
+                if ($result == 0) {
+                    print "   ✅ $pkg installed\n";
+                    $installed++;
+                } else {
+                    print "   ❌ $pkg not found or installation failed\n";
+                    $failed++;
+                }
             }
+
+            print "\n   Summary: $installed installed, $failed unavailable\n\n";
         }
     }
 

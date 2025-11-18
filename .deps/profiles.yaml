@@ -107,7 +107,6 @@ profiles:
       - libdigest-crc-perl
       - libdigest-elf-perl
       - libdigest-jhash-perl
-      - libdigest-perl
       - libevent-perl
       - libfile-extattr-perl
       - libfile-finder-perl
@@ -119,6 +118,9 @@ profiles:
       - libglib-perl
       - libglib2.0-dev
       - libgraphics-magick-perl
+      - libcurl4-openssl-dev
+      - libsoup2.4-dev
+      - liblua5.4-dev
       - libgtk3-perl
       - libgtk3-webkit2-perl
       - libhash-flatten-perl
@@ -164,14 +166,6 @@ profiles:
       - shared-mime-info
       - xserver-xorg-core
     cpan:
-      - AMOS7::13
-      - AMOS7::Assert::Truth
-      - AMOS7::CHKSUM
-      - AMOS7::CHKSUM::ELF
-      - AMOS7::FILE
-      - AMOS7::Protocol::P7
-      - AMOS7::TERM
-      - AMOS7::Twofish
       - AnyEvent
       - AnyEvent::Curl::Multi
       - BSD::Resource
@@ -289,9 +283,7 @@ profiles:
       - X11::Protocol
       - X11::Protocol::WM
       - X11::Protocol::XSetRoot
-      - X11::WM
       - XML::Feed
-      - XML::RSS::TimingBot
       - XML::RSSLite
       - YAML::XS
     cpan_fallback:
