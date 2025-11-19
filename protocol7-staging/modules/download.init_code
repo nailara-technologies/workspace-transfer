@@ -1,0 +1,94 @@
+## [:< ##
+
+# name = download.init_code
+# todo = clean empty sub dirs
+
+<[base.perlmod.load]>->( 'File::Path', qw| make_path | );
+
+package Download::UserAgent;
+
+use English;
+
+<[base.perlmod.runtime_use]>->('IO::Scalar');
+<[base.perlmod.autoload]>->('Config::Hosts');
+<[base.perlmod.autoload]>->('LWPx::ParanoidAgent');
+
+use parent qw| LWPx::ParanoidAgent |;
+
+our $etc_hosts = Config::Hosts->new();
+
+sub read_hosts {
+    my ( $self, $hosts_file ) = @ARG;
+    $hosts_file //= qw| /etc/hosts |;
+    <[base.logs]>->( 1, "reading '%s' file..", $hosts_file );
+
+    my $stderr_fhcopy = *STDERR;
+    my $stderr_buffer = '';
+    tie *STDERR, IO::Scalar->new(\$stderr_buffer);
+    eval { $etc_hosts->read_hosts($hosts_file) };
+    untie *STDERR;
+    *STDERR = $stderr_fhcopy;
+    if ($EVAL_ERROR) {
+        ( my $reason_str = $EVAL_ERROR ) =~ s/\n/ /g;
+        $reason_str =~ s|( Bailing out)?[ \.]+$||;
+        <[base.log]>->( 0, "<<!>> $hosts_file: $reason_str" );
+        $etc_hosts = undef;
+    }
+    map { <[base.log]>->( 0, "[ $hosts_file ] $ARG" ) } split m|\n|,
+        $stderr_buffer;
+}
+
+sub _resolve {
+    my ( $self, $host, $request, $timeout, $depth ) = @ARG;
+
+    <[base.logs]>->( 2, "resolving host '%s'..,", $host );
+
+    ## /etc/hosts ##
+    if ( defined $etc_hosts ) {
+        my $local_result;
+        $local_result = $etc_hosts->query_host($host);
+        if ( defined $local_result and defined $local_result->{'ip'} ) {
+            my $ip_addr = $local_result->{'ip'};
+            <[base.logs]>->( 2, ": found local entry '%s'", $ip_addr );
+            return $ip_addr;
+        }
+    }
+
+    ## DNS Resolver ##
+    return $self->SUPER::_resolve( $host, $request, $timeout, $depth );
+}
+
+package main;
+
+my $download_path = <download.cfg.download_path>;
+
+<download.cfg.http.query_etc_hosts> //= 1;
+<download.cfg.http.request_timeout> //= 10;
+<download.cfg.http.user_agent>      //= '';
+
+<download.obj.ua> = Download::UserAgent->new();
+
+<download.obj.ua>->read_hosts() if <download.cfg.http.query_etc_hosts>;
+
+<download.obj.ua>->whitelisted_hosts( sub { return 1 } );
+<download.obj.ua>->agent(<download.cfg.http.user_agent>);
+<download.obj.ua>->protocols_allowed( [qw|  ftp  http  https  |] );
+<download.obj.ua>->timeout(<download.cfg.http.request_timeout>);
+
+if ( !-d $download_path ) {
+    my ( undef, undef, $uid, $gid ) = getpwnam(<system.amos-zenka-user>)
+        or die "user '" . <system.amos-zenka-user> . "' not in passwd file";
+    <[base.logs]>->( "creating download directory '%s'.,", $download_path );
+    make_path( $download_path,
+        { 'mode' => 0750, 'uid' => $uid, 'group' => $gid } )
+        or warn
+        "cannot create download directory '$download_path' [ \l$OS_ERROR ]";
+}
+
+0;
+
+#,,..,.,.,,.,,,,.,,,,,.,.,...,.,.,..,,..,,,..,..,,...,...,.,.,.,,,..,,.,,,.,,,
+#4DBJVHABQPTSTLKQLE5LCJ2OUOVANGBUWPBDJRJCO2WUNHZ3JWSRUWZGW6XXMMDVPNDYXRI6OY2GE
+#\\\|VB4SEUQEDZLA2K6MWPDVCTN4DHM3WV6XWDLTTNJ2YPIZEDNA4FR \ / AMOS7 \ YOURUM ::
+#\[7]3FBXQWORXEAW3SRKHLWR5FEL6WOEY7AWW3EUTLRH4MZB5L6GIKAQ 7  DATA SIGNATURE ::
+#:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
