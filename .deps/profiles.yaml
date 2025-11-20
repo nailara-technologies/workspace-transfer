@@ -62,6 +62,57 @@ profiles:
       - tar
       - gzip
 
+  x11-desktop:
+    description: "X11 Desktop environment and GUI frameworks"
+    apt:
+      - libcairo-gobject-perl
+      - libcairo-perl
+      - libglib-perl
+      - libglib2.0-dev
+      - libgraphics-magick-perl
+      - libgtk3-perl
+      - libgtk3-webkit2-perl
+      - libx11-keyboard-perl
+      - libx11-protocol-other-perl
+      - libx11-protocol-perl
+      - libxml-feed-perl
+      - libxml-rsslite-perl
+      - notify-osd
+      - xserver-xorg-core
+      - gnuplot
+      - imagemagick
+      - libgd-dev
+    cpan:
+      - Cairo
+      - Cairo::GObject
+      - Convert::Color
+      - Font::FreeType
+      - Glib
+      - Glib::Object::Introspection
+      - Graphics::Magick
+      - Gtk3
+      - Gtk3::WebKit2
+      - Inline::Lua
+      - SDL
+      - SDL::Color
+      - SDL::Event
+      - SDL::Events
+      - SDL::GFX::Rotozoom
+      - SDL::Image
+      - SDL::Mouse
+      - SDL::RWOps
+      - SDL::Rect
+      - SDL::Surface
+      - SDL::TTF
+      - SDL::Video
+      - X11::Keyboard
+      - X11::Protocol
+      - X11::Protocol::WM
+      - X11::Protocol::XSetRoot
+      - GD::Graph
+      - GD::SVG
+      - Chart::Gnuplot
+
   protocol7_full:
     description: "Protocol-7 complete development environment"
     copy:
