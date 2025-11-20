@@ -1,0 +1,275 @@
+PROTOCOL-7 WEB MODULES - QUICK REFERENCE
+==========================================
+
+MODULES ANALYZED: 16 core modules + 2 plugin modules
+TOTAL CODE: ~5,800 lines across all web.* and plugin.web.* files
+
+═══════════════════════════════════════════════════════════════════════════════
+
+TIER 1: CORE FUNCTIONALITY (Foundation)
+────────────────────────────────────────
+
+▶ web.init_code
+  • Initializes web content processing engine
+  • Establishes configuration: /data/web (content), /var/httpd/skins (skins)
+  • Defines template patterns: <[command:args]> and <{variables}>
+  • Sets limits: max 8 recursion depth, 15s timeout, 5MB max template
+  • Initializes performance metrics and template caching
+
+═══════════════════════════════════════════════════════════════════════════════
+
+TIER 2: TEMPLATE PROCESSING (Parsing & Execution)
+───────────────────────────────────────────────────
+
+▶ web.process_template_recursive
+  • 6-step recursive template processor
+  • Meta variable substitution: <{varname}> → values
+  • Command extraction: <[module:args]> → execution queue
+  • Nested command support: <[outer:<[inner]>]>
+  • Depth limiting: max 8 levels prevents infinite loops
+  • Command placeholder system for out-of-order processing
+  • Handles array refs from pattern_split
+
+▶ web.execute_template_command
+  • Executes individual commands with timeout protection
+  • Validates command format (alphanumeric, dots, dashes, underscores)
+  • Looks up module in $code{} namespace
+  • SIGALRM-based timeout: 15 seconds (configurable)
+  • Handles scalar and hash returns (extracts 'content' key)
+  • Tracks pending commands for monitoring
+  • Wraps errors as HTML comments for graceful degradation
+
+═══════════════════════════════════════════════════════════════════════════════
+
+TIER 3: CONTENT & RENDERING (File Serving)
+─────────────────────────────────────────────
+
+▶ web.render_skinned_content
+  • Complete content serving pipeline
+  • Path: /data/web/{vhost}/{content_path}
+  • Index file resolution: index.txt → index.md → index.html
+  • Directory listing fallback if no index
+  • Detects content type (txt/md/html)
+  • Processes content through recursive template engine
+  • Wraps in skin template
+  • Generates menu with current path awareness
+  • Extracts/derives page title
+  • Integrates all subsystems
+
+═══════════════════════════════════════════════════════════════════════════════
+
+TIER 4: DIRECTORY SCANNING (File Discovery)
+──────────────────────────────────────────────
+
+▶ web.scan_directory
+  • Recursive directory traversal
+  • File type detection: txt, md, html vs other files
+  • Numeric prefix handling: 01_name for custom ordering
+  • Duplicate name resolution (prefers directories)
+  • Gathers file stats: size, mtime, is_index
+  • Filtering: skips hidden files, .git, backups
+  • Sorting: directories first, then by prefix, then by name
+
+═══════════════════════════════════════════════════════════════════════════════
+
+TIER 5: NAVIGATION & MENUS (User Interface)
+──────────────────────────────────────────────
+
+▶ plugin.web.menu.tree
+  • Hierarchical menu generation from /data/web filesystem
+  • Recursive submenu expansion (default depth: 3)
+  • Active path highlighting:
+    - CSS class "active" = item is in current path
+    - CSS class "current" = exact current page
+  • Only expands active path's directories (lazy expansion)
+  • Semantic HTML with menu-level-N nesting classes
+  • Position awareness: can identify current location in hierarchy
+
+▶ plugin.web.content.dirlist
+  • HTML directory listing with formatted table
+  • Icons: 📁 📄 📎
+  • Columns: Name, Type, Size (formatted), Modified, optional Checksum
+  • Clickable links to files/directories
+  • Size formatting: B, KB, MB, GB, TB
+  • Date format: YYYY-MM-DD HH:MM
+  • CSS classes for styling
+
+═══════════════════════════════════════════════════════════════════════════════
+
+TIER 6: SKINNING & THEMES (Visual Presentation)
+─────────────────────────────────────────────────
+
+▶ web.skin_resolver
+  • Cascade-based skin resolution with 4 priority levels:
+    1. User-selected skin (from preferences)
+    2. Device-detected skin: mobile/tablet/desktop from User-Agent
+    3. Time-based dark mode: 20:00-07:59 or preference override
+    4. Default fallback skin
+  • Validation: alphanumeric, dash, underscore names only
+  • Caching: key = $vhost:skin=$name:dark_mode=$bool
+  • Metadata support: reads metadata.yaml (name, version, author, description)
+  • Returns: skin_name, skin_root path, cascade order, device_type
+
+▶ web.cmd.skin (Operator Command)
+  • resolve: resolve skin for vhost with preferences
+  • list: list available skins
+  • info: show skin directory contents
+
+═══════════════════════════════════════════════════════════════════════════════
+
+TIER 7: COMMAND EXECUTION (Operators)
+──────────────────────────────────────
+
+▶ web.cmd.process-template
+  • Manual template processing from CLI
+  • Usage: process-template <path> [var=value ...]
+  • Validates file (exists, readable, <5MB)
+  • Generates unique template ID
+  • Tracks processing metrics
+  • Returns processed content with timing info
+
+▶ web.cmd.content
+  • Status: STUB (not yet implemented)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+TIER 8: IPC INTEGRATION (Inter-Process Communication)
+───────────────────────────────────────────────────────
+
+▶ web.process_template_ipc
+  • Receives template requests from httpd zenka via IPC
+  • Parameter format: template_id:content_b32r:meta_b32r:session_id
+  • Encoding: base32r to avoid delimiter conflicts
+  • Decodes and parses inputs
+  • Processes recursively
+  • Handles array vs scalar returns
+  • Returns IPC response: mode='size' (success) or mode='false' (error)
+  • Extensive debugging logs
+
+═══════════════════════════════════════════════════════════════════════════════
+
+TIER 9: ASSET MANAGEMENT (Resource Tracking)
+──────────────────────────────────────────────
+
+▶ web.assets.registry
+  • Central asset tracking data structure
+  • Tracks: asset_path, template, source_path, status, timestamps
+  • Statuses: present, missing, copied
+  • Statistics: total_assets, assets_present, assets_missing, assets_copied
+
+▶ web.assets.register
+  • Register individual assets
+  • Parameters: asset_path (required), template (required), source_path, status
+  • Updates totals automatically
+
+▶ web.assets.load_registry
+  • Loads pre-generated YAML registry
+  • File: $PROJECT_ROOT/var/httpd/static/.asset-registry.yaml
+  • Parses stats and asset entries
+  • Requires validator to have run first
+
+▶ web.assets.by_status
+  • Query assets by status: present, missing, copied
+  • Returns array of matching entries
+
+═══════════════════════════════════════════════════════════════════════════════
+
+WHAT'S FULLY IMPLEMENTED:
+═════════════════════════
+
+✓ Recursive template parsing with command execution
+✓ Meta variable substitution (<{varname}>)
+✓ Command extraction and timeout protection
+✓ Nested command support (<[outer:<[inner]>]>)
+✓ Content file serving from /data/web/{vhost}/
+✓ Index file resolution (txt > md > html)
+✓ Directory listing fallback
+✓ Hierarchical menu generation from filesystem
+✓ Active path highlighting in menus
+✓ Recursive submenu expansion
+✓ Skin cascade resolution (user > device > dark > default)
+✓ Device detection (mobile/tablet/desktop)
+✓ Time-based dark mode (20:00-07:59)
+✓ Directory scanning with file type detection
+✓ Numeric prefix ordering (01_, 02_, etc.)
+✓ Asset registry system
+✓ Performance metrics tracking
+✓ Template caching (30-minute TTL)
+✓ IPC integration with httpd
+
+═════════════════════════════════════════════════════════════════════════════════
+
+KEY GAPS FOR SKINNABLE CONTENT PLUGIN WITH MENU AWARENESS:
+═══════════════════════════════════════════════════════════
+
+MISSING (Priority: HIGH):
+─────────────────────────
+1. Breadcrumb generation (derivable from current_path + menu tree)
+2. "Up" navigation to parent directories
+3. Template command registry and documentation system
+4. Skin asset injection (CSS/JS into skin templates)
+5. Menu customization beyond filesystem (custom links, external URLs)
+6. Cache invalidation on content change
+7. Per-page access control / authentication integration
+8. Menu item custom ordering beyond numeric prefix
+
+MISSING (Priority: MEDIUM):
+──────────────────────────
+1. Menu persistence (collapsed/expanded state)
+2. Command parameter validation schemas
+3. Content versioning / draft workflow
+4. Publication scheduling
+5. Error recovery strategies (graceful degradation)
+6. Menu icon implementations
+7. Menu search/filter capability
+
+MISSING (Priority: LOW):
+───────────────────────
+1. Content approval process
+2. Asset path rewriting
+3. Parallel command execution (framework supports it, not used)
+4. Content history tracking
+5. Menu analytics/usage tracking
+
+═════════════════════════════════════════════════════════════════════════════════
+
+CONFIGURATION DEFAULTS:
+══════════════════════
+
+Content base:            /data/web                (web.cfg.base_dir)
+Skins directory:         /var/httpd/skins        (web.cfg.skins_dir)
+Max recursion depth:     8 levels                 (web.cfg.recursion_depth_max)
+Command timeout:         15 seconds               (web.cfg.command_timeout)
+Cache enabled:           Yes, 30-min TTL          (web.cfg.cache_ttl = 1800)
+Max template size:       5 MB                     (web.cfg.template_max_size)
+Parallel commands:       16 max                   (web.cfg.parallel_commands_max)
+Menu scan depth:         3 levels                 (default in plugin.web.menu.tree)
+
+═════════════════════════════════════════════════════════════════════════════════
+
+COMMAND PATTERNS:
+════════════════
+
+Template commands:       <[module.path:arg1:arg2]>
+Meta variables:          <{variable_name}>
+Nested commands:         <[outer:<[inner]>]>
+Template output:         <<COMMAND:id>> (placeholder system)
+
+═════════════════════════════════════════════════════════════════════════════════
+
+INTEGRATION NOTES:
+══════════════════
+
+• All web.* modules are core to the template/content system
+• plugin.web.* modules provide user-facing features (menus, listings)
+• System integrates with:
+  - base.parser.pattern_split (command parsing)
+  - file.slurp (file loading)
+  - chk-sum.elf.vax-BASE32 (checksums)
+  - YAML::Tiny (registry loading)
+  - JSON::XS (meta variable encoding)
+• IPC communication uses base32r encoding for reliability
+• All components track performance metrics
+• Error handling favors graceful degradation over crashes
+
+═════════════════════════════════════════════════════════════════════════════════
