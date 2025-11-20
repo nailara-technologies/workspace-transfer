@@ -18,6 +18,9 @@ context-checkpoints/*.md
 # Session markers (local only)
 .initialized
 
+# Protocol-7 working directory (maintained separately)
+protocol-7/
+
 # Token tracking data (local analytics only)
 .token-stats.log
 .current-session
