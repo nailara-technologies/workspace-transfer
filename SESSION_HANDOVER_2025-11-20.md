@@ -275,8 +275,86 @@ grep -n "base.perlmod.runtime_use\|base.perlmod.pre_init" modules/download.init_
 
 **Ready for httpsd certificate debugging!** 🎯
 
+## Next Session: HTTPS/SSL Certificate Debugging for httpsd Zenka
+
+### Critical Issue Found
+
+**Error Message**:
+```
+httpsd: SSL socket creation failed: cannot set multiple SSL protocols in SSL_version at /usr/share/perl5/IO/Socket/SSL.pm line 690
+httpsd.register_socket: invalid socket supplied
+<< cannot bind protocol 'https' to ''-fd >>
+```
+
+**Symptoms**:
+- httpsd zenka fails to create SSL socket after installing locally signed certificate
+- Socket creation fails at `modules/httpsd.create_ssl_socket` line 52 (SSL_version parameter)
+- IO::Socket::SSL reports "cannot set multiple SSL protocols" error
+- No HTTPS binding occurs, httpsd falls back to HTTP only
+
+### Investigation Points
+
+1. **SSL_version Parameter Issue** (Primary)
+   - File: `modules/httpsd.create_ssl_socket` (line 52)
+   - Configuration: `<httpsd.cfg.tls_version>` defaults to `TLSv1_2`
+   - Problem: Appears to be setting multiple SSL protocols at once
+   - Solution: May need to use `SSL_version => 'TLSv1_2:TLSv1_3'` syntax or separate parameters
+
+2. **Certificate Validation**
+   - File: `modules/httpsd.startup.validate_certificates`
+   - Check if certificate format is correct for locally signed certs
+   - Verify certificate chain (self-signed vs CA-signed)
+   - Confirm key file permissions and format
+
+3. **Error Handling Improvements**
+   - Current: Generic eval error output
+   - Needed: Cleaner error messages with actionable guidance
+   - Enhancement: Add certificate validation details to error output
+   - Enhancement: Log actual IO::Socket::SSL error details
+
+### Implementation Plan
+
+1. **Debug SSL_version Configuration**
+   - Test different SSL_version formats in IO::Socket::SSL
+   - Check if TLSv1_2 is correct syntax for modern Perl IO::Socket::SSL
+   - May need to use SSL_hostname or other configuration options
+
+2. **Improve Error Handling**
+   - Extract and log full IO::Socket::SSL::errstr() details
+   - Add certificate validation checks before socket creation
+   - Provide specific guidance for common certificate issues:
+     - Missing certificate file
+     - Invalid key file format
+     - Mismatched certificate/key pairs
+     - Self-signed vs CA-signed certificate issues
+
+3. **Testing Strategy**
+   - Test with Let's Encrypt certificate (working baseline)
+   - Test with locally signed certificate (current failure case)
+   - Test with different TLS versions
+   - Verify error messages are user-friendly
+
+### Related Files
+- **Main issue**: `modules/httpsd.create_ssl_socket` (line 52 - SSL_version parameter)
+- **Configuration**: `modules/httpsd.init_code` (httpsd.cfg settings)
+- **Certificate validation**: `modules/httpsd.startup.validate_certificates`
+- **Socket registration**: `modules/httpsd.register_socket` (error reporting)
+
+### Previous Session Context
+- SSL/TLS infrastructure is generally stable (from Nov 16-18 work)
+- `base.s_read()` fix for SSL sockets is working
+- Issue is specific to locally signed certificates and SSL_version configuration
+
+---
+
 Next session should focus on:
-1. Verify HTTPS certificate chain loading
-2. Debug any SSL/TLS handshake issues
-3. Test certificate renewal process
-4. Verify ACME challenge integration with letsencrypt zenka
+1. Investigate SSL_version parameter in httpsd.create_ssl_socket
+   - Root cause: "cannot set multiple SSL protocols in SSL_version" error
+   - File location: modules/httpsd.create_ssl_socket line 52
+2. Improve error handling in socket creation
+   - Add cleaner, more actionable error messages
+   - Log full IO::Socket::SSL details for debugging
+3. Test locally signed certificates
+   - Verify certificate format and validation
+   - Compare with working Let's Encrypt setup
+4. Verify ACME challenge integration with letsencrypt zenka after fixes
