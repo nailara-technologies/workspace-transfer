@@ -1,0 +1,268 @@
+================================================================================
+HTTPS HANDLER INVESTIGATION - FINDINGS SUMMARY
+================================================================================
+
+SEARCH CRITERIA AND FINDINGS:
+================================================================================
+
+1. PROTOCOL STATE FOR HTTPS - HOW IS IT DEFINED?
+================================================================================
+FILE: /home/user/protocol-7/modules/httpsd.init_code (lines 64-115)
+
+STATUS: ✅ PROPERLY DEFINED AND REGISTERED
+
+The https protocol state is defined with:
+- Input handler: httpsd.request_handler (NOT generic httpd.request_handler)
+- Output handler: base.handler.write
+- Protocol registration at: $data{'protocol'}{'https'}
+- Socket-type registration at: $data{'io'}{'type'}{'ip.ssl'}
+
+KEY DEFINITION:
+  <protocol.https.state> = {
+      '0' => {
+          'input'  => { 'handler' => 'httpsd.request_handler' },
+          'output' => { 'handler' => 'base.handler.write' }
+      }
+  };
+
+HANDLER CHAIN SETUP: ✅ CORRECT
+  io.ip.ssl.input.read → base.handler.read → httpsd.request_handler
+
+
+2. EVENT LOOP INVOCATION - WHERE/HOW ARE HANDLERS CALLED?
+================================================================================
+FILES INVOLVED:
+  - /home/user/protocol-7/modules/base.session.init (lines 241-250)
+  - /home/user/protocol-7/modules/base.handler.read (lines 1-99)
+  - /home/user/protocol-7/modules/base.handler.input (lines 38-40)
+  - /home/user/protocol-7/modules/net.read_linewise_estimated (lines 1-100)
+  - /home/user/protocol-7/modules/base.s_read (lines 25-58)
+
+INVOCATION CHAIN:
+  1. Event->io() watcher monitors socket FD (poll='r')
+     Location: base.session.init, line 241
+     
+  2. When FD readable, calls: base.handler.read($event)
+     
+  3. base.handler.read routes based on read-mode:
+     - linewise: calls net.read_linewise_estimated()
+     
+  4. net.read_linewise_estimated() calls: base.s_read()
+     
+  5. base.s_read() [CRITICAL]:
+     - Checks if socket is IO::Socket::SSL
+     - If yes: uses $socket->sysread() for decryption
+     - If no: uses IO::AIO::aio_read() for TCP
+     Location: /home/user/protocol-7/modules/base.s_read, lines 25-38
+     
+  6. Session buffer updated with decrypted data
+     
+  7. Buffer watcher triggers base.handler.input()
+     Location: base.session.init, line 160
+     
+  8. base.handler.input() calls protocol-specific handler:
+     $session->{'input'}->{'handler'} = 'httpsd.request_handler'
+     Location: base.handler.input, lines 38-40
+
+STATUS: ✅ CHAIN EXISTS, ⚠️ INVOCATION TIMING QUESTIONABLE
+
+
+3. HANDLER REGISTRATION FOR HTTPS PROTOCOL
+================================================================================
+FILE: /home/user/protocol-7/modules/httpsd.init_code
+
+LEVEL 1 - SOCKET-TYPE REGISTRATION (lines 83-104):
+  $data{'io'}{'type'}{'ip.ssl'} = {
+      'ref'     => 'IO::Socket::SSL',
+      'handler' => {
+          'input' => {
+              'connect' => 'io.ip.ssl.input.connect',
+              'read'    => 'base.handler.read',
+              'write'   => 'base.handler.write'
+          }
+      }
+  };
+
+LEVEL 2 - PROTOCOL HANDLER REGISTRATION (lines 109-115):
+  $data{'protocol'}{'https'} = {
+      'connect' => { 'callback' => undef, 'banner' => '' },
+      'state' => <protocol.https.state>
+  };
+
+HOW IT'S USED BY base.handler.connect:
+  File: /home/user/protocol-7/modules/base.handler.connect
+  Line 29: my $handler = $data{'io'}{'type'}{$type}{'handler'}{$mode}{'connect'};
+  This resolves to: io.ip.ssl.input.connect
+
+STATUS: ✅ PROPERLY REGISTERED AT BOTH LEVELS
+
+
+4. INPUT/OUTPUT STATE HANDLERS FOR HTTPS
+================================================================================
+FILES:
+  - /home/user/protocol-7/modules/base.session.init (socket registration)
+  - /home/user/protocol-7/modules/base.session.init_state (handler assignment)
+  - /home/user/protocol-7/modules/io.ip.ssl.input.open (SSL initialization)
+  - /home/user/protocol-7/modules/io.ip.ssl.input.close (SSL cleanup)
+
+INPUT HANDLER SETUP:
+  1. Session created with protocol='https'
+     Location: base.handler.connect, line 76
+     
+  2. Protocol state initialized:
+     Location: base.session.init, line 267
+     Calls: <[base.session.init_state]>->($id, 0)
+     
+  3. Input handler assigned from state:
+     Location: base.session.init_state, line 48
+     Sets: $session->{'input'}->{'handler'} = 'httpsd.request_handler'
+
+TWO WATCHERS MONITOR INPUT:
+  a) File descriptor watcher (Event->io):
+     Location: base.session.init, lines 241-250
+     Monitors: socket FD
+     Polls: 'r' (readable)
+     Triggers: base.handler.read()
+     
+  b) Buffer variable watcher (event.add_var):
+     Location: base.session.init, lines 160-168
+     Monitors: $session->{'buffer'}->{'input'}
+     Polls: 'w' (on write/modification)
+     Triggers: base.handler.input()
+
+STATUS: ✅ PROPERLY INITIALIZED
+⚠️ POTENTIAL ISSUE: Buffer watcher uses poll='w' which fires on buffer modification,
+   but this might not happen reliably for SSL if base.handler.read isn't called.
+
+
+5. BASE.HANDLER.CONNECT - HTTPS IDENTIFICATION AND SETUP
+================================================================================
+FILE: /home/user/protocol-7/modules/base.handler.connect
+
+HOW IT IDENTIFIES HTTPS:
+  Lines 15-19:
+    my $type  = $data{'handle'}{$fd_srv}{'link'};      # Gets 'ip.ssl'
+    my $proto = $data{'handle'}{$fd_srv}{'protocol'}
+             // $data{'session'}{$id}{'protocol'};     # Gets 'https'
+
+HANDLER SELECTION (Lines 29-43):
+    my $handler = $data{'io'}{'type'}{$type}{'handler'}{$mode}{'connect'};
+    # Resolves to: io.ip.ssl.input.connect
+    
+    my $fd_client = $code{$handler}->($_[0]);  # Call it
+
+SSL CONNECTION ACCEPTANCE:
+  File: /home/user/protocol-7/modules/io.ip.ssl.input.connect
+  Lines 13-55:
+    - Checks: ref($fd) eq 'IO::Socket::SSL'
+    - Calls: $fd->accept() to get client socket
+    - Registers: $data{'handle'}{$client_sock_fd} with 'encryption'=>'tls'
+    - Critical: Also registers by numeric FD (line 41)
+    - Returns: $client_sock_fd (IO::Socket::SSL object)
+
+SESSION CREATION:
+  File: base.handler.connect, line 76
+    my $cid = <[base.session.init]>->($fd_client, 'https', 'input', $name);
+
+STATUS: ✅ PROPERLY IMPLEMENTED
+
+
+================================================================================
+CRITICAL INSIGHT: THE SSL READ HANDLER IS NOW SSL-AWARE
+================================================================================
+
+FILE: /home/user/protocol-7/modules/base.s_read
+
+Lines 25-38 show that base.s_read has been updated to handle SSL sockets:
+
+  if ( ref($read_fh) eq qw| IO::Socket::SSL | ) {
+      # For SSL sockets, use sysread which handles TLS decryption automatically
+      my $b_read = $read_fh->sysread( my $r_buff, $read_len, 0 );
+      
+      if ( defined $b_read && $b_read > 0 ) {
+          utf8::decode($r_buff);
+          $b_read = length($r_buff);
+          $buffer_ref->$* .= $r_buff;
+          return $b_read;
+      } else {
+          return $b_read // -1;
+      }
+  } else {
+      # For TCP sockets, use IO::AIO::aio_read
+      ...
+  }
+
+This means the infrastructure FOR reading encrypted data is in place.
+
+
+================================================================================
+DIFFERENCE BETWEEN HTTP AND HTTPS HANDLER INVOCATION
+================================================================================
+
+TCP/HTTP (WORKS ✅):
+  1. Client connects to port 80
+  2. io.ip.tcp.input.connect accepts → IO::Socket::IP
+  3. Session created with protocol='http'
+  4. Handler set to: httpd.request_handler
+  5. Event loop sees FD as readable (standard TCP)
+  6. base.handler.read() called → base.s_read() → IO::AIO::aio_read()
+  7. Buffer updated → base.handler.input() → httpd.request_handler
+  8. HTTP response sent
+
+SSL/HTTPS (DELAYED UNTIL DISCONNECT ❌):
+  1. Client connects to port 443
+  2. io.ip.ssl.input.connect accepts → IO::Socket::SSL
+  3. Session created with protocol='https'
+  4. Handler set to: httpsd.request_handler
+  5. Event loop should see FD as readable but... ⚠️
+  6. base.handler.read() may not be called during normal processing
+  7. Buffer stays empty → base.handler.input() not triggered
+  8. Handler eventually called during session cleanup after disconnect
+
+
+================================================================================
+ROOT CAUSE: EVENT LOOP TIMING ISSUE WITH SSL
+================================================================================
+
+The problem is NOT with handler registration or the handler chain itself.
+Both are properly configured.
+
+The problem appears to be:
+  - Event loop doesn't recognize SSL socket FD as readable during normal
+    request processing
+  - OR base.handler.read() isn't being called by the Event->io() watcher
+  - OR there's a synchronization issue between FD readable events and
+    buffer watcher activation
+
+This explains why handlers execute AFTER disconnect:
+  - Session cleanup triggers
+  - Which forcefully calls remaining handlers
+  - And handlers execute, but client is already gone
+
+
+================================================================================
+FILES TO EXAMINE FOR DEBUGGING
+================================================================================
+
+Core Handler Files:
+  /home/user/protocol-7/modules/base.handler.read - Main read dispatcher
+  /home/user/protocol-7/modules/base.handler.input - Protocol handler dispatcher
+  /home/user/protocol-7/modules/base.handler.connect - Connection acceptor
+  /home/user/protocol-7/modules/base.s_read - SSL-aware socket read
+
+Session/State Files:
+  /home/user/protocol-7/modules/base.session.init - Event watcher registration
+  /home/user/protocol-7/modules/base.session.init_state - Handler assignment
+
+HTTPS-Specific Files:
+  /home/user/protocol-7/modules/httpsd.init_code - Protocol/socket registration
+  /home/user/protocol-7/modules/httpsd.request_handler - HTTPS request handler
+  /home/user/protocol-7/modules/io.ip.ssl.input.connect - SSL connection accept
+  /home/user/protocol-7/modules/io.ip.ssl.input.open - SSL socket initialization
+  /home/user/protocol-7/modules/io.ip.ssl.input.close - SSL socket cleanup
+
+Event Loop/Watchers:
+  /home/user/protocol-7/modules/base.handler.read (lines 241-250 in base.session.init)
+    Check Event->io() watcher configuration for SSL sockets
+
+================================================================================
