@@ -44,3 +44,4 @@ visualizations/token-dashboard-current.html
 # Temporary files
 /work/
 *.tmp
+setup.log
