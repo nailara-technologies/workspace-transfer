@@ -181,6 +181,7 @@ profiles:
       - libimage-exif-perl
       - libimager-perl
       - libio-aio-perl
+      - libio-compress-perl
       - libio-interface-perl
       - libio-socket-multicast-perl
       - libio-stringy-perl
