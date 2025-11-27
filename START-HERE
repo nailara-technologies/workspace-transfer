@@ -202,18 +202,23 @@ else
     fi
 fi
 
-# Offer to install protocol7_full if in auto-install mode
+# Offer to install development profile if in auto-install mode
 if [ "$AUTO_INSTALL" = true ]; then
     echo ""
-    print_section "Installing full Protocol-7 development environment"
-    bin/deps install protocol7_full
+    print_section "Installing Protocol-7 development environment"
+    cd "$PROTOCOL7_DIR"
+    bin/p7-deps install development
 else
     echo ""
-    echo "Optional: For full Protocol-7 development environment, install with:"
-    echo "  bin/deps install protocol7_full"
+    echo "Optional: For full Protocol-7 development environment (v7, httpd, httpsd, letsencr, etc.), install with:"
+    echo "  cd ../protocol-7"
+    echo "  bin/p7-deps install development"
+    echo ""
+    echo "For GUI/extended tools (GTK3, SDL, Cairo, etc.), use:"
+    echo "  bin/p7-deps install protocol7-extended"
     echo ""
     echo "Or check available profiles:"
-    echo "  bin/deps list"
+    echo "  bin/p7-deps list"
 fi
 
 # Step 7: Print summary and next steps
@@ -232,9 +237,10 @@ echo ""
 echo "2. Understand the workflow:"
 echo "   cat docs/onboarding/PROTOCOL7_SETUP.md"
 echo ""
-echo "3. Check dependencies (optional):"
-echo "   bin/deps check protocol7-full"
-echo "   bin/deps install protocol7-full"
+echo "3. Install Protocol-7 development dependencies (optional):"
+echo "   cd ../protocol-7"
+echo "   bin/p7-deps install development       # For v7, httpd, httpsd, letsencr, etc."
+echo "   bin/p7-deps install protocol7-extended # For GUI tools (GTK3, SDL, Cairo)"
 echo ""
 echo "4. Start working on protocol-7:"
 echo "   cd ../protocol-7"
