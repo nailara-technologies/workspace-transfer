@@ -153,7 +153,19 @@ cd /home/user/protocol-7
 **Reference**: `task-archive/NEXT_SESSION_WEB_ZENKA_HANDOFF.md`
 **Critical Blocker**: Recovery of `base.parser.pattern_split`
 
-### Option 4: Phase 2 - Integration Tasks
+### Option 4: Link-Upgrade Client-Side Encryption
+**Priority**: HIGH (Protocol-7 security)
+**Scope**: Implement C25519 + ChaCha20-Poly1305 encryption in bin/p7.c and nshell
+**Status**: Server-side (Phase 1) is COMPLETE. Client needs implementation.
+**Estimated Work**: 8-12 hours
+**Reference**: `/home/user/protocol-7/HANDOVER_SESSION_020_CLIENT_ENCRYPTION.md`
+**What It Does**:
+- Ephemeral C25519 key generation for each session
+- ChaCha20-Poly1305 AEAD encryption with per-message nonces
+- Link-upgrade protocol handshake (state 2→3 transition)
+- Transparent message encryption/decryption in client
+
+### Option 5: Phase 2 - Integration Tasks
 **Priority**: MEDIUM
 **Scope**: Import Protocol-7 work into workspace-transfer repositories
 **Estimated Work**: 20+ hours
