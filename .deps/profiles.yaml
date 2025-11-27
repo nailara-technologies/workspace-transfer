@@ -121,6 +121,9 @@ profiles:
         sudo: true
     symlinks:
       - target: "bin/Protocol-7"
+        link: "/usr/local/bin/p7.work"
+        sudo: true
+      - target: "bin/Protocol-7"
         link: "/usr/local/bin/p7.v7"
         sudo: true
       - target: "bin/Protocol-7"
