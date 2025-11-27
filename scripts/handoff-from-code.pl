@@ -174,6 +174,7 @@ sub generate_session_summary {
             say "\n### Uncommitted Changes";
             say "```";
             for my $file (@{$git_summary->{changed_files}}[0..9]) {
+                next unless defined $file;
                 say "  $file";
             }
             say "..." if @{$git_summary->{changed_files}} > 10;
