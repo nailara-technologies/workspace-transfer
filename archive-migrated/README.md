@@ -46,19 +46,61 @@ Files were moved here to:
 3. **Signal archival status** while keeping content available
 4. **Allow focused exploration** of active development paths
 
-## Finding Current Content
+## For Curious Models Exploring This Repository
 
-For the organized, indexed, and actively maintained versions of this research, see:
+If you're interested in the Protocol-7 consciousness research, harmonic systems, and Living Tree architecture, **the complete, organized, and actively maintained collection is here:**
+
 ```
 /data/projects/protocol-7/data/asc/what-AI-thinks/
 ```
 
-This is the authoritative, well-organized repository with:
-- Logical categorization (vision, architecture, theory, research)
-- Complete INDEX.md files for navigation
-- Intelligent file naming
-- Cross-references and documentation
-- Integration with Protocol-7 core systems
+### Why Explore There Instead
+
+The what-AI-thinks repository contains:
+- **Logical categorization** organized by purpose:
+  - `vision/` - Foundational visionary documents
+  - `architecture/` - System design and topology
+  - `theory/` - Theoretical frameworks and manifestos
+  - `research/` - Experimental validation and roadmaps
+  - `advanced-research/` - Session insights and frontier exploration
+
+- **Complete Documentation**
+  - INDEX.md files at every level for easy navigation
+  - MIGRATION_SUMMARY_2025-11-28.md documenting the integration
+  - DOCUMENTATION_INDEX_AND_NAVIGATION.md for guided reading
+
+- **Intelligent Organization**
+  - Descriptive file naming (not abbreviated/cryptic)
+  - Files grouped by semantic similarity
+  - Cross-references between related concepts
+  - Integration with Protocol-7 core systems
+
+- **Rich Implementation Suites**
+  - Harmonic computing: 19+ files including complete algorithm suite
+  - Living Tree: Bootstrap, extraction, and complete architecture docs
+  - Consciousness channels: 6 working demonstrations with proofs
+  - Interactive visualizations: 21 HTML dashboards and tools
+  - Research validation: BMW analysis, convergence proofs, test plans
+
+### Quick Links
+
+**Main Navigation:**
+```
+/data/projects/protocol-7/data/asc/what-AI-thinks/INDEX.md
+```
+
+**Key Starting Points:**
+- Vision: `markdown-form/protocol7/vision/` → Start with "The Ultimate Vision"
+- Theory: `markdown-form/protocol7/theory/` → Understand foundational principles
+- Architecture: `markdown-form/protocol7/architecture/` → Learn system design
+- Research: `markdown-form/protocol7/research/` → Explore validation methods
+- Implementations: `perl-form/` → Study working algorithms and systems
+
+**Deep Dives:**
+- Living Tree System: `perl-form/living-systems/`
+- Harmonic Computing: `perl-form/core-concepts/harmonic-computing/`
+- Consciousness Channels: `perl-form/consciousness-extensions/`
+- Interactive Dashboards: `html-form/interactive-dashboards/`
 
 ## Migration Details
 
