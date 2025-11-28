@@ -2,18 +2,23 @@
 
 **STOP!** Before reading anything else, you MUST initialize this workspace.
 
+Works on: Claude Console • Claude Code Web • Local machines
+
 ---
 
 ## ⚡ Quick Initialization (< 5 seconds)
 
 ```bash
-# You should already be in: /home/claude/workspace-transfer
-# If not: cd /home/claude/workspace-transfer
+# Step 1: Navigate to workspace-transfer directory
+# If you just cloned:
+#   cd workspace-transfer
+# If it already exists:
+#   cd ~/workspace-transfer  (or wherever you cloned it)
 
-# Step 1: Bootstrap (auto-configures everything)
+# Step 2: Bootstrap (auto-configures everything)
 perl bootstrap.pl
 
-# Step 2: Verify initialization
+# Step 3: Verify initialization
 perl init.pl
 ```
 
@@ -61,10 +66,10 @@ perl creative-checkpoint.pl
 
 ## 🧪 Self-Test (In The Wild)
 
-This mechanism tests itself:
+This mechanism tests itself across all environments:
 
 1. **New Claude starts** → Sees this file first
-2. **Runs bootstrap** → Gets configured in 5 seconds
+2. **Runs bootstrap** → Gets configured in 5 seconds (detects environment)
 3. **Runs init.pl** → Gets green light
 4. **Runs status-check** → Gets told what to do
 5. **Follows instructions** → Actually works on task
@@ -97,9 +102,14 @@ perl status-check.pl
 ## 🔧 Troubleshooting
 
 ### "Cannot find bootstrap.pl"
-You're not in the repository directory:
+You're not in the repository directory. Find it first:
 ```bash
-cd /home/claude/workspace-transfer
+# If you just cloned:
+cd workspace-transfer
+
+# If it exists elsewhere:
+cd ~/workspace-transfer
+ls -la bootstrap.pl  # verify file exists
 ```
 
 ### "Permission denied"
@@ -109,10 +119,29 @@ chmod +x bootstrap.pl init.pl status-check.pl
 ```
 
 ### ".credentials not found"
-Bootstrap will warn you. You can:
-- Copy `.credentials.template` to `.credentials` and add token
-- OR: Set environment variable `GITHUB_TOKEN`
-- For read-only work, you can proceed without credentials
+Bootstrap will guide you. Choose the best method for your environment:
+
+**Claude Console / Claude Code Web:**
+- ✅ Automatic - Uses Anthropic JWT proxy (no action needed)
+
+**Local Machine:**
+- Option 1: Create `.credentials` file (see `.credentials.template`)
+- Option 2: Set `GITHUB_TOKEN` environment variable
+- Option 3: Use SSH keys (git should auto-detect)
+
+For read-only work, you can proceed without credentials.
+
+---
+
+## 🌍 Environment Detection
+
+Bootstrap automatically detects which environment you're in:
+
+- **Claude Console**: `/home/claude` (full automatic setup)
+- **Claude Code Web**: `/home/user` (full automatic setup)
+- **Local Machine**: Any path (uses SSH or provided credentials)
+
+All paths are resolved dynamically. No need to hardcode anything.
 
 ---
 
